@@ -1,0 +1,143 @@
+/**
+ * Layer 2 — the animation catalogue.
+ * No game and no component defines its own @keyframes. If something new is
+ * needed, it is added HERE so the whole app moves the same way.
+ * Reference: docs/DESIGN_SYSTEM.md §5.3
+ *
+ * Rule: only `transform` and `opacity`. Anything else janks on mobile.
+ */
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-4px);
+  }
+
+  40% {
+    transform: translateX(4px);
+  }
+
+  60% {
+    transform: translateX(-3px);
+  }
+
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes reveal-wave {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes draw-stroke {
+  from {
+    stroke-dashoffset: 100%;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ─────────── Utility classes ─────────── */
+
+.anim-pop-in {
+  animation: pop-in var(--d-fast) var(--e-spring) backwards;
+}
+
+.anim-slide-up {
+  animation: slide-up var(--d-slow) var(--e-out) backwards;
+}
+
+.anim-view-in {
+  animation: view-in var(--d-slow) var(--e-out) backwards;
+}
+
+.anim-shake {
+  animation: shake var(--d-base) var(--e-in-out);
+}
+
+.anim-pulse-soft {
+  animation: pulse-soft 1.6s var(--e-in-out) infinite;
+}
+
+/*
+ * Staggered entrance. Pass the index as a custom property:
+ *   <li style={{ '--i': index }} className="anim-stagger">
+ * The delay is capped so a long list never leaves the user waiting.
+ * See docs/STYLING.md §5 on why this inline style is allowed.
+ */
+.anim-stagger {
+  animation: pop-in var(--d-base) var(--e-out) backwards;
+  animation-delay: min(calc(var(--i, 0) * var(--stagger-step)), var(--stagger-max));
+}

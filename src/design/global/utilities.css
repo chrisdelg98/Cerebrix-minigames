@@ -1,0 +1,39 @@
+/**
+ * Layer 2 — the closed list of global utilities.
+ * This is NOT a utility framework. Adding one requires a reason in the PR.
+ * Reference: docs/STYLING.md §4
+ */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap, var(--sp-4));
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--gap, var(--sp-3));
+}
+
+.center {
+  display: grid;
+  place-items: center;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Digits must not shift width as they change — timers, counters, cell values. */
+.tabular {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}

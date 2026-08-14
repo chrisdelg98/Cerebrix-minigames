@@ -1,0 +1,45 @@
+/**
+ * Layer 1 — raw palette.
+ * The ONLY file in the repo allowed to contain literal colour values.
+ * Never consume --raw-* from a component; go through theme.css.
+ * Reference: docs/DESIGN_SYSTEM.md §2.1
+ */
+:root {
+  /* Neutrals — blue-tinted grey, the base of the whole UI */
+  --raw-slate-50: #f7f8fa;
+  --raw-slate-100: #edeff3;
+  --raw-slate-200: #dde1e9;
+  --raw-slate-300: #c3c9d6;
+  --raw-slate-400: #9aa3b5;
+  --raw-slate-500: #6e7891;
+  --raw-slate-600: #4e566c;
+  --raw-slate-700: #363d4f;
+  --raw-slate-800: #232838;
+  --raw-slate-900: #171b27;
+  --raw-slate-950: #0e1119;
+  --raw-slate-1000: #0a0c12;
+
+  /* Primary accent — electric violet, the brand colour */
+  --raw-violet-300: #c4b5fd;
+  --raw-violet-400: #a78bfa;
+  --raw-violet-500: #8b5cf6;
+  --raw-violet-600: #6c4cf1;
+  --raw-violet-700: #5533d4;
+  --raw-violet-900: #2e1b6b;
+
+  /* Secondary accent — amber. Streaks, records and achievements ONLY. */
+  --raw-amber-400: #ffc24d;
+  --raw-amber-500: #ffb020;
+  --raw-amber-600: #e08c00;
+
+  /* Semantic */
+  --raw-green-500: #2fbf71;
+  --raw-green-600: #1e9e59;
+  --raw-red-500: #f0426a;
+  --raw-red-600: #d42450;
+  --raw-blue-500: #3ea6ff;
+  --raw-blue-600: #1e86e0;
+
+  --raw-white: #ffffff;
+  --raw-black: #000000;
+}

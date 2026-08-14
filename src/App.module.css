@@ -1,0 +1,95 @@
+/* Phase 0 placeholder — replaced by the real shell in Phase 1. */
+
+@layer components {
+  .main {
+    display: grid;
+    place-items: center;
+    min-block-size: 100dvh;
+    padding: var(--sp-4);
+    padding-block-end: calc(var(--sp-4) + env(safe-area-inset-bottom));
+  }
+
+  .card {
+    inline-size: min(100%, 460px);
+    padding: var(--sp-5);
+    background-color: var(--c-surface);
+    border: var(--bw-base) solid var(--c-border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+    animation: slide-up var(--d-slow) var(--e-out) backwards;
+  }
+
+  .eyebrow {
+    color: var(--c-accent);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .title {
+    margin-block: var(--sp-1) var(--sp-2);
+    font-size: var(--fs-3xl);
+  }
+
+  .tagline {
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  .phases {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    margin-block-start: var(--sp-5);
+    list-style: none;
+  }
+
+  .phase {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-2) var(--sp-3);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-hair) solid var(--c-border-hairline);
+    border-radius: var(--r-md);
+    transition-property: transform, border-color;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .phase[data-done='true'] {
+    border-color: var(--c-success);
+  }
+
+  /* Hover only where a real pointer exists — docs/DESIGN_SYSTEM.md §7.3 */
+  @media (hover: hover) and (pointer: fine) {
+    .phase:hover {
+      transform: translateX(4px);
+      border-color: var(--c-accent);
+    }
+  }
+
+  .phaseIndex {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: 24px;
+    block-size: 24px;
+    background-color: var(--c-surface-sunken);
+    border-radius: var(--r-sm);
+    color: var(--c-text-subtle);
+    font-family: var(--font-num);
+    font-size: var(--fs-xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .phase[data-done='true'] .phaseIndex {
+    background-color: var(--c-success-soft);
+    color: var(--c-success);
+  }
+
+  .phaseLabel {
+    font-size: var(--fs-sm);
+  }
+}

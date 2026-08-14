@@ -1,0 +1,37 @@
+/**
+ * Layer 1 — typography.
+ * Reference: docs/DESIGN_SYSTEM.md §3
+ *
+ * Fonts are system-stack for now. Self-hosted variable fonts land in Phase 2,
+ * subset and preloaded — never Google Fonts at runtime (blocks render on 3G).
+ */
+:root {
+  --font-ui: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', roboto, sans-serif;
+  --font-num: ui-monospace, 'SF Mono', 'Cascadia Mono', consolas, monospace;
+
+  /* Scale — 16px base, 1.25 ratio (major third) */
+  --fs-2xs: 0.694rem;
+  --fs-xs: 0.8rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.563rem;
+  --fs-2xl: 1.953rem;
+  --fs-3xl: 2.441rem;
+
+  /* Weights */
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-bold: 700;
+  --fw-black: 800;
+
+  /* Line heights */
+  --lh-tight: 1.15;
+  --lh-snug: 1.35;
+  --lh-body: 1.6;
+
+  /* Tracking */
+  --ls-tight: -0.02em;
+  --ls-normal: 0;
+  --ls-wide: 0.06em;
+}

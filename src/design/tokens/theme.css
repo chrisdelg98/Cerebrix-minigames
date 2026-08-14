@@ -1,0 +1,102 @@
+/**
+ * Layer 1 — semantic tokens.
+ * This is what components consume. Changing a value here repaints the app.
+ * Reference: docs/DESIGN_SYSTEM.md §2.2
+ */
+
+:root,
+[data-theme='dark'] {
+  /* Surfaces */
+  --c-bg: var(--raw-slate-950);
+  --c-surface: var(--raw-slate-900);
+  --c-surface-raised: var(--raw-slate-800);
+  --c-surface-sunken: var(--raw-slate-1000);
+
+  /* Text */
+  --c-text: var(--raw-slate-50);
+  --c-text-muted: var(--raw-slate-400);
+  --c-text-subtle: var(--raw-slate-500);
+  --c-text-on-accent: var(--raw-white);
+
+  /* Borders */
+  --c-border: var(--raw-slate-700);
+  --c-border-strong: var(--raw-slate-600);
+  --c-border-hairline: var(--raw-slate-800);
+
+  /* Accent */
+  --c-accent: var(--raw-violet-500);
+  --c-accent-hover: var(--raw-violet-400);
+  --c-accent-press: var(--raw-violet-600);
+  --c-accent-soft: color-mix(in oklab, var(--raw-violet-500) 18%, transparent);
+  --c-accent-ring: color-mix(in oklab, var(--raw-violet-400) 55%, transparent);
+
+  /* Highlight — streaks, records, achievements */
+  --c-gold: var(--raw-amber-400);
+  --c-gold-soft: color-mix(in oklab, var(--raw-amber-400) 16%, transparent);
+
+  /* Semantic feedback */
+  --c-success: var(--raw-green-500);
+  --c-success-soft: color-mix(in oklab, var(--raw-green-500) 16%, transparent);
+  --c-danger: var(--raw-red-500);
+  --c-danger-soft: color-mix(in oklab, var(--raw-red-500) 16%, transparent);
+  --c-info: var(--raw-blue-500);
+  --c-info-soft: color-mix(in oklab, var(--raw-blue-500) 16%, transparent);
+
+  /* Board cells — shared by every game */
+  --c-cell: var(--raw-slate-800);
+  --c-cell-hover: var(--raw-slate-700);
+  --c-cell-active: var(--c-accent-soft);
+  --c-cell-fixed: var(--raw-slate-900);
+  --c-cell-peer: color-mix(in oklab, var(--raw-violet-500) 8%, transparent);
+  --c-cell-error: var(--c-danger-soft);
+  --c-cell-hint: var(--c-info-soft);
+
+  /* Solid neobrutalist shadow */
+  --c-shadow: var(--raw-black);
+
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --c-bg: var(--raw-slate-50);
+  --c-surface: var(--raw-white);
+  --c-surface-raised: var(--raw-white);
+  --c-surface-sunken: var(--raw-slate-100);
+
+  --c-text: var(--raw-slate-900);
+  --c-text-muted: var(--raw-slate-500);
+  --c-text-subtle: var(--raw-slate-400);
+  --c-text-on-accent: var(--raw-white);
+
+  --c-border: var(--raw-slate-300);
+  --c-border-strong: var(--raw-slate-400);
+  --c-border-hairline: var(--raw-slate-200);
+
+  --c-accent: var(--raw-violet-600);
+  --c-accent-hover: var(--raw-violet-500);
+  --c-accent-press: var(--raw-violet-700);
+  --c-accent-soft: color-mix(in oklab, var(--raw-violet-600) 12%, transparent);
+  --c-accent-ring: color-mix(in oklab, var(--raw-violet-600) 45%, transparent);
+
+  --c-gold: var(--raw-amber-600);
+  --c-gold-soft: color-mix(in oklab, var(--raw-amber-500) 20%, transparent);
+
+  --c-success: var(--raw-green-600);
+  --c-success-soft: color-mix(in oklab, var(--raw-green-600) 14%, transparent);
+  --c-danger: var(--raw-red-600);
+  --c-danger-soft: color-mix(in oklab, var(--raw-red-600) 12%, transparent);
+  --c-info: var(--raw-blue-600);
+  --c-info-soft: color-mix(in oklab, var(--raw-blue-600) 12%, transparent);
+
+  --c-cell: var(--raw-white);
+  --c-cell-hover: var(--raw-slate-100);
+  --c-cell-active: var(--c-accent-soft);
+  --c-cell-fixed: var(--raw-slate-100);
+  --c-cell-peer: color-mix(in oklab, var(--raw-violet-600) 7%, transparent);
+  --c-cell-error: var(--c-danger-soft);
+  --c-cell-hint: var(--c-info-soft);
+
+  --c-shadow: var(--raw-slate-900);
+
+  color-scheme: light;
+}

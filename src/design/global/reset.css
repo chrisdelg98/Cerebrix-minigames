@@ -1,0 +1,68 @@
+/**
+ * Layer 2 — reset.
+ * Reference: docs/STYLING.md §2
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* dvh, never vh: the mobile URL bar breaks vh. */
+  block-size: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-block-size: 100dvh;
+  /* Stops the accidental pull-to-refresh while dragging on a board. */
+  overscroll-behavior-y: none;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-inline-size: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  /* Removes the 300ms tap delay on mobile. */
+  touch-action: manipulation;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+#root {
+  isolation: isolate;
+  min-block-size: 100dvh;
+}

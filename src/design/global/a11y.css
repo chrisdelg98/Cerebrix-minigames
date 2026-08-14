@@ -1,0 +1,69 @@
+/**
+ * Layer 2 — accessibility baseline.
+ * Reference: docs/DESIGN_SYSTEM.md §5.5 and §10
+ */
+
+/* Focus is always visible. `outline: none` without a replacement is forbidden. */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: var(--r-sm);
+}
+
+.sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link — visible only when focused */
+.skip-link {
+  position: absolute;
+  inset-block-start: var(--sp-2);
+  inset-inline-start: var(--sp-2);
+  z-index: 100;
+  padding: var(--sp-2) var(--sp-4);
+  background-color: var(--c-surface-raised);
+  border-radius: var(--r-md);
+  transform: translateY(-200%);
+  transition-property: transform;
+  transition-duration: var(--d-fast);
+  transition-timing-function: var(--e-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/*
+ * Motion opt-out, two channels:
+ *   1. the OS setting (prefers-reduced-motion)
+ *   2. the in-app toggle, which writes data-motion="reduced" on <html>
+ * Every animation's END STATE must be correct even if it never runs.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+[data-motion='reduced'],
+[data-motion='reduced'] *,
+[data-motion='reduced'] *::before,
+[data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

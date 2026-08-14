@@ -1,0 +1,23 @@
+/**
+ * Layer 1 — motion.
+ * Every duration and curve in the app comes from here. No literals anywhere else.
+ * Reference: docs/DESIGN_SYSTEM.md §5.1
+ */
+:root {
+  /* Durations */
+  --d-instant: 80ms;
+  --d-fast: 140ms;
+  --d-base: 220ms;
+  --d-slow: 360ms;
+  --d-slower: 600ms;
+
+  /* Curves */
+  --e-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --e-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --e-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --e-snap: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Stagger — cascades never wait longer than --stagger-max */
+  --stagger-step: 22ms;
+  --stagger-max: 260ms;
+}

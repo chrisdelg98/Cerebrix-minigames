@@ -1,0 +1,55 @@
+/**
+ * Layer 1 — spacing, radii, borders, shadows, focus ring.
+ * Reference: docs/DESIGN_SYSTEM.md §4
+ */
+:root {
+  /* Spacing — 4px base */
+  --sp-0: 0;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4rem;
+
+  /* Radii — soft cubic */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-full: 999px;
+
+  /* Border widths */
+  --bw-hair: 1px;
+  --bw-base: 2px;
+  --bw-thick: 3px;
+
+  /* Solid offset shadows — soft neobrutalism */
+  --sh-sm: 2px 2px 0 0 var(--c-shadow);
+  --sh-md: 4px 4px 0 0 var(--c-shadow);
+  --sh-lg: 6px 6px 0 0 var(--c-shadow);
+  --sh-none: 0 0 0 0 var(--c-shadow);
+
+  /* Diffuse elevation — modals and floating menus only */
+  --sh-pop: 0 12px 32px -8px rgb(0 0 0 / 45%);
+
+  /* Focus — identical across the whole app */
+  --ring: 0 0 0 3px var(--c-accent-ring);
+  --ring-offset: 0 0 0 2px var(--c-bg), 0 0 0 5px var(--c-accent-ring);
+
+  /* Minimum touch target — WCAG 2.5.5 */
+  --touch-min: 44px;
+
+  /* Shell layout */
+  --header-h: 56px;
+  --footer-h: 64px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 64px;
+  }
+}

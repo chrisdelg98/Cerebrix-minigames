@@ -1,0 +1,27 @@
+/**
+ * The single global stylesheet entry point.
+ *
+ * Layer order is declared up front so the cascade never depends on import
+ * order or on selector specificity games. A game can always override a shared
+ * component without !important, and the override stays obvious in the diff.
+ *
+ * Reference: docs/STYLING.md §1
+ */
+@layer tokens, base, components, game, overrides;
+
+@import url('./tokens/palette.css') layer(tokens);
+@import url('./tokens/theme.css') layer(tokens);
+@import url('./tokens/space.css') layer(tokens);
+@import url('./tokens/motion.css') layer(tokens);
+@import url('./tokens/type.css') layer(tokens);
+
+@import url('./global/reset.css') layer(base);
+@import url('./global/elements.css') layer(base);
+@import url('./global/a11y.css') layer(base);
+@import url('./global/utilities.css') layer(base);
+@import url('./animations.css') layer(base);
+
+/*
+ * `overrides` stays declared and empty on purpose: it is the last-resort escape
+ * hatch. Anything landing there must carry a comment explaining why.
+ */

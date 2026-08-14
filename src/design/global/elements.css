@@ -1,0 +1,68 @@
+/**
+ * Layer 2 — base element styling.
+ * Everything here applies app-wide without anyone opting in.
+ * Reference: docs/STYLING.md §2
+ */
+
+body {
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  transition-property: background-color, color;
+  transition-duration: var(--d-base);
+  transition-timing-function: var(--e-out);
+}
+
+h1,
+h2,
+h3 {
+  font-weight: var(--fw-black);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+}
+
+h1 {
+  font-size: var(--fs-2xl);
+}
+
+h2 {
+  font-size: var(--fs-xl);
+}
+
+h3 {
+  font-size: var(--fs-lg);
+}
+
+a {
+  color: var(--c-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+::selection {
+  background-color: var(--c-accent-soft);
+  color: var(--c-text);
+}
+
+/* Scrollbars — themed, unobtrusive */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  inline-size: 10px;
+  block-size: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--c-border-strong);
+  border-radius: var(--r-full);
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}

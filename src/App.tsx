@@ -37,7 +37,7 @@ export function App() {
               key={phase.id}
               className={`${s.phase} anim-stagger`}
               data-done={phase.done}
-              style={{ '--i': i } satisfies CSSVars}
+              style={{ '--i': i } as CSSVars}
             >
               <span className={s.phaseIndex}>{phase.id}</span>
               <span className={s.phaseLabel}>{phase.label}</span>

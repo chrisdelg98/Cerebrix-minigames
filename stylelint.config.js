@@ -15,28 +15,24 @@ export default {
     'declaration-property-value-disallowed-list': {
       // Raw palette values must be consumed through semantic tokens.
       '/.*/': [/var\(\s*--raw-/],
+
+      // Animating layout properties forces reflow on every frame and janks on
+      // mobile. `all` is worse still — it transitions whatever happens to
+      // change. Only compositor-friendly properties belong here.
+      // docs/DESIGN_SYSTEM.md §5.2
+      'transition-property': [
+        /\b(all|width|height|inline-size|block-size|top|right|bottom|left|inset|margin|padding)\b/,
+      ],
     },
 
     // No !important, ever. Use @layer ordering instead (docs/STYLING.md §1).
     'declaration-no-important': true,
 
     /* ── Motion: only compositor-friendly properties ── */
-    'property-disallowed-list': [
-      // Shorthand `transition`/`animation` hide what is being animated.
-      'transition',
-      'animation',
-    ],
-    'declaration-property-value-allowed-list': {
-      'transition-property': [
-        'transform',
-        'opacity',
-        'color',
-        'background-color',
-        'border-color',
-        'box-shadow',
-        'none',
-      ],
-    },
+    // The `transition` shorthand hides what is being animated, so it is banned
+    // in favour of explicit transition-property. The `animation` shorthand is
+    // fine: the keyframes name says exactly what runs.
+    'property-disallowed-list': ['transition'],
 
     /* ── CSS Modules: camelCase, matching vite.config.ts localsConvention ── */
     'selector-class-pattern': [
@@ -51,6 +47,14 @@ export default {
     'max-nesting-depth': [2, { ignore: ['pseudo-classes'] }],
     'no-descending-specificity': null,
     'custom-property-pattern': null,
+
+    // Token files group related custom properties with a blank line and a
+    // comment. That grouping is the whole point of the file — keep it.
+    'custom-property-empty-line-before': null,
+
+    // Safari still needs -webkit-user-select for boards, and iOS Safari needs
+    // the tap-highlight property, which has no unprefixed form at all.
+    'property-no-vendor-prefix': [true, { ignoreProperties: ['user-select', 'tap-highlight-color'] }],
   },
 
   overrides: [

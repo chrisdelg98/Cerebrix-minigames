@@ -9,33 +9,33 @@
 
 El plan de partida era correcto en su tesis central: **el contrato primero, los juegos después**. Estos son los ajustes:
 
-| # | Cambio | Razón |
-|---|--------|-------|
-| 1 | **`render` sale de la interfaz del motor.** El contrato se parte en `engine` (lógica pura, sin React) + `View` (componente). | Si `render` vive en la misma interfaz que `validate`, el motor queda casado con el framework. Separados, la lógica se testea sin DOM, corre en un Web Worker y sobrevive a un cambio de UI. Es la mejora estructural más importante. |
-| 2 | **Los tokens de diseño se crean en Fase 1, no en Fase 2.** | El shell necesita *algún* color desde el minuto uno. Se crean los tokens (10 min de trabajo) y el shell los consume desde el principio; la Fase 2 construye los componentes y el estilo real sobre esa base ya conectada. Evita reescribir el shell entero. |
-| 3 | **Persistencia con `schemaVersion` y migraciones desde el día 1.** | El original guarda estado sin versionar. La primera vez que cambies la forma del estado de Sudoku, todas las partidas guardadas de tus usuarios revientan. Un campo `schemaVersion` + una tabla de migraciones cuesta 20 líneas ahora y es imposible de retrofittear después. |
-| 4 | **Autosave por evento, no por intervalo.** Se guarda con debounce tras cada jugada **y** en `visibilitychange`. | En móvil el sistema mata la pestaña sin avisar. Un `setInterval` de 10s pierde las últimas jugadas; `visibilitychange` es el único evento confiable. |
-| 5 | **Generación de Sudoku en Web Worker.** | El backtracking con verificación de unicidad puede tardar segundos en un móvil de gama media. En el hilo principal congela la UI y arruina el "super fluido". |
-| 6 | **Fase 7 nueva: pulido, PWA y presupuesto de performance.** | El plan original terminaba en "dos juegos corriendo". Falta el trabajo que hace que se sienta bien en el transporte: offline, instalable, y medición real de FPS en un dispositivo lento. |
-| 7 | **Cada fase tiene criterios de aceptación verificables**, no solo un hito narrativo. | "Hito: el shell carga cualquier plugin" es una intención. "El test `registry.test.ts` monta un módulo falso sin que `/core` lo importe" es una verificación. |
-| 8 | **`/core` no importa de `/games` — con un lint que lo hace fallar.** | La regla del plan original es la correcta, pero una regla que no está automatizada se rompe a las tres semanas. Se enforcea con `eslint-plugin-boundaries` en CI. |
+| #   | Cambio                                                                                                                       | Razón                                                                                                                                                                                                                                                                         |
+| --- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **`render` sale de la interfaz del motor.** El contrato se parte en `engine` (lógica pura, sin React) + `View` (componente). | Si `render` vive en la misma interfaz que `validate`, el motor queda casado con el framework. Separados, la lógica se testea sin DOM, corre en un Web Worker y sobrevive a un cambio de UI. Es la mejora estructural más importante.                                          |
+| 2   | **Los tokens de diseño se crean en Fase 1, no en Fase 2.**                                                                   | El shell necesita _algún_ color desde el minuto uno. Se crean los tokens (10 min de trabajo) y el shell los consume desde el principio; la Fase 2 construye los componentes y el estilo real sobre esa base ya conectada. Evita reescribir el shell entero.                   |
+| 3   | **Persistencia con `schemaVersion` y migraciones desde el día 1.**                                                           | El original guarda estado sin versionar. La primera vez que cambies la forma del estado de Sudoku, todas las partidas guardadas de tus usuarios revientan. Un campo `schemaVersion` + una tabla de migraciones cuesta 20 líneas ahora y es imposible de retrofittear después. |
+| 4   | **Autosave por evento, no por intervalo.** Se guarda con debounce tras cada jugada **y** en `visibilitychange`.              | En móvil el sistema mata la pestaña sin avisar. Un `setInterval` de 10s pierde las últimas jugadas; `visibilitychange` es el único evento confiable.                                                                                                                          |
+| 5   | **Generación de Sudoku en Web Worker.**                                                                                      | El backtracking con verificación de unicidad puede tardar segundos en un móvil de gama media. En el hilo principal congela la UI y arruina el "super fluido".                                                                                                                 |
+| 6   | **Fase 7 nueva: pulido, PWA y presupuesto de performance.**                                                                  | El plan original terminaba en "dos juegos corriendo". Falta el trabajo que hace que se sienta bien en el transporte: offline, instalable, y medición real de FPS en un dispositivo lento.                                                                                     |
+| 7   | **Cada fase tiene criterios de aceptación verificables**, no solo un hito narrativo.                                         | "Hito: el shell carga cualquier plugin" es una intención. "El test `registry.test.ts` monta un módulo falso sin que `/core` lo importe" es una verificación.                                                                                                                  |
+| 8   | **`/core` no importa de `/games` — con un lint que lo hace fallar.**                                                         | La regla del plan original es la correcta, pero una regla que no está automatizada se rompe a las tres semanas. Se enforcea con `eslint-plugin-boundaries` en CI.                                                                                                             |
 
 ---
 
 ## 🧱 Decisiones base (cerradas)
 
-| Decisión | Elección |
-|----------|----------|
-| **Framework** | React 19 + TypeScript (`strict`) |
-| **Bundler** | Vite 6 |
-| **Estado del shell** | Zustand (~1 kB). El estado *del juego* vive en su engine, no acá. |
-| **Estilos** | CSS Modules + custom properties. Sin Tailwind: el design system se define en tokens y no quiero dos fuentes de verdad. |
-| **Router** | React Router v7 (`createBrowserRouter` + `lazy`) |
-| **Persistencia** | IndexedDB vía `idb`, detrás de una interfaz propia |
-| **Tests** | Vitest (lógica) + Testing Library (componentes) + Playwright (E2E, desde Fase 6) |
-| **Sprites** | SVG inline animado con CSS (ver `DESIGN_SYSTEM.md` §6) |
-| **Backend** | Ninguno en v1. La capa `/storage` deja la puerta abierta. |
-| **Deploy** | Sitio estático (Vercel / Netlify / GitHub Pages) |
+| Decisión             | Elección                                                                                                               |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Framework**        | React 19 + TypeScript (`strict`)                                                                                       |
+| **Bundler**          | Vite 8                                                                                                                 |
+| **Estado del shell** | Zustand (~1 kB). El estado _del juego_ vive en su engine, no acá.                                                      |
+| **Estilos**          | CSS Modules + custom properties. Sin Tailwind: el design system se define en tokens y no quiero dos fuentes de verdad. |
+| **Router**           | React Router v7 (`createBrowserRouter` + `lazy`)                                                                       |
+| **Persistencia**     | IndexedDB vía `idb`, detrás de una interfaz propia                                                                     |
+| **Tests**            | Vitest (lógica) + Testing Library (componentes) + Playwright (E2E, desde Fase 6)                                       |
+| **Sprites**          | SVG inline animado con CSS (ver `DESIGN_SYSTEM.md` §6)                                                                 |
+| **Backend**          | Ninguno en v1. La capa `/storage` deja la puerta abierta.                                                              |
+| **Deploy**           | Sitio estático (Vercel / Netlify / GitHub Pages)                                                                       |
 
 ### Estructura de carpetas
 
@@ -84,19 +84,31 @@ cerebrix/
 
 **Objetivo:** que `npm run dev` levante una página en blanco con todo el tooling puesto.
 
-- [ ] `npm create vite@latest . -- --template react-ts`
-- [ ] TypeScript en `strict` + `noUncheckedIndexedAccess` (crítico: trabajás con matrices todo el tiempo)
-- [ ] Alias de paths: `@core`, `@design`, `@games`, `@storage`
-- [ ] ESLint + Prettier + `eslint-plugin-boundaries` con las 4 reglas de frontera
-- [ ] Stylelint con las reglas de [`STYLING.md`](./STYLING.md) §8 (cero hex, cero `--raw-*`, cero `!important`)
-- [ ] Capas CSS `@layer tokens, base, components, game, overrides` declaradas
-- [ ] Vitest configurado con un test trivial que pase
-- [ ] Husky + lint-staged (lint + format en pre-commit)
-- [ ] GitHub Actions: audit → typecheck → lint → test → build
-- [ ] Endurecimiento de cadena de suministro: `ignore-scripts=true` en `.npmrc`, `npm ci --ignore-scripts` en CI, `npm audit --audit-level=high`, lockfile versionado
-- [ ] `.gitignore`, `README.md`, `docs/`
+- [x] Vite 8 + React 19 + TypeScript
+- [x] TypeScript en `strict` + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`
+- [x] Alias de paths: `@core`, `@design`, `@games`, `@storage`
+- [x] ESLint + Prettier + `eslint-plugin-boundaries` con las 4 reglas de frontera
+- [x] Stylelint con las reglas de [`STYLING.md`](./STYLING.md) §8 (cero hex, cero `--raw-*`, cero `!important`)
+- [x] Capas CSS `@layer tokens, base, components, game, overrides` declaradas
+- [x] Vitest + Testing Library, con tests que verifican las reglas de frontera
+- [x] Husky + lint-staged (lint + format en pre-commit)
+- [x] GitHub Actions: audit → typecheck → lint → format → test → build
+- [x] Endurecimiento de cadena de suministro: `ignore-scripts=true` en `.npmrc`, `npm ci --ignore-scripts` en CI, `npm audit --audit-level=high`, lockfile versionado
+- [x] `.gitignore`, `README.md`, `docs/`
 
-**✅ Aceptación:** un import ilegal (`/core` → `/games/sudoku`) **rompe el build en CI**.
+**✅ Aceptación — cumplida.** `tests/boundaries.test.ts` verifica que estos cinco imports ilegales rompen el lint:
+
+| Import ilegal             | Regla                                                                |
+| ------------------------- | -------------------------------------------------------------------- |
+| `/core` → `@games/sudoku` | El registro es el único que nombra juegos, y con `import()` perezoso |
+| juego A → juego B         | Los juegos no se conocen entre sí                                    |
+| `engine/` → `react`       | El motor es lógica pura                                              |
+| `engine/` → `@design/*`   | El motor no conoce la UI                                             |
+| `/design` → `@core/*`     | `/design` es la capa más baja                                        |
+
+> Durante esta fase la config de `boundaries` estuvo mal escrita **dos veces** y el lint pasó en verde igual. De ahí el test: una regla de arquitectura que nunca dispara es peor que no tenerla, porque da confianza falsa.
+
+**Estado del build:** bundle inicial **60.5 kB gzip** (presupuesto: 120 kB).
 
 ---
 
@@ -113,6 +125,7 @@ cerebrix/
 - [ ] `games/_dummy/` — botón "Ganar", implementa el contrato completo
 
 **✅ Aceptación:**
+
 - Se juega el dummy desde Home.
 - Un `grep -r "games/" src/core/` devuelve **solo** `registry.ts`.
 - Agregar un segundo juego falso al registro lo hace aparecer en Home **sin tocar ningún otro archivo**.
@@ -135,6 +148,7 @@ Referencia normativa completa: [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
 - [ ] Layout responsive: barra de acciones fija abajo en móvil, `dvh`, `safe-area-inset`
 
 **✅ Aceptación:**
+
 - Cambiar `--raw-violet-600` repinta acentos en toda la app.
 - Nada se rompe a 360px de ancho ni con las animaciones desactivadas.
 - Storybook o una ruta `/kitchen-sink` muestra todos los componentes en sus estados.
@@ -153,7 +167,7 @@ interface StorageDriver {
   recordResult(gameId: string, result: GameResult): Promise<void>;
   getStats(gameId: string): Promise<GameStats>;
   getGlobalStats(): Promise<GlobalStats>;
-  exportAll(): Promise<string>;   // JSON — backup del usuario
+  exportAll(): Promise<string>; // JSON — backup del usuario
   importAll(json: string): Promise<void>;
 }
 ```
@@ -166,6 +180,7 @@ interface StorageDriver {
 - [ ] Exportar/importar como archivo JSON
 
 **✅ Aceptación:**
+
 - Jugás el dummy, matás la pestaña desde el administrador de tareas, reabrís → estado exacto, timer incluido.
 - Un test carga un registro con `schemaVersion: 1` y lo migra a la versión actual sin pérdida.
 
@@ -195,6 +210,7 @@ type Difficulty = 1 | 2 | 3 | 4 | 5;
 **Objetivo:** el primer juego real, cumpliendo el contrato sin modificarlo.
 
 **5a — Jugable con puzzles pregenerados**
+
 - [ ] `data/puzzles-{1..5}.json` (≥ 50 por dificultad), importados dinámicamente
 - [ ] Engine puro: `createInitialState`, `applyMove`, `validate`, `checkWin`, `serialize`, `deserialize`
 - [ ] Vista: grid 9×9 con líneas de bloque, selección, resaltado de pares (fila/columna/caja), resaltado del mismo número
@@ -204,12 +220,14 @@ type Difficulty = 1 | 2 | 3 | 4 | 5;
 - [ ] Victoria: `win-burst` + guardado de resultado
 
 **5b — Generador propio**
+
 - [ ] Backtracking con orden aleatorio + poda por unicidad de solución
 - [ ] Calibración de dificultad por técnicas requeridas (naked single, hidden single, pointing pair…), no solo por celdas vacías
 - [ ] Corre en `generator.worker.ts`; la UI muestra progreso y **nunca** se congela
 - [ ] Pre-generación de la siguiente partida en idle (`requestIdleCallback`)
 
 **✅ Aceptación:**
+
 - Sudoku jugable, guardable, con dificultad, dentro del shell — **con cero cambios en `/core`** (verificable en el diff).
 - Tests del engine: unicidad de solución, detección de conflictos, round-trip de serialización.
 - 60fps al navegar el tablero con throttling 4× en un móvil emulado.
@@ -229,6 +247,7 @@ Buscaminas antes que Solitario a propósito: comparte el modelo de grid (reusa `
 - [ ] Contador de minas restantes
 
 **✅ Aceptación (la que importa):**
+
 - Si entró **sin tocar `/core`** → la arquitectura sirve, se sigue.
 - Si hubo que tocar `/core` → **se para y se refactoriza el contrato ahora**. Con dos juegos cuesta una tarde; con cinco, una semana. Documentar qué supuesto falló.
 

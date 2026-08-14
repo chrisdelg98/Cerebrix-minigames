@@ -36,7 +36,9 @@
       "@storage/*": ["src/storage/*"]
     },
 
-    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"]
+    // "node" is here for the test suite (tests/boundaries.test.ts writes fixture
+    // files). Application code under src/ must stay browser-only.
+    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom", "node"]
   },
   "include": ["src", "tests"]
 }

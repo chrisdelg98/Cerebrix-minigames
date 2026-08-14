@@ -4,7 +4,7 @@
 
 ### Una colección de minijuegos de concentración que se siente bien en el bolsillo
 
-*Sudoku, Buscaminas y más — en una arquitectura donde agregar el próximo juego toma un día, no una semana.*
+_Sudoku, Buscaminas y más — en una arquitectura donde agregar el próximo juego toma un día, no una semana._
 
 <br/>
 
@@ -34,12 +34,12 @@ Lo que la hace distinta no es la lista de juegos. Es que está construida sobre 
 
 ## 🎮 Juegos
 
-| | Juego | Estado | Dificultades |
-|:---:|---|:---:|:---:|
-| 🔢 | **Sudoku** — clásico 9×9 con anotaciones, pistas y generador propio | 🚧 Fase 5 | 1–5 |
-| 💣 | **Buscaminas** — con primer click seguro y chording | 📋 Fase 6 | 1–5 |
-| 🃏 | **Solitario** — Klondike | 💭 Backlog | — |
-| 🧩 | **Nonograma** | 💭 Backlog | — |
+|     | Juego                                                               |   Estado   | Dificultades |
+| :-: | ------------------------------------------------------------------- | :--------: | :----------: |
+| 🔢  | **Sudoku** — clásico 9×9 con anotaciones, pistas y generador propio | 🚧 Fase 5  |     1–5      |
+| 💣  | **Buscaminas** — con primer click seguro y chording                 | 📋 Fase 6  |     1–5      |
+| 🃏  | **Solitario** — Klondike                                            | 💭 Backlog |      —       |
+| 🧩  | **Nonograma**                                                       | 💭 Backlog |      —       |
 
 ---
 
@@ -50,12 +50,14 @@ Lo que la hace distinta no es la lista de juegos. Es que está construida sobre 
 <td width="50%" valign="top">
 
 ### 📱 Móvil de verdad
+
 Diseñado a 360px y expandido hacia arriba. Barra de acciones al alcance del pulgar, áreas de toque de 44px, `safe-area-inset`, cero scroll horizontal. Funciona con una mano en un colectivo.
 
 </td>
 <td width="50%" valign="top">
 
 ### ⚡ 60fps o no existe
+
 Solo se anima `transform` y `opacity`. Presupuesto de 8ms de main thread por frame, verificado con throttling 4×. Las cascadas van por onda, nunca 480 celdas a la vez.
 
 </td>
@@ -64,12 +66,14 @@ Solo se anima `transform` y `opacity`. Presupuesto de 8ms de main thread por fra
 <td width="50%" valign="top">
 
 ### 🎨 Un token repinta todo
+
 Sistema de diseño con tokens semánticos: color, tipografía, espaciado, sombras y movimiento. Tema claro y oscuro. Ningún componente inventa un valor propio.
 
 </td>
 <td width="50%" valign="top">
 
 ### 🦴 Sprites SVG animados
+
 Vectoriales, escritos en código, animados con CSS puro. Nítidos en cualquier pantalla, heredan el tema solos y viajan dentro del chunk del juego que los usa.
 
 </td>
@@ -78,12 +82,14 @@ Vectoriales, escritos en código, animados con CSS puro. Nítidos en cualquier p
 <td width="50%" valign="top">
 
 ### 💾 Nunca perdés una partida
+
 Autosave con debounce tras cada jugada y flush en `visibilitychange` — el único evento confiable cuando el móvil mata la pestaña. IndexedDB con estado versionado y migraciones.
 
 </td>
 <td width="50%" valign="top">
 
 ### 🔌 Offline y lazy
+
 PWA instalable, sin backend. Cada juego es un chunk aparte que se descarga al abrirlo — con prefetch al hacer hover o tocar la tarjeta, así ya está listo cuando soltás el dedo.
 
 </td>
@@ -92,12 +98,14 @@ PWA instalable, sin backend. Cada juego es un chunk aparte que se descarga al ab
 <td width="50%" valign="top">
 
 ### ♿ Accesible por defecto
+
 Navegación completa por teclado, foco siempre visible, contraste AA en ambos temas, `aria-live` para el estado del juego y respeto a `prefers-reduced-motion`.
 
 </td>
 <td width="50%" valign="top">
 
 ### 🧪 Lógica pura y testeada
+
 Los motores de juego no importan React ni CSS. Se testean sin DOM, corren en Web Workers y sobreviven a cualquier cambio de UI.
 
 </td>
@@ -151,18 +159,18 @@ npm run dev          # → http://localhost:5173
 
 ### 📜 Scripts
 
-| Comando | Qué hace |
-|---------|----------|
-| `npm run dev` | Servidor de desarrollo con HMR |
-| `npm run build` | Typecheck + build de producción |
-| `npm run preview` | Sirve el build localmente |
-| `npm run test` | Tests unitarios (Vitest) |
-| `npm run test:watch` | Tests en modo watch |
-| `npm run lint` | ESLint + reglas de frontera |
-| `npm run lint:css` | Stylelint + reglas del sistema de diseño |
-| `npm run typecheck` | TypeScript en modo `strict` |
-| `npm run format` | Prettier sobre todo el repo |
-| `npm run verify` | Todo lo anterior — lo mismo que corre CI |
+| Comando              | Qué hace                                 |
+| -------------------- | ---------------------------------------- |
+| `npm run dev`        | Servidor de desarrollo con HMR           |
+| `npm run build`      | Typecheck + build de producción          |
+| `npm run preview`    | Sirve el build localmente                |
+| `npm run test`       | Tests unitarios (Vitest)                 |
+| `npm run test:watch` | Tests en modo watch                      |
+| `npm run lint`       | ESLint + reglas de frontera              |
+| `npm run lint:css`   | Stylelint + reglas del sistema de diseño |
+| `npm run typecheck`  | TypeScript en modo `strict`              |
+| `npm run format`     | Prettier sobre todo el repo              |
+| `npm run verify`     | Todo lo anterior — lo mismo que corre CI |
 
 ### 🔒 Nota sobre dependencias
 

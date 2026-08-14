@@ -25,15 +25,33 @@ export default tseslint.config(
       boundaries,
     },
     settings: {
+      // boundaries resolves each import to a file before it can classify it.
+      // The bundled node resolver only knows .js/.json, so without these
+      // extensions every TypeScript import resolves to "unknown" and the rules
+      // quietly pass. Aliases are declared here too, mirroring tsconfig.app.json
+      // and vite.config.ts.
+      'import/resolver': {
+        node: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx'],
+          moduleDirectory: ['node_modules', 'src'],
+        },
+      },
+
       'boundaries/include': ['src/**/*'],
+      // A pattern describes the element's DIRECTORY, not the files inside it —
+      // every file under src/games/sudoku belongs to the 'game' element. Pointing
+      // patterns at files instead (src/games/*/**/*) makes every file fall
+      // through to the broadest element and the rules silently never fire.
+      // Verified by the illegal-import cases in tests/boundaries.test.ts.
       'boundaries/elements': [
-        { type: 'core', pattern: 'src/core/**' },
-        { type: 'design', pattern: 'src/design/**' },
-        { type: 'storage', pattern: 'src/storage/**' },
-        // capture:1 is the game id, so rules can compare one game against another.
-        { type: 'game-engine', pattern: 'src/games/*/engine/**', capture: ['id'] },
-        { type: 'game', pattern: 'src/games/*/**', capture: ['id'] },
-        { type: 'app', pattern: 'src/*' },
+        { type: 'core', pattern: 'src/core' },
+        { type: 'design', pattern: 'src/design' },
+        { type: 'storage', pattern: 'src/storage' },
+        // The capture holds the game id, so policies can tell one game from
+        // another. The engine is listed first: it is nested inside a game and
+        // needs to win over the broader 'game' element.
+        { type: 'game-engine', pattern: 'src/games/*/engine', capture: ['id'] },
+        { type: 'game', pattern: 'src/games/*', capture: ['id'] },
       ],
     },
     rules: {
@@ -41,57 +59,57 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
 
       /* ─────────── Boundary rules — docs/PLAN.md "Reglas de frontera" ─────────── */
-      'boundaries/element-types': [
+      'boundaries/dependencies': [
         'error',
         {
           default: 'disallow',
-          message: '${file.type} is not allowed to import ${dependency.type}',
-          rules: [
+          message: '{{from.type}} is not allowed to import {{to.type}}',
+          policies: [
             {
               // /design is the lowest layer: it knows nothing about core or games.
-              from: ['design'],
-              allow: ['design'],
+              from: [{ element: { type: 'design' } }],
+              allow: [{ to: { element: { type: 'design' } } }],
             },
             {
-              from: ['storage'],
-              allow: ['storage'],
+              from: [{ element: { type: 'storage' } }],
+              allow: [{ to: { element: { type: 'storage' } } }],
             },
             {
               // /core may use design and storage, but never a specific game.
-              // The registry reaches games only through lazy import(), which is
-              // exempted below via the ignore list.
-              from: ['core'],
-              allow: ['core', 'design', 'storage'],
+              // The registry reaches games only through lazy import(), and is
+              // exempted from the no-restricted-imports rule below.
+              from: [{ element: { type: 'core' } }],
+              allow: [
+                { to: { element: { type: 'core' } } },
+                { to: { element: { type: 'design' } } },
+                { to: { element: { type: 'storage' } } },
+              ],
             },
             {
               // A game engine is pure logic: no React, no CSS, no design system.
-              // Enforced further by the no-restricted-imports rule below.
-              from: ['game-engine'],
-              allow: [['game-engine', { id: '${from.id}' }]],
+              // Enforced further by the no-restricted-imports override below.
+              from: [{ element: { type: 'game-engine' } }],
+              allow: [
+                { to: { element: { type: 'game-engine', captured: { id: '{{from.id}}' } } } },
+              ],
             },
             {
-              // A game may use its own files, the design system, storage and core
-              // contracts — but never another game.
-              from: ['game'],
-              allow: ['design', 'storage', 'core', ['game', { id: '${from.id}' }]],
+              // A game may use its own files, the design system, storage and the
+              // core contract — but never another game.
+              from: [{ element: { type: 'game' } }],
+              allow: [
+                { to: { element: { type: 'design' } } },
+                { to: { element: { type: 'storage' } } },
+                { to: { element: { type: 'core' } } },
+                { to: { element: { type: 'game', captured: { id: '{{from.id}}' } } } },
+              ],
             },
             {
-              from: ['app'],
-              allow: ['core', 'design', 'storage', 'app'],
-            },
-          ],
-        },
-      ],
-
-      /* /core must not statically import a game. The registry uses import(). */
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@games/*', '**/games/*'],
-              message:
-                '/core must not import a game statically. Register it in src/core/registry.ts with a lazy import().',
+              // A game's own engine is reachable from the game it belongs to.
+              from: [{ element: { type: 'game' } }],
+              allow: [
+                { to: { element: { type: 'game-engine', captured: { id: '{{from.id}}' } } } },
+              ],
             },
           ],
         },
@@ -108,6 +126,87 @@ export default tseslint.config(
     },
   },
 
+  /*
+   * ─────────── Alias-based boundary enforcement ───────────
+   *
+   * boundaries/dependencies resolves relative imports, but the bundled node
+   * resolver cannot follow path aliases, so an aliased import silently
+   * resolves to "unknown" and passes. These rules close that hole per layer
+   * without pulling in another resolver package.
+   *
+   * Together with boundaries/dependencies above, every edge in the four
+   * boundary rules of docs/PLAN.md is covered.
+   */
+  {
+    files: ['src/design/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@core/*', '@games/*', '@storage/*'],
+              message:
+                '/design is the lowest layer: it must not know about core, storage or any game. See docs/STYLING.md §1.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/storage/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@core/*', '@games/*', '@design/*'],
+              message: '/storage must stay independent of core, design and games.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/core/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@games/*', '**/games/*'],
+              message:
+                '/core must not import a game statically. Register it in src/core/registry.ts with a lazy import().',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/games/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              // Inside a game, its own files are reached relatively. Any use of
+              // the @games alias therefore means reaching into another game.
+              group: ['@games/*'],
+              message:
+                'A game must not import another game. Use relative paths for your own files. See docs/GAME_CONTRACT.md §8.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   /* ─────────── Game engines: pure logic only ─────────── */
   {
     files: ['src/games/*/engine/**/*.ts'],
@@ -117,7 +216,7 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ['react', 'react-dom', 'react/*', '@design/*', '**/*.css'],
+              group: ['react', 'react-dom', 'react/*', '@design/*', '@games/*', '**/*.css'],
               message:
                 'Game engines must stay framework-free so they can be tested without a DOM and run inside a Web Worker. See docs/GAME_CONTRACT.md §2.',
             },
@@ -162,7 +261,13 @@ export default tseslint.config(
   {
     files: ['tests/**/*.{ts,tsx}', 'src/**/*.test.{ts,tsx}'],
     rules: {
+      // ESLint's own package ships no resolvable types, so the boundaries test
+      // that drives the ESLint API trips every unsafe-* rule. Test-only code.
       '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
     },
   }

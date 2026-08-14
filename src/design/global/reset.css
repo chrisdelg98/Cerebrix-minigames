@@ -23,6 +23,7 @@ html {
 
 body {
   min-block-size: 100dvh;
+
   /* Stops the accidental pull-to-refresh while dragging on a board. */
   overscroll-behavior-y: none;
 }
@@ -48,6 +49,7 @@ button {
   background: none;
   border: none;
   cursor: pointer;
+
   /* Removes the 300ms tap delay on mobile. */
   touch-action: manipulation;
 }

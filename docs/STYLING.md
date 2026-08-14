@@ -33,17 +33,17 @@ Se declara explícitamente con `@layer` para que la cascada no dependa del orden
 /* src/design/index.css — el único punto de entrada global */
 @layer tokens, base, components, game, overrides;
 
-@import './tokens/palette.css'   layer(tokens);
-@import './tokens/theme.css'     layer(tokens);
-@import './tokens/space.css'     layer(tokens);
-@import './tokens/motion.css'    layer(tokens);
+@import './tokens/palette.css' layer(tokens);
+@import './tokens/theme.css' layer(tokens);
+@import './tokens/space.css' layer(tokens);
+@import './tokens/motion.css' layer(tokens);
 
-@import './global/reset.css'     layer(base);
-@import './global/elements.css'  layer(base);
-@import './global/a11y.css'      layer(base);
+@import './global/reset.css' layer(base);
+@import './global/elements.css' layer(base);
+@import './global/a11y.css' layer(base);
 @import './global/utilities.css' layer(base);
 
-@import './animations.css'       layer(base);
+@import './animations.css' layer(base);
 ```
 
 Los CSS Modules de componentes se envuelven en `@layer components`, y los de juego en `@layer game`. Consecuencia práctica: **un juego siempre puede sobrescribir un componente sin `!important` ni guerras de especificidad**, y sigue siendo evidente en el diff que lo está haciendo.
@@ -59,25 +59,25 @@ Los CSS Modules de componentes se envuelven en `@layer components`, y los de jue
 ✅ **Solo** declaraciones de custom properties.
 ❌ Prohibido cualquier selector que pinte algo.
 
-| Archivo | Contenido |
-|---------|-----------|
-| `palette.css` | Valores crudos `--raw-*`. El único lugar del repo con hex literales. |
-| `theme.css` | Tokens semánticos `--c-*` para `[data-theme="dark"]` y `[data-theme="light"]`. |
-| `space.css` | `--sp-*`, `--r-*`, `--bw-*`, `--sh-*`, `--ring`. |
-| `motion.css` | `--d-*`, `--e-*`, `--stagger-*`. |
-| `type.css` | `--font-*`, `--fs-*`, `--fw-*`, `--lh-*`, `--ls-*`. |
+| Archivo       | Contenido                                                                      |
+| ------------- | ------------------------------------------------------------------------------ |
+| `palette.css` | Valores crudos `--raw-*`. El único lugar del repo con hex literales.           |
+| `theme.css`   | Tokens semánticos `--c-*` para `[data-theme="dark"]` y `[data-theme="light"]`. |
+| `space.css`   | `--sp-*`, `--r-*`, `--bw-*`, `--sh-*`, `--ring`.                               |
+| `motion.css`  | `--d-*`, `--e-*`, `--stagger-*`.                                               |
+| `type.css`    | `--font-*`, `--fs-*`, `--fw-*`, `--lh-*`, `--ls-*`.                            |
 
 ### Capa 2 — Global base (`src/design/global/`)
 
 Lo que aplica a **toda** la app sin que nadie tenga que pedirlo.
 
-| Archivo | Contenido |
-|---------|-----------|
-| `reset.css` | `box-sizing`, márgenes en cero, `img`/`svg` en bloque, `dvh`, `overscroll-behavior`, `-webkit-tap-highlight-color: transparent`. |
-| `elements.css` | `html`/`body` con tokens, tipografía base, `h1..h6`, `p`, `a`, `button`, `input`, selección de texto, scrollbars. |
-| `a11y.css` | `:focus-visible` con `--ring`, `.sr-only`, `prefers-reduced-motion`, `[data-motion="reduced"]`. |
-| `utilities.css` | **Lista cerrada** (§4). Nada de un framework de utilidades acá. |
-| `animations.css` | Los `@keyframes` del catálogo y las clases `.anim-*`. |
+| Archivo          | Contenido                                                                                                                        |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `reset.css`      | `box-sizing`, márgenes en cero, `img`/`svg` en bloque, `dvh`, `overscroll-behavior`, `-webkit-tap-highlight-color: transparent`. |
+| `elements.css`   | `html`/`body` con tokens, tipografía base, `h1..h6`, `p`, `a`, `button`, `input`, selección de texto, scrollbars.                |
+| `a11y.css`       | `:focus-visible` con `--ring`, `.sr-only`, `prefers-reduced-motion`, `[data-motion="reduced"]`.                                  |
+| `utilities.css`  | **Lista cerrada** (§4). Nada de un framework de utilidades acá.                                                                  |
+| `animations.css` | Los `@keyframes` del catálogo y las clases `.anim-*`.                                                                            |
 
 ### Capa 3 — Componentes (`src/design/components/`)
 
@@ -99,7 +99,7 @@ src/design/components/Button/
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  min-height: 44px;                      /* táctil */
+  min-height: 44px; /* táctil */
   padding: var(--sp-2) var(--sp-4);
   border: var(--bw-base) solid var(--c-border-strong);
   border-radius: var(--r-md);
@@ -107,9 +107,10 @@ src/design/components/Button/
   color: var(--c-text);
   font: var(--fw-bold) var(--fs-sm) / 1 var(--font-ui);
   box-shadow: var(--sh-md);
-  transition: transform var(--d-fast) var(--e-out),
-              box-shadow var(--d-fast) var(--e-out),
-              background-color var(--d-fast) var(--e-out);
+  transition:
+    transform var(--d-fast) var(--e-out),
+    box-shadow var(--d-fast) var(--e-out),
+    background-color var(--d-fast) var(--e-out);
 }
 
 .button[data-variant='primary'] {
@@ -140,11 +141,13 @@ src/design/components/Button/
 El único CSS que un juego puede escribir es el que **ningún otro juego podría reusar**.
 
 ✅ Legítimo:
+
 - Las líneas gruesas que separan las cajas 3×3 del Sudoku.
 - El ondear de la tela de la bandera en Buscaminas.
 - El abanico de cartas del Solitario.
 
 ❌ No legítimo (va a Capa 2 o 3):
+
 - Un botón con otro color → variante de `<Button>`.
 - Un espaciado distinto → token de espaciado.
 - Una animación de entrada → catálogo de `animations.css`.
@@ -185,16 +188,16 @@ Antes de escribir una sola regla CSS:
 
 No usamos un framework de utilidades. Existen **estas y solo estas**, en `utilities.css`. Agregar una requiere justificarla en el PR:
 
-| Clase | Para qué |
-|-------|----------|
-| `.sr-only` | Texto solo para lectores de pantalla |
-| `.stack` | Columna flex con `gap: var(--gap, var(--sp-4))` |
-| `.row` | Fila flex con `gap` y `align-items: center` |
-| `.center` | Centrado en ambos ejes |
-| `.truncate` | Elipsis de una línea |
-| `.tabular` | `font-variant-numeric: tabular-nums` |
-| `.no-select` | `user-select: none` (tableros) |
-| `.anim-*` | Las del catálogo de animaciones |
+| Clase        | Para qué                                        |
+| ------------ | ----------------------------------------------- |
+| `.sr-only`   | Texto solo para lectores de pantalla            |
+| `.stack`     | Columna flex con `gap: var(--gap, var(--sp-4))` |
+| `.row`       | Fila flex con `gap` y `align-items: center`     |
+| `.center`    | Centrado en ambos ejes                          |
+| `.truncate`  | Elipsis de una línea                            |
+| `.tabular`   | `font-variant-numeric: tabular-nums`            |
+| `.no-select` | `user-select: none` (tableros)                  |
+| `.anim-*`    | Las del catálogo de animaciones                 |
 
 Todo lo demás se resuelve con un CSS Module.
 
@@ -217,15 +220,21 @@ Rompe el theming, esquiva los tokens, es invisible para stylelint y no se puede 
 
 Un valor que **solo se conoce en runtime y varía por elemento** no puede vivir en una hoja estática. Se pasa como custom property, y el CSS Module decide qué hacer con ella. Eso no es estilo inline: es **dato**.
 
-```jsx
+```tsx
 // ✅ Correcto — el índice alimenta la cascada, el CSS define la animación
-{games.map((game, i) => (
-  <GameCard key={game.id} style={{ '--i': i }} />
-))}
+{
+  games.map((game, i) => <GameCard key={game.id} style={{ '--i': i } as CSSVars} />);
+}
 ```
+
+> `CSSVars` (`src/design/types.ts`) es `CSSProperties & Record<'--${string}', string | number>`.
+> Va con `as` y no con `satisfies`: React tipa `style` como `CSSProperties`, y un objeto literal con una clave `--*` choca contra el excess property check antes de que `satisfies` pueda ensancharlo.
+
 ```css
-.card { animation: pop-in var(--d-base) var(--e-out) backwards;
-        animation-delay: min(calc(var(--i) * var(--stagger-step)), var(--stagger-max)); }
+.card {
+  animation: pop-in var(--d-base) var(--e-out) backwards;
+  animation-delay: min(calc(var(--i) * var(--stagger-step)), var(--stagger-max));
+}
 ```
 
 ```jsx
@@ -270,11 +279,13 @@ Si la custom property se recalcula **en cada frame** (arrastre, seguimiento del 
 Tres mecanismos, en orden de preferencia:
 
 **1. Prop de variante** — si el caso es reusable, se agrega al componente.
+
 ```jsx
 <Cell variant="fixed" size="sm" />
 ```
 
 **2. Custom properties de instancia** — el componente expone "perillas" documentadas.
+
 ```css
 /* Cell.module.css — API pública del componente */
 .cell {
@@ -282,16 +293,20 @@ Tres mecanismos, en orden de preferencia:
   border-radius: var(--cell-radius, var(--r-sm));
 }
 ```
+
 ```css
 /* games/minesweeper/view/Board.module.css */
-.board { --cell-radius: var(--r-xs); }   /* Buscaminas usa celdas más cuadradas */
+.board {
+  --cell-radius: var(--r-xs);
+} /* Buscaminas usa celdas más cuadradas */
 ```
 
 **3. Sobrescritura por capa** — último recurso, solo para lo genuinamente único.
+
 ```css
 /* games/sudoku/view/Board.module.css — @layer game gana sobre @layer components */
 .board .cell[data-block-edge='right'] {
-  box-shadow: inset -2px 0 0 0 var(--c-border-strong);   /* línea de caja 3×3 */
+  box-shadow: inset -2px 0 0 0 var(--c-border-strong); /* línea de caja 3×3 */
 }
 ```
 
@@ -303,16 +318,16 @@ Si un juego llega al mecanismo 3 más de dos o tres veces, **el componente compa
 
 Ninguna de estas reglas sobrevive tres semanas si depende de la memoria. Todo se verifica en CI:
 
-| Regla | Herramienta |
-|-------|-------------|
-| Cero hex fuera de `palette.css` | `stylelint` — `color-no-hex` con override para ese archivo |
-| Cero `--raw-*` fuera de `theme.css` | `stylelint` — regla `declaration-property-value-disallowed-list` |
-| Cero duraciones/curvas hardcodeadas | `stylelint` — patrón sobre `transition` / `animation` |
-| Cero `style={}` con propiedades reales | `eslint` — `react/forbid-dom-props` + regla propia que permite claves `--*` |
-| Solo `transform`/`opacity` animados | `stylelint` — lista blanca en `transition-property` |
-| CSS Modules en camelCase | `stylelint` — `selector-class-pattern` |
-| `/design` no importa de `/core` ni `/games` | `eslint-plugin-boundaries` |
-| Nada de `!important` | `stylelint` — `declaration-no-important` |
+| Regla                                       | Herramienta                                                                 |
+| ------------------------------------------- | --------------------------------------------------------------------------- |
+| Cero hex fuera de `palette.css`             | `stylelint` — `color-no-hex` con override para ese archivo                  |
+| Cero `--raw-*` fuera de `theme.css`         | `stylelint` — regla `declaration-property-value-disallowed-list`            |
+| Cero duraciones/curvas hardcodeadas         | `stylelint` — patrón sobre `transition` / `animation`                       |
+| Cero `style={}` con propiedades reales      | `eslint` — `react/forbid-dom-props` + regla propia que permite claves `--*` |
+| Solo `transform`/`opacity` animados         | `stylelint` — lista blanca en `transition-property`                         |
+| CSS Modules en camelCase                    | `stylelint` — `selector-class-pattern`                                      |
+| `/design` no importa de `/core` ni `/games` | `eslint-plugin-boundaries`                                                  |
+| Nada de `!important`                        | `stylelint` — `declaration-no-important`                                    |
 
 ---
 

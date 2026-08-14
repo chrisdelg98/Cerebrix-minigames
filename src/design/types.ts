@@ -10,7 +10,11 @@ import type { CSSProperties } from 'react';
  *
  * See docs/STYLING.md §5.
  *
+ * `as` rather than `satisfies`: React types `style` as CSSProperties, and an
+ * object literal with a `--*` key trips the excess property check before
+ * `satisfies` can widen it.
+ *
  * @example
- * <li style={{ '--i': index } satisfies CSSVars} className="anim-stagger" />
+ * <li style={{ '--i': index } as CSSVars} className="anim-stagger" />
  */
 export type CSSVars = CSSProperties & Record<`--${string}`, string | number>;

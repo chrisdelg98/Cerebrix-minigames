@@ -29,15 +29,11 @@ export default defineConfig({
   build: {
     target: 'es2022',
     cssCodeSplit: true,
-    // Games are loaded through dynamic import() in the registry, so Vite emits
-    // one chunk per game automatically. See docs/PLAN.md, Phase 7 budgets.
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-        },
-      },
-    },
+    // No manualChunks on purpose. Games are loaded through dynamic import() in
+    // the registry, so Vite already emits one chunk per game; hand-rolling a
+    // vendor chunk on top of that usually hurts cache hit rates more than it
+    // helps. Revisit only if the Phase 7 budgets say otherwise.
+    // See docs/PLAN.md, Phase 7.
   },
 
   test: {

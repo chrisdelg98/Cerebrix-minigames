@@ -112,21 +112,20 @@ export interface GameEngine<TState, TMove, TConfig = unknown> {
   deserialize(raw: string, fromVersion: number): TState;
 }
 
-export type ValidationResult =
-  | { ok: true }
-  | { ok: false; reason: string; cells?: CellRef[] };  // celdas a resaltar en rojo
+export type ValidationResult = { ok: true } | { ok: false; reason: string; cells?: CellRef[] }; // celdas a resaltar en rojo
 
 export type GameStatus =
-  | { kind: 'playing' }
-  | { kind: 'won'; score?: number }
-  | { kind: 'lost'; reason?: string };
+  { kind: 'playing' } | { kind: 'won'; score?: number } | { kind: 'lost'; reason?: string };
 
 export interface Hint {
   cells: CellRef[];
   message: string;
 }
 
-export interface CellRef { row: number; col: number; }
+export interface CellRef {
+  row: number;
+  col: number;
+}
 
 /* ─────────────── Vista ─────────────── */
 
@@ -186,7 +185,7 @@ export interface RegistryEntry {
 export const REGISTRY: RegistryEntry[] = [
   {
     id: 'sudoku',
-    preview: { /* ... */ },
+    preview: {/* ... */},
     icon: SudokuIcon,
     load: () => import('@games/sudoku'),
   },
@@ -200,19 +199,19 @@ export const REGISTRY: RegistryEntry[] = [
 
 ## 5. De quién es cada responsabilidad
 
-| Responsabilidad | Shell (`/core`) | Juego |
-|-----------------|:---------------:|:-----:|
-| Timer, pausa, reanudar | ✅ | ❌ |
-| Selector de dificultad | ✅ | Solo `getDifficultyConfig` |
-| Autosave y resumir | ✅ | Solo `serialize` / `deserialize` |
-| Deshacer / rehacer | ✅ (guarda la pila de estados) | ❌ (por eso `applyMove` debe ser puro) |
-| Estadísticas y rachas | ✅ | ❌ |
-| Botón de pista | ✅ (si existe `getHint`) | Solo `getHint` |
-| Modal de victoria / derrota | ✅ | ❌ (solo reporta vía `checkStatus`) |
-| Barra de progreso | ✅ | Solo `getProgress` |
-| Reglas del juego | ❌ | ✅ |
-| Render del tablero | ❌ | ✅ (con componentes de `/design`) |
-| Interacción propia (long-press, chording) | ❌ | ✅ |
+| Responsabilidad                           |        Shell (`/core`)         |                 Juego                  |
+| ----------------------------------------- | :----------------------------: | :------------------------------------: |
+| Timer, pausa, reanudar                    |               ✅               |                   ❌                   |
+| Selector de dificultad                    |               ✅               |       Solo `getDifficultyConfig`       |
+| Autosave y resumir                        |               ✅               |    Solo `serialize` / `deserialize`    |
+| Deshacer / rehacer                        | ✅ (guarda la pila de estados) | ❌ (por eso `applyMove` debe ser puro) |
+| Estadísticas y rachas                     |               ✅               |                   ❌                   |
+| Botón de pista                            |    ✅ (si existe `getHint`)    |             Solo `getHint`             |
+| Modal de victoria / derrota               |               ✅               |  ❌ (solo reporta vía `checkStatus`)   |
+| Barra de progreso                         |               ✅               |           Solo `getProgress`           |
+| Reglas del juego                          |               ❌               |                   ✅                   |
+| Render del tablero                        |               ❌               |   ✅ (con componentes de `/design`)    |
+| Interacción propia (long-press, chording) |               ❌               |                   ✅                   |
 
 Si un juego siente que necesita su propio timer o su propio autosave: **es señal de que el contrato está incompleto**. Se extiende el contrato, no se duplica la funcionalidad dentro del juego.
 

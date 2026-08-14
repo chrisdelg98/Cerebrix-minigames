@@ -1,0 +1,13 @@
+# Normalize line endings across platforms.
+* text=auto eol=lf
+
+# Binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ico binary
+
+# Keep the lockfile out of diffs and merge conflicts.
+package-lock.json -diff linguist-generated=true

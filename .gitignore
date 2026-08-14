@@ -1,0 +1,76 @@
+# ---------- Dependencias ----------
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# ---------- Build / output ----------
+dist/
+dist-ssr/
+build/
+out/
+.vite/
+*.local
+
+# ---------- Cachés de herramientas ----------
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+.cache/
+.temp/
+.turbo/
+
+# ---------- Tests / cobertura ----------
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+
+# ---------- Entorno ----------
+.env
+.env.*
+!.env.example
+
+# ---------- Logs ----------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ---------- Editores ----------
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+
+# ---------- Sistema operativo ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ---------- Deploy ----------
+.vercel
+.netlify
+
+# ---------- Assets generados ----------
+# Los puzzles pregenerados SÍ se versionan (src/games/*/data/*.json).
+# Lo que se genera en build no:
+public/sprites-generated/

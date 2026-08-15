@@ -38,6 +38,21 @@
     content: '';
   }
 
+  /*
+   * Authorship, independent of the highlight state — declared BEFORE the
+   * states so an error still wins the colour. A clue is the puzzle talking; a
+   * player digit is the only mark on the board that is yours.
+   */
+  .cell[data-authored='clue'] {
+    color: var(--c-text);
+    font-weight: var(--fw-black);
+  }
+
+  .cell[data-authored='player'] {
+    color: var(--c-accent);
+    font-weight: var(--fw-bold);
+  }
+
   .cell[data-state='fixed'] {
     background-color: var(--c-cell-fixed);
 

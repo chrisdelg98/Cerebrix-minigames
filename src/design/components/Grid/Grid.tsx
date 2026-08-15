@@ -13,6 +13,8 @@ export interface GridProps {
   /** Caps the board width. Defaults to the shared board budget. */
   maxSize?: string;
   gap?: string;
+  /** Wraps the board in a raised surface so it reads as an object on the page. */
+  framed?: boolean;
 }
 
 /**
@@ -23,8 +25,8 @@ export interface GridProps {
  * Not square by construction: `rows` may differ from `cols` — Minesweeper needs
  * that, and it is exactly the kind of assumption Phase 6 exists to break.
  */
-export function Grid({ cols, rows = cols, children, label, maxSize, gap }: GridProps) {
-  return (
+export function Grid({ cols, rows = cols, children, label, maxSize, gap, framed }: GridProps) {
+  const grid = (
     <div
       className={`${s.grid} no-select`}
       role="grid"
@@ -43,4 +45,8 @@ export function Grid({ cols, rows = cols, children, label, maxSize, gap }: GridP
       {children}
     </div>
   );
+
+  // A wrapper rather than padding on the grid itself: padding would eat into
+  // the box that aspect-ratio sizes, and squeeze every cell.
+  return framed === true ? <div className={s.frame}>{grid}</div> : grid;
 }

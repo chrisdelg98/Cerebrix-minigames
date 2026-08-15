@@ -6,6 +6,15 @@
 
 body {
   background-color: var(--c-bg);
+
+  /*
+   * A single wide glow behind everything. Flat black reads as "unfinished",
+   * not as "dark" — but this stays ambient on purpose: the accent is soft and
+   * enormous, so it never competes with the board for attention
+   * (docs/DESIGN_SYSTEM.md §1, principle 1).
+   */
+  background-image: radial-gradient(120% 70% at 50% -20%, var(--c-accent-soft), transparent 70%);
+  background-attachment: fixed;
   color: var(--c-text);
   font-family: var(--font-ui);
   font-size: var(--fs-md);

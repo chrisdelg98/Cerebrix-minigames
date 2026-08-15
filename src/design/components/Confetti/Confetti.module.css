@@ -1,0 +1,11 @@
+@layer components {
+  /* Above the board, below the modal, and never in the way of a tap. */
+  .confetti {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    inline-size: 100%;
+    block-size: 100%;
+    pointer-events: none;
+  }
+}

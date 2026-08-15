@@ -107,7 +107,7 @@ export function SudokuView({
       {/* The wrapper owns keyboard nav for all 81 cells: 81 handlers would be
           81 closures rebuilt on every state change. */}
       <div onKeyDown={onKeyDown} className={s.boardWrap}>
-        <Grid cols={SIZE} label="Tablero de Sudoku" gap="var(--bw-hair)">
+        <Grid cols={SIZE} label="Tablero de Sudoku" gap="var(--bw-hair)" framed>
           {state.values.map((value, index) => (
             <Cell
               key={index}
@@ -126,6 +126,7 @@ export function SudokuView({
               })}
               value={value !== 0 ? value : <Notes values={notesOf(state.notes[index] ?? 0)} />}
               label={describe(index, value, state.given[index] === true)}
+              authored={value === 0 ? undefined : state.given[index] === true ? 'clue' : 'player'}
               blockEdges={blockEdgesFor(index)}
               disabled={!interactive}
               onActivate={() => {

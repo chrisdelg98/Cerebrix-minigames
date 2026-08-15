@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { Button } from '@design/components/Button';
+import { Confetti } from '@design/components/Confetti';
 import { DifficultyPicker } from '@design/components/DifficultyPicker';
 import { Modal } from '@design/components/Modal';
 import { Skeleton } from '@design/components/Skeleton';
 import { Timer } from '@design/components/Timer';
 import { useToast } from '@design/components/Toast';
+import { ArrowLeftIcon } from '@design/sprites/SettingsIcons';
 import { Trophy } from '@design/sprites/Trophy';
 
 import { type Difficulty } from '../contract';
@@ -59,7 +61,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
   const header = (
     <>
       <Link to="/" className={s.back} aria-label="Volver al inicio">
-        ←
+        <ArrowLeftIcon />
       </Link>
 
       <span className={s.title}>{session.module?.meta.name ?? entry.preview.name}</span>
@@ -134,6 +136,8 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
 
   return (
     <AppShell header={header} footer={footer} progress={session.progress}>
+      <Confetti active={won} />
+
       <div className={s.stage}>
         {/* Remounting on every rejection is what replays the shake. */}
         <div

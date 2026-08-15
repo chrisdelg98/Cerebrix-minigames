@@ -1,4 +1,12 @@
 @layer components {
+  .frame {
+    padding: var(--sp-2);
+    background-color: var(--c-surface);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+  }
+
   /*
    * Set by the component (docs/STYLING.md §5): --cols, --rows, and optionally
    * --board-max and --board-gap. --cell-size is derived here and read back by

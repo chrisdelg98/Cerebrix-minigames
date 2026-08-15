@@ -1,5 +1,12 @@
 @layer components {
   .modal {
+    /*
+     * The UA stylesheet centres a modal <dialog> with `margin: auto`, and the
+     * global reset zeroes margins on everything — which parked every modal in
+     * the top-left corner. Restated here rather than exempting dialog from the
+     * reset, so the centring is visible where the modal is defined.
+     */
+    margin: auto;
     max-inline-size: min(100% - (2 * var(--sp-4)), 420px);
     padding: 0;
     background-color: var(--c-surface);

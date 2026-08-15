@@ -40,6 +40,14 @@ export function MotionIcon({ size = 20 }: SpriteProps) {
   );
 }
 
+export function ArrowLeftIcon({ size = 20 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <path d="M19 12H5M12 19l-7-7 7-7" />
+    </svg>
+  );
+}
+
 export function MotionOffIcon({ size = 20 }: SpriteProps) {
   return (
     <svg width={size} height={size} {...base}>

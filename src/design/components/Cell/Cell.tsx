@@ -27,6 +27,14 @@ export interface CellProps {
   onActivate?: () => void;
   disabled?: boolean;
   blockEdges?: readonly BlockEdge[];
+  /**
+   * Who put the value there. A board where your own digits look exactly like
+   * the ones you were given hides the only thing you actually did.
+   *
+   * Explicitly `| undefined` because `exactOptionalPropertyTypes` is on: an
+   * empty cell has no author, and saying so should not need a spread.
+   */
+  authored?: 'clue' | 'player' | undefined;
   /** Distance from the origin of a reveal, for wave cascades. */
   distance?: number;
   animate?: 'pop-in' | 'reveal-wave' | 'none';
@@ -55,6 +63,7 @@ export const Cell = memo(function Cell({
   onActivate,
   disabled = false,
   blockEdges,
+  authored,
   distance,
   animate = 'none',
   ref,
@@ -69,6 +78,7 @@ export const Cell = memo(function Cell({
       role="gridcell"
       className={`${s.cell} ${animationClass}`}
       data-state={state}
+      data-authored={authored}
       data-edge-top={blockEdges?.includes('top')}
       data-edge-right={blockEdges?.includes('right')}
       data-edge-bottom={blockEdges?.includes('bottom')}

@@ -207,17 +207,45 @@ interface StorageDriver {
 }
 ```
 
-- [ ] Interfaz + driver IndexedDB (`idb`), con fallback a `localStorage`
-- [ ] `schemaVersion` en cada registro + tabla de migraciones
-- [ ] `useAutosave`: debounce 400ms tras cada jugada + flush en `visibilitychange` y `pagehide`
-- [ ] Estadísticas: partidas, completadas, % éxito, tiempo total, mejor tiempo **por dificultad**, racha actual, racha máxima
-- [ ] "Continuar partida" en la tarjeta de Home cuando hay sesión guardada
-- [ ] Exportar/importar como archivo JSON
+- [x] Interfaz + driver IndexedDB (`idb`), con fallback a `localStorage`
+- [x] `schemaVersion` en cada registro + tabla de migraciones
+- [x] `useAutosave`: debounce 400ms tras cada jugada + flush en `visibilitychange` y `pagehide`
+- [x] Estadísticas: partidas, completadas, % éxito, tiempo total, mejor tiempo **por dificultad**, racha actual, racha máxima
+- [x] "Continuar partida" en la tarjeta de Home cuando hay sesión guardada
+- [x] Exportar/importar como archivo JSON
+
+> La interfaz creció dos miembros respecto del boceto: `listSessions()`, para que Home sepa qué juegos tienen algo que continuar en un solo viaje en vez de uno por juego, y `kind`, para poder afirmar en un diagnóstico qué implementación terminó corriendo.
 
 **✅ Aceptación:**
 
-- Jugás el dummy, matás la pestaña desde el administrador de tareas, reabrís → estado exacto, timer incluido.
-- Un test carga un registro con `schemaVersion: 1` y lo migra a la versión actual sin pérdida.
+| Criterio                                                       | Estado                                                                                                                                 |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Matás la pestaña y reabrís → estado exacto, **timer incluido** | ✅ `tests/persistence.test.tsx` desmonta el árbol sin aviso y lo vuelve a montar; el reloj retoma en `01:05` desde una sesión guardada |
+| Un registro viejo migra a la versión actual sin pérdida        | ⚠️ **El runner sí, la tabla está vacía.** Ver abajo                                                                                    |
+| El flush ocurre sin esperar el debounce                        | ✅ Test que dispara `visibilitychange` y verifica que se guardó igual                                                                  |
+| Un backup corrupto no destruye lo guardado                     | ✅ Test que importa basura y comprueba que la sesión anterior sigue ahí                                                                |
+
+**Sobre la migración:** el criterio pedía migrar un registro `schemaVersion: 1` a la versión actual — pero la forma del registro **no cambió todavía**, así que la tabla real está vacía y esa migración no existe. Inventar una falsa para que el test pase de verde sería mentir. Lo que se construyó y se testea es el **runner**: salta de versión en versión, se ejercita con una cadena sintética de v1 → v3, y **rechaza** tanto un registro del futuro como una cadena con un salto faltante, en vez de leerlo optimistamente y perder campos en silencio. Es la máquina donde la primera migración real se enchufa sin tocar nada más.
+
+### Decisiones que tomó esta fase
+
+**Las estadísticas se derivan del log de resultados, nunca se guardan al lado.** Un agregado corriendo junto al log son dos fuentes de verdad que divergen la primera vez que una escritura falla a medias, y después no hay forma de saber cuál tiene razón. Recomputar es barato a este volumen; si el log crece demasiado, la solución es compactar resultados viejos, no duplicar los totales.
+
+**"Racha" significa victorias consecutivas**, cortadas por una derrota — no días jugados. Es la lectura que encaja con el resto de la lista (partidas, completadas, % éxito) y la que hace que la llama del sprite se apague al llegar a cero.
+
+**Una sesión ilegible se descarta, un backup ilegible se rechaza.** Son casos opuestos a propósito: un autosave corrupto que no se puede leer deja al jugador trabado en ese juego para siempre, así que se borra; un archivo de importación inválido se valida **entero antes del primer borrado**, porque importar a medias sobre el historial de alguien no tiene vuelta atrás.
+
+**`schemaVersion` del registro ≠ `stateVersion` del juego.** El primero es de esta capa y versiona la forma del sobre; el segundo es del juego, viaja adentro, y se le pasa a `engine.deserialize` para que migre su propia forma. Separados, cambiar el estado de Sudoku no obliga a migrar los registros de Buscaminas.
+
+**Los object stores no se versionan con el registro.** Cambiar la forma de un registro no fuerza un bump de versión de IndexedDB ni el upgrade bloqueado que eso provoca cuando hay otra pestaña abierta.
+
+### Verificación
+
+Los dos drivers pasan **la misma suite de contrato**: el fallback no es un camino de segunda, lo recibe cualquier navegador en modo privado, y una divergencia entre ambos es justo el bug que solo le aparece a los usuarios con menos manera de reportarlo. Requirió agregar `fake-indexeddb` como dependencia de desarrollo — jsdom no trae IndexedDB, y sin eso el driver principal quedaba sin un solo test.
+
+Los tests de persistencia a nivel shell corren contra el fallback de `localStorage`, que es lo que jsdom permite. Lo que ejercitan es **el uso que el shell hace del storage**, no una implementación en particular.
+
+**Estado del build:** inicial **102.6 kB gzip** (97.6 JS + 5.0 CSS; presupuesto 120 kB). `idb` es la mayor parte de la subida. Queda margen, pero es el momento de mirarlo en cada fase.
 
 ---
 

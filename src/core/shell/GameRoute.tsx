@@ -60,7 +60,11 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
       <span className={s.title}>{session.module?.meta.name ?? entry.preview.name}</span>
 
       <span className={s.headerEnd}>
-        <Timer key={session.roundId} running={session.phase === 'ready' && playing} />
+        <Timer
+          key={session.roundId}
+          running={session.phase === 'ready' && playing}
+          elapsedMs={session.elapsedMs}
+        />
         <DifficultyPicker<Difficulty>
           value={session.difficulty}
           options={difficultyOptions(

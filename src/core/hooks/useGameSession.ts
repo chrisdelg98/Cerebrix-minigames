@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { SCHEMA_VERSION } from '@storage/index';
 
 import {
   type AnyGameModule,
@@ -7,13 +9,15 @@ import {
   type GameStatus,
   type Hint,
 } from '../contract';
+import { useStorage } from '../storageContext';
+import { useAutosave } from './useAutosave';
 
 /**
  * Everything the shell owns during a game: loading the module, holding the
- * state, the undo stack, rejected moves and the terminal status.
+ * state, the undo stack, rejected moves, the clock, autosave and the result.
  *
  * The game owns none of it — see the responsibility table in
- * docs/GAME_CONTRACT.md §5. Autosave and resume plug in here in Phase 3.
+ * docs/GAME_CONTRACT.md §5. It only supplies `serialize`/`deserialize`.
  */
 
 export type GameLoader = () => Promise<{ default: AnyGameModule }>;
@@ -42,6 +46,10 @@ export interface Session {
   canHint: boolean;
   /** Identifies the current board. The shell keys the timer off it. */
   roundId: string;
+  /** Time carried over from a resumed session; the clock continues from here. */
+  elapsedMs: number;
+  /** True when this board came back from storage rather than being generated. */
+  resumed: boolean;
   dispatch: (move: unknown) => void;
   undo: () => void;
   restart: () => void;
@@ -57,7 +65,13 @@ interface OfRound<T> {
   value: T;
 }
 
+function roundKey(difficulty: number, seed: string | undefined): string {
+  return `${String(difficulty)}:${seed ?? 'first'}`;
+}
+
 export function useGameSession(load: GameLoader, initialDifficulty: Difficulty): Session {
+  const storage = useStorage();
+
   const [module, setModule] = useState<AnyGameModule | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>(initialDifficulty);
@@ -67,13 +81,15 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
    * games that generate one, and it doubles as the identity of the round.
    */
   const [seed, setSeed] = useState<string | undefined>(undefined);
-  const round = `${difficulty}:${seed ?? 'first'}`;
+  const round = roundKey(difficulty, seed);
 
   // The undo stack IS the state: its last entry is the current position. That
   // only works because `applyMove` is contractually pure.
   const [stack, setStack] = useState<OfRound<unknown[]> | null>(null);
   const [lastRejection, setLastRejection] = useState<OfRound<Rejection> | null>(null);
   const [lastHint, setLastHint] = useState<OfRound<Hint | null> | null>(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
+  const [resumed, setResumed] = useState(false);
 
   // Everything below is DERIVED from the current round rather than cleared when
   // it changes: an effect that calls setState synchronously just to reset state
@@ -81,6 +97,20 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
   const history = stack?.round === round ? stack.value : [];
   const rejection = lastRejection?.round === round ? lastRejection.value : null;
   const hint = lastHint?.round === round ? lastHint.value : null;
+
+  // Read inside the board effect without making it depend on the stack — that
+  // dependency would restart the board on every move. Synced in an effect
+  // declared BEFORE that one, so it is already current when the board effect
+  // runs on the same commit.
+  const stackRef = useRef(stack);
+  useEffect(() => {
+    stackRef.current = stack;
+  }, [stack]);
+
+  /** Only the first board of a visit may be restored; later ones are asked for. */
+  const bootedRef = useRef(false);
+  const startedAtRef = useRef(0);
+  const recordedRoundRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -98,26 +128,57 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     };
   }, [load]);
 
-  // A new board whenever the module arrives, the difficulty changes, or the
-  // player restarts. `createInitialState` may be async (puzzle JSON, worker).
+  // Resume, or start a new board. `createInitialState` may be async (puzzle
+  // JSON, worker), and `deserialize` may reject a state it cannot read.
   useEffect(() => {
     if (!module) return;
+    // The board for this exact round already exists — nothing to do. This is
+    // what stops the resume below from being immediately overwritten when it
+    // adopts the saved difficulty and re-runs this effect.
+    if (stackRef.current?.round === round) return;
 
     let cancelled = false;
-    const config = module.engine.getDifficultyConfig(difficulty);
 
-    Promise.resolve(module.engine.createInitialState(config, seed))
-      .then((initial) => {
-        if (!cancelled) setStack({ round, value: [initial] });
-      })
-      .catch((cause: unknown) => {
-        if (!cancelled) setError(toError(cause));
-      });
+    const begin = async (): Promise<void> => {
+      if (!bootedRef.current) {
+        bootedRef.current = true;
+
+        const saved = await storage.loadSession(module.meta.id);
+        if (saved && !cancelled) {
+          try {
+            const state = module.engine.deserialize(saved.state, saved.stateVersion);
+            startedAtRef.current = performance.now();
+            setElapsedMs(saved.elapsedMs);
+            setResumed(true);
+            setDifficulty(saved.difficulty as Difficulty);
+            setStack({ round: roundKey(saved.difficulty, undefined), value: [state] });
+            return;
+          } catch {
+            // A save we cannot read is dropped rather than left to fail on
+            // every future visit to this game.
+            await storage.clearSession(module.meta.id);
+          }
+        }
+      }
+
+      const config = module.engine.getDifficultyConfig(difficulty);
+      const initial = await module.engine.createInitialState(config, seed);
+      if (cancelled) return;
+
+      startedAtRef.current = performance.now();
+      setElapsedMs(0);
+      setResumed(false);
+      setStack({ round, value: [initial] });
+    };
+
+    begin().catch((cause: unknown) => {
+      if (!cancelled) setError(toError(cause));
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [module, difficulty, seed, round]);
+  }, [module, difficulty, seed, round, storage]);
 
   const state = history.length > 0 ? history[history.length - 1] : undefined;
   const ready = module !== null && history.length > 0;
@@ -132,9 +193,52 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     [ready, module, state]
   );
 
+  const playing = status.kind === 'playing';
+
+  /** Wall-clock elapsed right now, which is what a save has to record. */
+  const currentElapsed = useCallback(
+    () => elapsedMs + (playing ? performance.now() - startedAtRef.current : 0),
+    [elapsedMs, playing]
+  );
+
+  useAutosave({
+    enabled: ready && playing && module !== null,
+    trigger: state,
+    save: () => {
+      if (!module || state === undefined) return;
+      void storage.saveSession(module.meta.id, {
+        schemaVersion: SCHEMA_VERSION,
+        gameId: module.meta.id,
+        stateVersion: module.meta.stateVersion,
+        difficulty,
+        state: module.engine.serialize(state),
+        elapsedMs: currentElapsed(),
+        savedAt: Date.now(),
+      });
+    },
+  });
+
+  // A finished game is recorded once and its autosave dropped: there is nothing
+  // left to continue.
+  useEffect(() => {
+    if (!module || !ready || playing) return;
+    if (recordedRoundRef.current === round) return;
+    recordedRoundRef.current = round;
+
+    void storage.recordResult(module.meta.id, {
+      schemaVersion: SCHEMA_VERSION,
+      gameId: module.meta.id,
+      difficulty,
+      outcome: status.kind === 'won' ? 'won' : 'lost',
+      elapsedMs: currentElapsed(),
+      finishedAt: Date.now(),
+    });
+    void storage.clearSession(module.meta.id);
+  }, [module, ready, playing, status.kind, round, difficulty, storage, currentElapsed]);
+
   const dispatch = useCallback(
     (move: unknown) => {
-      if (!module || state === undefined || status.kind !== 'playing') return;
+      if (!module || state === undefined || !playing) return;
 
       const verdict = module.engine.validate(state, move);
       if (!verdict.ok) {
@@ -152,7 +256,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
         current === null ? current : { round: current.round, value: [...current.value, next] }
       );
     },
-    [module, state, status.kind, round]
+    [module, state, playing, round]
   );
 
   const undo = useCallback(() => {
@@ -188,9 +292,11 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     difficulty,
     hint,
     rejection,
-    canUndo: history.length > 1 && status.kind === 'playing',
-    canHint: typeof module?.engine.getHint === 'function' && status.kind === 'playing',
+    canUndo: history.length > 1 && playing,
+    canHint: typeof module?.engine.getHint === 'function' && playing,
     roundId: round,
+    elapsedMs,
+    resumed,
     dispatch,
     undo,
     restart,

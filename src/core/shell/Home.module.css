@@ -41,11 +41,24 @@
     font-size: var(--fs-sm);
   }
 
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--sp-2);
+    margin-block-end: var(--sp-5);
+  }
+
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: var(--sp-3);
     list-style: none;
+  }
+
+  .footer {
+    margin-block-start: var(--sp-6);
+    padding-block-start: var(--sp-4);
+    border-block-start: var(--bw-hair) solid var(--c-border-hairline);
   }
 
   .card {

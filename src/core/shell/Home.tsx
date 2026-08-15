@@ -4,11 +4,17 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@design/components/Badge';
 import { EmptyState } from '@design/components/EmptyState';
 import { SettingsToggles } from '@design/components/SettingsToggles';
+import { StatTile } from '@design/components/StatTile';
+import { Clock } from '@design/sprites/Clock';
 import { LogoCerebrix } from '@design/sprites/LogoCerebrix';
+import { Streak } from '@design/sprites/Streak';
+import { Trophy } from '@design/sprites/Trophy';
 import { type CSSVars } from '@design/types';
 
 import { usePrefetch } from '../hooks/usePrefetch';
+import { useGlobalStats, useSavedSessions } from '../hooks/useStoredData';
 import { REGISTRY, type RegistryEntry } from '../registry';
+import { DataControls } from './DataControls';
 
 import s from './Home.module.css';
 
@@ -41,6 +47,13 @@ function claimIntro(): boolean {
 export function Home({ entries = REGISTRY }: HomeProps) {
   const prefetch = usePrefetch();
   const [intro] = useState(claimIntro);
+  const { sessions, refresh: refreshSessions } = useSavedSessions();
+  const { stats, refresh: refreshStats } = useGlobalStats();
+
+  const refreshAll = () => {
+    refreshSessions();
+    refreshStats();
+  };
 
   return (
     <div className={s.home} id="main" data-intro={intro}>
@@ -53,6 +66,28 @@ export function Home({ entries = REGISTRY }: HomeProps) {
         <SettingsToggles />
       </header>
 
+      {stats !== null && stats.played > 0 && (
+        <section className={s.stats} aria-label="Tus estadísticas">
+          <StatTile label="Partidas" value={stats.played} icon={<Trophy size={18} />} />
+          <StatTile
+            label="Completadas"
+            value={stats.completed}
+            icon={<Trophy size={18} state="unlocked" />}
+          />
+          <StatTile
+            label="Éxito"
+            value={Math.round(stats.successRate * 100)}
+            format={(value) => `${String(Math.round(value))}%`}
+            icon={<Clock size={18} />}
+          />
+          <StatTile
+            label="Racha"
+            value={stats.currentStreak}
+            icon={<Streak size={18} count={stats.currentStreak} />}
+          />
+        </section>
+      )}
+
       {entries.length === 0 ? (
         <EmptyState
           title="Todavía no hay juegos"
@@ -62,6 +97,7 @@ export function Home({ entries = REGISTRY }: HomeProps) {
         <ul className={s.grid}>
           {entries.map((entry, i) => {
             const Icon = entry.icon;
+            const saved = sessions[entry.id];
 
             return (
               <li
@@ -89,6 +125,7 @@ export function Home({ entries = REGISTRY }: HomeProps) {
                     <span className={s.cardTagline}>{entry.preview.tagline}</span>
 
                     <span className={s.cardMeta}>
+                      {saved !== undefined && <Badge tone="success">Continuar</Badge>}
                       {entry.preview.tags.map((tag) => (
                         <Badge key={tag}>{tag}</Badge>
                       ))}
@@ -104,6 +141,10 @@ export function Home({ entries = REGISTRY }: HomeProps) {
           })}
         </ul>
       )}
+
+      <footer className={s.footer}>
+        <DataControls onImported={refreshAll} />
+      </footer>
     </div>
   );
 }

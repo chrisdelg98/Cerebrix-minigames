@@ -1,0 +1,7 @@
+@layer components {
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+}

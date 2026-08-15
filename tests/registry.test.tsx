@@ -1,10 +1,14 @@
+import { type ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { type AnyGameModule } from '@core/contract';
 import { REGISTRY, type RegistryEntry } from '@core/registry';
 import { Home } from '@core/shell/Home';
+import { StorageContext } from '@core/storageContext';
+import { ToastProvider } from '@design/components/Toast';
+import { LocalStorageDriver } from '@storage/localStorageDriver';
 
 /**
  * Phase 1 acceptance (docs/PLAN.md): Home is painted from the registry, and
@@ -48,12 +52,27 @@ describe('registry', () => {
   });
 });
 
+/** Home lives inside the shell's providers, so it is tested inside them too. */
+function Shell({ children }: { children: ReactNode }) {
+  return (
+    <StorageContext.Provider value={new LocalStorageDriver()}>
+      <ToastProvider>
+        <MemoryRouter>{children}</MemoryRouter>
+      </ToastProvider>
+    </StorageContext.Provider>
+  );
+}
+
 describe('Home', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('renders one card per registry entry', () => {
     render(
-      <MemoryRouter>
+      <Shell>
         <Home />
-      </MemoryRouter>
+      </Shell>
     );
 
     expect(screen.getAllByRole('listitem')).toHaveLength(REGISTRY.length);
@@ -61,9 +80,9 @@ describe('Home', () => {
 
   it('shows a newly registered game without any other file changing', () => {
     render(
-      <MemoryRouter>
+      <Shell>
         <Home entries={[...REGISTRY, fakeEntry]} />
-      </MemoryRouter>
+      </Shell>
     );
 
     expect(screen.getByText('Juego inventado')).toBeInTheDocument();

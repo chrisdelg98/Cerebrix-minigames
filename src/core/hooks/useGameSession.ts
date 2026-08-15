@@ -56,6 +56,13 @@ export interface Session {
   elapsedMs: number;
   /** True when this board came back from storage rather than being generated. */
   resumed: boolean;
+  /**
+   * False until the player says go. The board is not shown and the clock is
+   * not running before that — otherwise the timer counts while they are still
+   * reading the rules, and the puzzle can be studied for free.
+   */
+  started: boolean;
+  start: () => void;
   dispatch: (move: unknown) => void;
   undo: () => void;
   restart: () => void;
@@ -99,6 +106,9 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
   const [elapsedMs, setElapsedMs] = useState(0);
   const [resumed, setResumed] = useState(false);
   const [pendingDifficulty, setPendingDifficulty] = useState<Difficulty | null>(null);
+  /* Which round the player pressed start on — derived, not reset by an effect:
+     a new board (restart, difficulty change) simply is not the started one. */
+  const [startedRound, setStartedRound] = useState<string | null>(null);
 
   // Everything below is DERIVED from the current round rather than cleared when
   // it changes: an effect that calls setState synchronously just to reset state
@@ -171,7 +181,6 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
         if (saved && !cancelled) {
           try {
             const state = module.engine.deserialize(saved.state, saved.stateVersion);
-            startedAtRef.current = performance.now();
             setElapsedMs(saved.elapsedMs);
             setResumed(true);
             setDifficulty(saved.difficulty as Difficulty);
@@ -189,7 +198,6 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
       const initial = await module.engine.createInitialState(config, seed);
       if (cancelled) return;
 
-      startedAtRef.current = performance.now();
       setElapsedMs(0);
       setResumed(false);
       setStack({ round, value: [initial] });
@@ -219,14 +227,21 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
 
   const playing = status.kind === 'playing';
 
+  const started = startedRound === round;
+
+  const start = useCallback(() => {
+    startedAtRef.current = performance.now();
+    setStartedRound(round);
+  }, [round]);
+
   /** Wall-clock elapsed right now, which is what a save has to record. */
   const currentElapsed = useCallback(
-    () => elapsedMs + (playing ? performance.now() - startedAtRef.current : 0),
-    [elapsedMs, playing]
+    () => elapsedMs + (started && playing ? performance.now() - startedAtRef.current : 0),
+    [elapsedMs, playing, started]
   );
 
   useAutosave({
-    enabled: ready && playing && module !== null,
+    enabled: started && ready && playing && module !== null,
     trigger: state,
     save: () => {
       if (!module || state === undefined) return;
@@ -245,7 +260,8 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
   // A finished game is recorded once and its autosave dropped: there is nothing
   // left to continue.
   useEffect(() => {
-    if (!module || !ready || playing) return;
+    // Nothing is recorded for a game that was never started.
+    if (!module || !ready || playing || !started) return;
     if (recordedRoundRef.current === round) return;
     recordedRoundRef.current = round;
 
@@ -258,11 +274,11 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
       finishedAt: Date.now(),
     });
     void storage.clearSession(module.meta.id);
-  }, [module, ready, playing, status.kind, round, difficulty, storage, currentElapsed]);
+  }, [module, ready, playing, started, status.kind, round, difficulty, storage, currentElapsed]);
 
   const dispatch = useCallback(
     (move: unknown) => {
-      if (!module || state === undefined || !playing) return;
+      if (!module || state === undefined || !playing || !started) return;
 
       const verdict = module.engine.validate(state, move);
       if (!verdict.ok) {
@@ -280,7 +296,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
         current === null ? current : { round: current.round, value: [...current.value, next] }
       );
     },
-    [module, state, playing, round]
+    [module, state, playing, started, round]
   );
 
   const undo = useCallback(() => {
@@ -349,6 +365,8 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     pendingDifficulty,
     elapsedMs,
     resumed,
+    started,
+    start,
     dispatch,
     undo,
     restart,

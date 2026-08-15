@@ -66,7 +66,7 @@ export function NumberPad({
           disabled={disabled}
           onClick={onTogglePencil}
         >
-          {pencil ? 'Lápiz activo' : 'Lápiz'}
+          {pencil ? 'Anotando' : 'Anotar'}
         </Button>
         <Button size="sm" icon={<EraserIcon size={16} />} disabled={disabled} onClick={onErase}>
           Borrar

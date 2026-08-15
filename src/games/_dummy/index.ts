@@ -20,6 +20,11 @@ export default defineGame({
     difficulties: [1, 3, 5],
     tags: ['lógica'],
     estimatedMinutes: [1, 2],
+    howToPlay: [
+      'Tocá cada casilla para marcarla.',
+      'Marcá todas y ganás.',
+      'El botón "Ganar" las marca todas de una.',
+    ],
     stateVersion: 1,
   },
 

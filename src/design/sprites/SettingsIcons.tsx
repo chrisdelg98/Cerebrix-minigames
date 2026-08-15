@@ -48,6 +48,23 @@ export function ArrowLeftIcon({ size = 20 }: SpriteProps) {
   );
 }
 
+export function HintIcon({ size = 18 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <path d="M9 18h6M10 21h4" />
+      <path d="M12 3a6 6 0 0 0-3.6 10.8c.4.3.6.8.6 1.2h6c0-.4.2-.9.6-1.2A6 6 0 0 0 12 3z" />
+    </svg>
+  );
+}
+
+export function PlayIcon({ size = 18 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <path d="M7 4.5v15l13-7.5z" />
+    </svg>
+  );
+}
+
 export function MotionOffIcon({ size = 20 }: SpriteProps) {
   return (
     <svg width={size} height={size} {...base}>

@@ -43,10 +43,89 @@
   }
 
   .live {
-    min-block-size: var(--sp-5);
+    display: grid;
+    place-items: center;
+    min-block-size: var(--sp-6);
+  }
+
+  /* A hint used to be grey text that nobody saw. It is the app answering a
+     question the player asked, so it gets the weight of an answer. */
+  .notice {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-4);
+    border: var(--bw-hair) solid;
+    border-radius: var(--r-full);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    animation: pop-in var(--d-base) var(--e-spring);
+  }
+
+  .notice[data-tone='hint'] {
+    background-color: var(--c-info-soft);
+    border-color: var(--c-info);
+    color: var(--c-info);
+  }
+
+  .notice[data-tone='error'] {
+    background-color: var(--c-danger-soft);
+    border-color: var(--c-danger);
+    color: var(--c-danger);
+  }
+
+  .gate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+    inline-size: min(100%, 480px);
+    padding: var(--sp-6) var(--sp-4);
+    text-align: center;
+    animation: slide-up var(--d-slow) var(--e-out) backwards;
+  }
+
+  .gateTitle {
+    font-size: var(--fs-2xl);
+  }
+
+  .gateLevel {
     color: var(--c-text-muted);
     font-size: var(--fs-sm);
-    text-align: center;
+  }
+
+  .rules {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    inline-size: 100%;
+    padding: var(--sp-4);
+    background-color: var(--c-surface);
+    border: var(--bw-hair) solid var(--c-border-hairline);
+    border-radius: var(--r-lg);
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    list-style: none;
+    text-align: start;
+  }
+
+  .rules li {
+    padding-inline-start: var(--sp-4);
+    position: relative;
+  }
+
+  .rules li::before {
+    position: absolute;
+    inset-inline-start: 0;
+    color: var(--c-accent);
+    content: '›';
+    font-weight: var(--fw-black);
+  }
+
+  .gateNote {
+    color: var(--c-text-subtle);
+    font-size: var(--fs-xs);
   }
 
   .message {

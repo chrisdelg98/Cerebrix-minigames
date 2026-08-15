@@ -18,6 +18,12 @@ export default defineGame({
     difficulties: [1, 2, 3, 4, 5],
     tags: ['lógica'],
     estimatedMinutes: [5, 25],
+    howToPlay: [
+      'Completá la grilla para que del 1 al 9 aparezca una sola vez en cada fila, cada columna y cada caja de 3×3.',
+      'Elegí una casilla y escribí con el teclado numérico, o con las teclas 1-9 y las flechas.',
+      'Con "Notas" anotás los candidatos posibles en chiquito, sin comprometerte todavía.',
+      'Si un número repite en su fila, columna o caja, se marca en rojo.',
+    ],
     stateVersion: 1,
   },
 

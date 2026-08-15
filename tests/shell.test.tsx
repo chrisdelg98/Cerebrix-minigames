@@ -130,6 +130,7 @@ describe('the contract, not the game', () => {
         difficulties: [1],
         tags: ['memoria'],
         estimatedMinutes: [1, 1],
+        howToPlay: ['Escribí tres letras.'],
         stateVersion: 1,
       },
       engine: {

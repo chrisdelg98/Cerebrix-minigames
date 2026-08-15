@@ -10,9 +10,10 @@
     inline-size: 100%;
     aspect-ratio: 1;
     background-color: var(--cell-bg, var(--c-cell));
-    /* Always a visible edge, however faint: an empty cell with no border
-       stops reading as a cell at all. */
-    border: var(--bw-hair) solid var(--c-border);
+
+    /* Always a visible edge: an empty cell with no border stops reading as a
+       cell at all, and the faint one disappeared under the row/column tint. */
+    border: var(--bw-hair) solid var(--c-border-strong);
     border-radius: var(--cell-radius, var(--r-sm));
     color: var(--c-text);
     font-family: var(--font-num);
@@ -81,9 +82,13 @@
     color: var(--c-danger);
   }
 
+  /* The hint is the app pointing at a square. A thicker ring is what makes
+     "here" unmistakable without shouting. */
   .cell[data-state='hint'] {
     background-color: var(--c-cell-hint);
+    border-width: var(--bw-base);
     border-color: var(--c-info);
+    color: var(--c-info);
   }
 
   /* Block dividers drawn with inset shadows: no extra nodes in a 480-cell board. */

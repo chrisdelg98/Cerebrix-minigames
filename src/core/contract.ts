@@ -28,6 +28,12 @@ export interface GameMeta {
   /** For filtering and grouping on Home. */
   tags: GameTag[];
   estimatedMinutes: [min: number, max: number];
+  /**
+   * Two or three lines of "how this is played", shown before the board.
+   * The shell gates every game behind a start screen and has no idea what any
+   * of them are about — so the rules travel with the game, like everything else.
+   */
+  howToPlay: string[];
   /** Shape version of TState. Bump it whenever the saved shape changes. */
   stateVersion: number;
 }

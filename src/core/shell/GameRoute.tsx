@@ -8,7 +8,7 @@ import { Modal } from '@design/components/Modal';
 import { Skeleton } from '@design/components/Skeleton';
 import { Timer } from '@design/components/Timer';
 import { useToast } from '@design/components/Toast';
-import { ArrowLeftIcon } from '@design/sprites/SettingsIcons';
+import { ArrowLeftIcon, HintIcon, PlayIcon } from '@design/sprites/SettingsIcons';
 import { Trophy } from '@design/sprites/Trophy';
 
 import { type Difficulty } from '../contract';
@@ -69,7 +69,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
       <span className={s.headerEnd}>
         <Timer
           key={session.roundId}
-          running={session.phase === 'ready' && playing}
+          running={session.started && session.phase === 'ready' && playing}
           elapsedMs={session.elapsedMs}
         />
         <DifficultyPicker<Difficulty>
@@ -106,6 +106,39 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
 
   const { View, actions = [] } = session.module;
   const won = session.status.kind === 'won';
+
+  /*
+   * Nothing of the board is rendered before the player starts — not hidden with
+   * CSS, not rendered at all. A blurred board can still be read off the DOM, and
+   * the whole point is that the puzzle cannot be studied while the clock is
+   * stopped. It also gives them a moment to change the level or read the rules.
+   */
+  if (!session.started) {
+    return (
+      <AppShell header={header}>
+        <div className={s.gate}>
+          <h2 className={s.gateTitle}>{session.module.meta.name}</h2>
+          <p className={s.gateLevel}>
+            {session.resumed ? 'Tenés una partida a medias en ' : 'Vas a jugar en '}
+            <strong>{DIFFICULTY_LABELS[session.difficulty]}</strong>
+            {session.resumed ? '.' : '. Podés cambiar el nivel arriba antes de empezar.'}
+          </p>
+
+          <ul className={s.rules}>
+            {session.module.meta.howToPlay.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+
+          <Button variant="primary" size="lg" icon={<PlayIcon size={20} />} onClick={session.start}>
+            {session.resumed ? 'Continuar partida' : 'Empezar partida'}
+          </Button>
+
+          <p className={s.gateNote}>El reloj arranca cuando tocás el botón.</p>
+        </div>
+      </AppShell>
+    );
+  }
 
   const footer = (
     <>
@@ -162,9 +195,19 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
           it opens, and saying it twice makes a screen reader read the win
           twice over.
         */}
-        <p className={s.live} role="status" aria-live="polite">
-          {playing ? (session.rejection?.reason ?? session.hint?.message ?? '') : ''}
-        </p>
+        <div className={s.live} role="status" aria-live="polite">
+          {playing && session.rejection && (
+            <p className={s.notice} data-tone="error">
+              {session.rejection.reason}
+            </p>
+          )}
+          {playing && !session.rejection && session.hint && (
+            <p className={s.notice} data-tone="hint">
+              <HintIcon size={18} />
+              {session.hint.message}
+            </p>
+          )}
+        </div>
       </div>
 
       <Modal

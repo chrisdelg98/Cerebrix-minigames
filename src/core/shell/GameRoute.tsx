@@ -125,18 +125,55 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
             {session.resumed ? '.' : '. Podés cambiar el nivel arriba antes de empezar.'}
           </p>
 
+          <div className={s.gateActions}>
+            <Button
+              variant="primary"
+              size="lg"
+              icon={<PlayIcon size={20} />}
+              onClick={session.start}
+            >
+              {session.resumed ? 'Continuar partida' : 'Empezar partida'}
+            </Button>
+
+            {/* The rules are one tap away, not in the way. Someone who already
+                knows the game should not have to read past them every time. */}
+            <Button
+              size="lg"
+              icon={<HintIcon size={20} />}
+              onClick={() => {
+                setRulesOpen(true);
+              }}
+            >
+              Cómo se juega
+            </Button>
+          </div>
+
+          <p className={s.gateNote}>El reloj arranca cuando tocás el botón.</p>
+        </div>
+
+        <Modal
+          open={rulesOpen}
+          onClose={() => {
+            setRulesOpen(false);
+          }}
+          title={`Cómo se juega ${session.module.meta.name}`}
+          actions={
+            <Button
+              variant="primary"
+              onClick={() => {
+                setRulesOpen(false);
+              }}
+            >
+              Entendido
+            </Button>
+          }
+        >
           <ul className={s.rules}>
             {session.module.meta.howToPlay.map((line) => (
               <li key={line}>{line}</li>
             ))}
           </ul>
-
-          <Button variant="primary" size="lg" icon={<PlayIcon size={20} />} onClick={session.start}>
-            {session.resumed ? 'Continuar partida' : 'Empezar partida'}
-          </Button>
-
-          <p className={s.gateNote}>El reloj arranca cuando tocás el botón.</p>
-        </div>
+        </Modal>
       </AppShell>
     );
   }

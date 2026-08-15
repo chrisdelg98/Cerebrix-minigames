@@ -10,7 +10,9 @@
     inline-size: 100%;
     aspect-ratio: 1;
     background-color: var(--cell-bg, var(--c-cell));
-    border: var(--bw-hair) solid var(--c-border-hairline);
+    /* Always a visible edge, however faint: an empty cell with no border
+       stops reading as a cell at all. */
+    border: var(--bw-hair) solid var(--c-border);
     border-radius: var(--cell-radius, var(--r-sm));
     color: var(--c-text);
     font-family: var(--font-num);

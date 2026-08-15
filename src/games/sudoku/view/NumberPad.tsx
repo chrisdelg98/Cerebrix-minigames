@@ -1,4 +1,4 @@
-import { IconButton } from '@design/components/IconButton';
+import { Button } from '@design/components/Button';
 
 import { EraserIcon, PencilIcon } from '../sprites/SudokuIcons';
 
@@ -56,21 +56,21 @@ export function NumberPad({
         })}
       </div>
 
+      {/* Icon plus label: two bare icons under the keypad were a guessing game. */}
       <div className={s.tools}>
-        <IconButton
-          label={pencil ? 'Salir del modo lápiz' : 'Modo lápiz'}
-          icon={<PencilIcon />}
-          variant={pencil ? 'solid' : 'ghost'}
+        <Button
+          size="sm"
+          variant={pencil ? 'primary' : 'ghost'}
+          icon={<PencilIcon size={16} />}
           aria-pressed={pencil}
           disabled={disabled}
           onClick={onTogglePencil}
-        />
-        <IconButton
-          label="Borrar la celda"
-          icon={<EraserIcon />}
-          disabled={disabled}
-          onClick={onErase}
-        />
+        >
+          {pencil ? 'Lápiz activo' : 'Lápiz'}
+        </Button>
+        <Button size="sm" icon={<EraserIcon size={16} />} disabled={disabled} onClick={onErase}>
+          Borrar
+        </Button>
       </div>
     </div>
   );

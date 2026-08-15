@@ -48,8 +48,14 @@ export default tseslint.config(
         { type: 'design', pattern: 'src/design' },
         { type: 'storage', pattern: 'src/storage' },
         // The capture holds the game id, so policies can tell one game from
-        // another. The engine is listed first: it is nested inside a game and
-        // needs to win over the broader 'game' element.
+        // another. The nested elements are listed first: they live inside a
+        // game and need to win over the broader 'game' element.
+        //
+        // `game-data` exists so the engine can read its own puzzles without
+        // being handed the whole game. Widening the policy to "engine may
+        // import its game" would have let it reach into view/ and drag React
+        // in through the back door.
+        { type: 'game-data', pattern: 'src/games/*/data', capture: ['id'] },
         { type: 'game-engine', pattern: 'src/games/*/engine', capture: ['id'] },
         { type: 'game', pattern: 'src/games/*', capture: ['id'] },
       ],
@@ -93,6 +99,7 @@ export default tseslint.config(
               from: [{ element: { type: 'game-engine' } }],
               allow: [
                 { to: { element: { type: 'game-engine', captured: { id: '{{from.id}}' } } } },
+                { to: { element: { type: 'game-data', captured: { id: '{{from.id}}' } } } },
                 { to: { element: { type: 'core' } } },
               ],
             },
@@ -105,6 +112,7 @@ export default tseslint.config(
                 { to: { element: { type: 'storage' } } },
                 { to: { element: { type: 'core' } } },
                 { to: { element: { type: 'game', captured: { id: '{{from.id}}' } } } },
+                { to: { element: { type: 'game-data', captured: { id: '{{from.id}}' } } } },
               ],
             },
             {

@@ -1,10 +1,20 @@
-import { memo, type ReactNode } from 'react';
+import { memo, type ReactNode, type Ref } from 'react';
 
 import { type CSSVars } from '../../types';
 
 import s from './Cell.module.css';
 
-export type CellState = 'empty' | 'filled' | 'fixed' | 'selected' | 'peer' | 'error' | 'hint';
+export type CellState =
+  | 'empty'
+  | 'filled'
+  | 'fixed'
+  | 'selected'
+  /** Shares a row, column or box with the selected cell. */
+  | 'peer'
+  /** Holds the same digit as the selected cell, anywhere on the board. */
+  | 'same'
+  | 'error'
+  | 'hint';
 
 /** Which sides carry a thick block divider — Sudoku's 3×3 boxes, and anything like them. */
 export type BlockEdge = 'top' | 'right' | 'bottom' | 'left';
@@ -20,6 +30,11 @@ export interface CellProps {
   /** Distance from the origin of a reveal, for wave cascades. */
   distance?: number;
   animate?: 'pop-in' | 'reveal-wave' | 'none';
+  /**
+   * React 19 passes ref as an ordinary prop — no forwardRef needed. A board
+   * that owns keyboard navigation needs this to move focus with the selection.
+   */
+  ref?: Ref<HTMLButtonElement>;
 }
 
 /**
@@ -42,12 +57,14 @@ export const Cell = memo(function Cell({
   blockEdges,
   distance,
   animate = 'none',
+  ref,
 }: CellProps) {
   const animationClass =
     animate === 'pop-in' ? 'anim-pop-in' : animate === 'reveal-wave' ? 'anim-reveal-wave' : '';
 
   return (
     <button
+      ref={ref}
       type="button"
       role="gridcell"
       className={`${s.cell} ${animationClass}`}

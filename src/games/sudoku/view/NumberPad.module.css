@@ -1,0 +1,66 @@
+@layer game {
+  .pad {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    inline-size: min(100%, 360px);
+  }
+
+  .digits {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: var(--sp-1);
+  }
+
+  /* --bp-sm — on a narrow phone nine keys in a row are below the touch
+     minimum, so they wrap to two rows. docs/DESIGN_SYSTEM.md §7.1 */
+  @media (width < 480px) {
+    .digits {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  .digit {
+    min-block-size: var(--touch-min);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-sm);
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    transition-property: transform, background-color, opacity, box-shadow;
+    transition-duration: var(--d-instant);
+    transition-timing-function: var(--e-snap);
+  }
+
+  .digit[data-done='true'] {
+    opacity: 0.35;
+  }
+
+  /* The pencil colours the pad itself, so the mode is visible from wherever
+     the eye happens to be — not only from the toggle. */
+  .pad[data-pencil='true'] .digit {
+    background-color: var(--c-info-soft);
+    border-color: var(--c-info);
+    color: var(--c-info);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .digit:hover:not(:disabled) {
+      background-color: var(--c-cell-hover);
+    }
+  }
+
+  .digit:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: var(--sh-none);
+  }
+
+  .tools {
+    display: flex;
+    gap: var(--sp-2);
+    justify-content: center;
+  }
+}

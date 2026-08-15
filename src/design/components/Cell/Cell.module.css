@@ -49,6 +49,11 @@
     background-color: var(--c-cell-peer);
   }
 
+  /* Stronger than peer: same-digit is a deliberate lookup, peer is ambient. */
+  .cell[data-state='same'] {
+    background-color: var(--c-accent-soft);
+  }
+
   .cell[data-state='selected'] {
     background-color: var(--c-cell-active);
     border-color: var(--c-accent);

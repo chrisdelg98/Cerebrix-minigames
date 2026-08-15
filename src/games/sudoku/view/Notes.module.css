@@ -1,0 +1,20 @@
+@layer game {
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    inline-size: 100%;
+    block-size: 100%;
+    padding: 2px;
+    color: var(--c-text-subtle);
+
+    /* Scales with the cell, like the digit does — docs/DESIGN_SYSTEM.md §3. */
+    font-size: clamp(0.5rem, calc(var(--cell-size, 2rem) * 0.24), 0.75rem);
+    font-weight: var(--fw-medium);
+    line-height: 1;
+  }
+
+  .note {
+    display: grid;
+    place-items: center;
+  }
+}

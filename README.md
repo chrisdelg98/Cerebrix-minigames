@@ -36,7 +36,7 @@ Lo que la hace distinta no es la lista de juegos. Es que está construida sobre 
 
 |     | Juego                                                               |   Estado   | Dificultades |
 | :-: | ------------------------------------------------------------------- | :--------: | :----------: |
-| 🔢  | **Sudoku** — clásico 9×9 con anotaciones, pistas y generador propio | 🚧 Fase 5  |     1–5      |
+| 🔢  | **Sudoku** — clásico 9×9 con anotaciones, pistas y generador propio | 🎮 Jugable |     1–5      |
 | 💣  | **Buscaminas** — con primer click seguro y chording                 | 📋 Fase 6  |     1–5      |
 | 🃏  | **Solitario** — Klondike                                            | 💭 Backlog |      —       |
 | 🧩  | **Nonograma**                                                       | 💭 Backlog |      —       |
@@ -206,7 +206,7 @@ cerebrix/
 ✅ Fase 2  Design system        tokens, componentes, animaciones
 ✅ Fase 3  Persistencia         autosave, estadísticas, migraciones
 ✅ Fase 4  Dificultad           escala 1–5 unificada
-🚧 Fase 5  Sudoku               el primer juego real
+🚧 Fase 5  Sudoku               5a jugable ✅ · 5b generador propio
 📋 Fase 6  Buscaminas           la prueba de fuego de la arquitectura
 📋 Fase 7  Pulido               PWA, offline, presupuestos de performance
 ```

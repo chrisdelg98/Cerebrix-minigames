@@ -15,7 +15,12 @@ describe('/core knows no game', () => {
   it('mentions games/ only in the registry', () => {
     const files = readdirSync(CORE, { recursive: true, encoding: 'utf8' })
       .map((entry) => entry.replaceAll('\\', '/'))
-      .filter((entry) => entry.endsWith('.ts') || entry.endsWith('.tsx'));
+      .filter((entry) => entry.endsWith('.ts') || entry.endsWith('.tsx'))
+      // boundaries.test.ts writes illegal-import fixtures into src/core and
+      // deletes them again. Vitest runs suites in parallel workers, so those
+      // files can exist on disk while this one is scanning — the reason they
+      // carry a prefix that no real source file uses.
+      .filter((entry) => !entry.includes('__fixture'));
 
     expect(files.length, 'no files scanned — check the path').toBeGreaterThan(0);
 

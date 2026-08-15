@@ -1,0 +1,12 @@
+@layer game {
+  .sudoku {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+
+  .boardWrap {
+    display: contents;
+  }
+}

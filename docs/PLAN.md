@@ -292,13 +292,13 @@ type Difficulty = 1 | 2 | 3 | 4 | 5;
 
 **5a — Jugable con puzzles pregenerados**
 
-- [ ] `data/puzzles-{1..5}.json` (≥ 50 por dificultad), importados dinámicamente
-- [ ] Engine puro: `createInitialState`, `applyMove`, `validate`, `checkWin`, `serialize`, `deserialize`
-- [ ] Vista: grid 9×9 con líneas de bloque, selección, resaltado de pares (fila/columna/caja), resaltado del mismo número
-- [ ] Teclado numérico táctil + soporte de teclado físico + flechas
-- [ ] Modo lápiz (anotaciones), deshacer/rehacer, borrar
-- [ ] Detección de conflictos con `shake` + `--c-cell-error`
-- [ ] Victoria: `win-burst` + guardado de resultado
+- [x] `data/puzzles-{1..5}.json` (50 por dificultad), importados dinámicamente
+- [x] Engine puro: `createInitialState`, `applyMove`, `validate`, `checkStatus`, `serialize`, `deserialize`
+- [x] Vista: grid 9×9 con líneas de bloque, selección, resaltado de pares (fila/columna/caja), resaltado del mismo número
+- [x] Teclado numérico táctil + soporte de teclado físico + flechas
+- [x] Modo lápiz (anotaciones), borrar — **`rehacer` no**, ver hallazgos
+- [x] Detección de conflictos con `--c-cell-error`; el `shake` quedó para las jugadas ilegales, ver decisiones
+- [x] Victoria: `win-burst` + guardado de resultado
 
 **5b — Generador propio**
 
@@ -309,9 +309,39 @@ type Difficulty = 1 | 2 | 3 | 4 | 5;
 
 **✅ Aceptación:**
 
-- Sudoku jugable, guardable, con dificultad, dentro del shell — **con cero cambios en `/core`** (verificable en el diff).
-- Tests del engine: unicidad de solución, detección de conflictos, round-trip de serialización.
-- 60fps al navegar el tablero con throttling 4× en un móvil emulado.
+| Criterio                                                                   | Estado                                                                                                                                            |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sudoku jugable, guardable, con dificultad, **con cero cambios en `/core`** | ✅ **El diff entero de `/core` son 14 líneas en `registry.ts`**: la entrada del registro. Ni el contrato, ni el shell, ni la sesión, ni el router |
+| Tests del engine: unicidad, conflictos, round-trip                         | ✅ `tests/sudokuEngine.test.ts` — 22 casos, sin DOM ni renderer                                                                                   |
+| 60fps con throttling 4× en un móvil emulado                                | ⚠️ **Sin medir.** Requiere DevTools en un navegador real                                                                                          |
+
+**Lo que dice el primer criterio:** la arquitectura funciona. Un juego real, con 81 celdas, teclado, anotaciones, puzzles propios y persistencia, entró sin que `/core` supiera que existe.
+
+### Decisiones que tomó esta fase
+
+**Un dígito en conflicto se escribe y se marca en rojo; no se bloquea.** El plan pedía `shake` + `--c-cell-error` para los conflictos, lo que sugiere rechazarlos. Rechazarlos convierte al juego en un detector de errores gratis: el jugador prueba un número y el tablero le dice si estaba bien. Sudoku es deducción; equivocarse y darse cuenta es el juego. Así que el conflicto es un **estado derivado del tablero** que la vista pinta con `--c-cell-error`, y el `shake` queda para las jugadas genuinamente ilegales — tocar una pista. Efecto lateral valioso: los conflictos viven en el estado, así que la vista los calcula sola y no hizo falta tocar el contrato.
+
+**Completo no es correcto.** Como los conflictos se permiten, un tablero lleno puede estar mal. `checkStatus` compara contra la solución única en vez de conformarse con que no queden huecos.
+
+**Escribir dos veces el mismo dígito lo borra.** Una tecla hace poner y quitar, que en móvil es la diferencia entre una pulsación y buscar el botón de borrar.
+
+**Colocar un dígito retira esa anotación de sus 20 pares.** Hacerlo a mano es exactamente la tedio que el modo lápiz existe para evitar, y como deshacer restaura estados enteros, ser servicial acá no cuesta nada.
+
+**El puzzle se elige por hash del seed.** El mismo seed da el mismo tablero, que es lo que el puzzle diario del backlog va a necesitar sin cambiar nada.
+
+**`game-data` es un elemento de frontera nuevo.** El motor tenía que leer `data/puzzles-N.json`, y la regla lo marcó como _engine → game_. La regla tenía razón en preguntar: la respuesta fue afinarla, no aflojarla. Permitir "el motor puede importar su juego" le habría abierto la puerta a `view/` y a React por la ventana de atrás. Ahora existe `game-data`, y el motor puede leer sus datos y nada más.
+
+### 🔎 Tres huecos del contrato que esta fase destapó
+
+Ninguno se parcheó por cuenta propia — van a la revisión de contrato de la Fase 6, que es donde el plan dice que corresponde.
+
+1. **`ValidationResult.cells` no tiene por dónde llegar a la vista.** El contrato lo documenta como "celdas a resaltar en rojo", pero `GameViewProps` no lleva el rechazo: el shell sabe qué celdas señalar y no tiene cómo decírselo a quien las dibuja. Acá no dolió porque los conflictos terminaron viviendo en el estado, pero el campo hoy no sirve para lo que promete.
+
+2. **`GameAction.toggle` está declarado y es inusable.** El shell puede dibujar la acción activa, pero la vista no puede leer ese estado, así que un toggle en la barra se encendería sin cambiar lo que hace tocar una celda. Por eso el modo lápiz vive en el teclado numérico — que además es donde el dedo ya está.
+
+3. **No existe `rehacer`.** Según `GAME_CONTRACT.md` §5 deshacer/rehacer son del shell, no del juego, así que agregarlo es tocar `/core`. Se dejó afuera a propósito para no contaminar el diff con el que se verifica el criterio de aceptación de esta fase. Es un hueco del shell, no del contrato.
+
+**Estado del build:** inicial **95.5 kB gzip** (bajó al reacomodarse los chunks). Sudoku: **4.0 kB gzip** de código + **3.9 kB** del archivo de puzzles de la dificultad que se juegue — 8 kB contra un presupuesto de 60.
 
 ---
 

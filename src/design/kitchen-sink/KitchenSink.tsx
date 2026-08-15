@@ -31,7 +31,16 @@ import s from './KitchenSink.module.css';
  * anyone's bundle unless they ask for it.
  */
 
-const CELL_STATES: CellState[] = ['empty', 'filled', 'fixed', 'selected', 'peer', 'error', 'hint'];
+const CELL_STATES: CellState[] = [
+  'empty',
+  'filled',
+  'fixed',
+  'selected',
+  'peer',
+  'same',
+  'error',
+  'hint',
+];
 
 export function KitchenSink() {
   const [difficulty, setDifficulty] = useState<1 | 2 | 3 | 4 | 5>(3);

@@ -6,6 +6,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 // import(), and by an icon small enough to ride in the initial bundle. The lint
 // exemption for this exact path lives in eslint.config.js.
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
+import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
 
 /**
  * The manifest. Adding a game is adding an entry here and nothing else in /core.
@@ -22,6 +23,19 @@ export interface RegistryEntry {
 }
 
 export const REGISTRY: readonly RegistryEntry[] = [
+  {
+    id: 'sudoku',
+    preview: {
+      id: 'sudoku',
+      name: 'Sudoku',
+      tagline: 'El clásico 9×9, con anotaciones y pistas.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      estimatedMinutes: [5, 25],
+    },
+    icon: SudokuIcon,
+    load: () => import('@games/sudoku'),
+  },
   {
     id: '_dummy',
     preview: {

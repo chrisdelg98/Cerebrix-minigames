@@ -175,7 +175,7 @@ describe('kitchen sink', () => {
     expect(await screen.findByRole('heading', { name: 'Kitchen sink' })).toBeInTheDocument();
 
     // The seven cell states of docs/DESIGN_SYSTEM.md §9, plus both boards.
-    for (const state of ['empty', 'filled', 'fixed', 'selected', 'peer', 'error', 'hint']) {
+    for (const state of ['empty', 'filled', 'fixed', 'selected', 'peer', 'same', 'error', 'hint']) {
       expect(screen.getByRole('gridcell', { name: `Celda ${state}` })).toBeInTheDocument();
     }
     expect(screen.getByRole('grid', { name: 'Tablero de ejemplo' })).toBeInTheDocument();

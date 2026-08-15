@@ -24,6 +24,15 @@ export const routes: RouteObject[] = [
           return { Component: GameRoute };
         },
       },
+      {
+        // The design system, documenting itself. Lazily routed: nobody
+        // downloads it unless they go looking for it.
+        path: 'kitchen-sink',
+        lazy: async () => {
+          const { KitchenSink } = await import('@design/kitchen-sink/KitchenSink');
+          return { Component: KitchenSink };
+        },
+      },
       { path: '*', element: <NotFound /> },
     ],
   },

@@ -1,0 +1,47 @@
+@layer components {
+  /* Anchored top on mobile — the bottom belongs to the action bar. */
+  .host {
+    position: fixed;
+    inset-block-start: calc(var(--sp-3) + env(safe-area-inset-top));
+    inset-inline: var(--sp-4);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    align-items: center;
+    pointer-events: none;
+  }
+
+  /* --bp-sm — docs/DESIGN_SYSTEM.md §7.1 */
+  @media (width >= 480px) {
+    .host {
+      inset-block: auto calc(var(--sp-5) + env(safe-area-inset-bottom));
+      inset-inline: auto var(--sp-5);
+      align-items: flex-end;
+    }
+  }
+
+  .toast {
+    max-inline-size: min(100%, 380px);
+    padding: var(--sp-3) var(--sp-4);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-md);
+    color: var(--c-text);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+  }
+
+  .toast[data-tone='success'] {
+    border-color: var(--c-success);
+  }
+
+  .toast[data-tone='danger'] {
+    border-color: var(--c-danger);
+  }
+
+  .toast[data-tone='info'] {
+    border-color: var(--c-info);
+  }
+}

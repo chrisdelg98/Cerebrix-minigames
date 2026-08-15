@@ -109,6 +109,32 @@
   }
 }
 
+@keyframes flip {
+  from {
+    transform: rotateY(0deg);
+  }
+
+  to {
+    transform: rotateY(180deg);
+  }
+}
+
+/* Victory. The overshoot lands back on scale(1), so the end state is correct
+   even when the animation is suppressed. */
+@keyframes win-burst {
+  0% {
+    transform: scale(1);
+  }
+
+  35% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
 /* ─────────── Utility classes ─────────── */
 
 .anim-pop-in {
@@ -140,4 +166,24 @@
 .anim-stagger {
   animation: pop-in var(--d-base) var(--e-out) backwards;
   animation-delay: min(calc(var(--i, 0) * var(--stagger-step)), var(--stagger-max));
+}
+
+/*
+ * Cascade by WAVE, not by index: the delay comes from the distance to the
+ * origin of the reveal, so a 480-cell board never animates all at once.
+ *   <div style={{ '--dist': chebyshevDistance }} className="anim-reveal-wave">
+ * docs/DESIGN_SYSTEM.md §5.2, rule 3.
+ */
+.anim-reveal-wave {
+  animation: reveal-wave var(--d-base) var(--e-out) backwards;
+  animation-delay: min(calc(var(--dist, 0) * var(--stagger-step)), var(--stagger-max));
+}
+
+.anim-flip {
+  animation: flip var(--d-base) var(--e-in-out) forwards;
+  backface-visibility: hidden;
+}
+
+.anim-win-burst {
+  animation: win-burst var(--d-slower) var(--e-spring);
 }

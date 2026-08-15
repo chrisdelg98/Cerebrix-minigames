@@ -1,0 +1,7 @@
+@layer components {
+  .toggles {
+    display: flex;
+    gap: var(--sp-1);
+    margin-inline-start: auto;
+  }
+}

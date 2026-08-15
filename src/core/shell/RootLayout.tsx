@@ -2,17 +2,18 @@ import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import { Skeleton } from '@design/components/Skeleton';
+import { ToastProvider } from '@design/components/Toast';
 
 import s from './RootLayout.module.css';
 
 /**
- * Everything outside the routes: the skip link and the fallback shown while a
- * lazily routed chunk is in flight. A shaped skeleton, never a full-screen
- * spinner (docs/DESIGN_SYSTEM.md §5.4).
+ * Everything outside the routes: the skip link, the toast host, and the
+ * fallback shown while a lazily routed chunk is in flight. A shaped skeleton,
+ * never a full-screen spinner (docs/DESIGN_SYSTEM.md §5.4).
  */
 export function RootLayout() {
   return (
-    <>
+    <ToastProvider>
       <a className="skip-link" href="#main">
         Saltar al contenido
       </a>
@@ -20,7 +21,7 @@ export function RootLayout() {
       <Suspense fallback={<RouteFallback />}>
         <Outlet />
       </Suspense>
-    </>
+    </ToastProvider>
   );
 }
 

@@ -154,20 +154,39 @@ cerebrix/
 
 Referencia normativa completa: [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
 
-- [ ] Tokens completos: color (dark + light), tipografía, espaciado, radios, sombras, motion
-- [ ] `animations.css` con el catálogo estándar (§5.3)
-- [ ] Componentes base: `Button`, `IconButton`, `Cell`, `Grid`, `Timer`, `Badge`, `DifficultyPicker`, `Modal`, `Toast`, `Skeleton`, `StatTile`
-- [ ] Secuencia de entrada animada de la Home (§5.4)
-- [ ] Sprites compartidos: `LogoCerebrix`, `Trophy`, `Streak`, `Clock`
-- [ ] Toggle de tema (dark/light) + script anti-FOUC en `<head>`
-- [ ] Toggle "Reducir animaciones" + soporte de `prefers-reduced-motion`
-- [ ] Layout responsive: barra de acciones fija abajo en móvil, `dvh`, `safe-area-inset`
+- [x] Tokens completos: color (dark + light), tipografía, espaciado, radios, sombras, motion
+- [x] `animations.css` con el catálogo estándar (§5.3)
+- [x] Componentes base: `Button`, `IconButton`, `Cell`, `Grid`, `Timer`, `Badge`, `DifficultyPicker`, `Modal`, `Toast`, `Skeleton`, `StatTile` — más `ProgressBar` y `EmptyState`
+- [x] Secuencia de entrada animada de la Home (§5.4)
+- [x] Sprites compartidos: `LogoCerebrix`, `Trophy`, `Streak`, `Clock`
+- [x] Toggle de tema (dark/light) + script anti-FOUC en `<head>`
+- [x] Toggle "Reducir animaciones" + soporte de `prefers-reduced-motion`
+- [x] Layout responsive: barra de acciones fija abajo en móvil, `dvh`, `safe-area-inset`
 
 **✅ Aceptación:**
 
-- Cambiar `--raw-violet-600` repinta acentos en toda la app.
-- Nada se rompe a 360px de ancho ni con las animaciones desactivadas.
-- Storybook o una ruta `/kitchen-sink` muestra todos los componentes en sus estados.
+| Criterio                                                  | Estado                                                                                                                                     |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Cambiar `--raw-violet-600` repinta acentos en toda la app | ✅ `tests/tokens.test.ts` verifica que la cadena token → paleta no esté cortada                                                            |
+| Ruta que muestra todos los componentes en sus estados     | ✅ `/kitchen-sink`, lazy — `tests/design.test.tsx` la monta entera                                                                         |
+| Nada se rompe con las animaciones desactivadas            | ✅ Ambos canales (OS y toggle propio) verificados en test; todo estado final es correcto sin animación                                     |
+| Nada se rompe a 360px de ancho                            | ⚠️ **Sin verificar visualmente.** El CSS es mobile-first con `dvh` y `safe-area-inset`, pero falta una mirada real en un viewport de 360px |
+
+> `press` y `lift` del catálogo (§5.3) no son `@keyframes`: son transiciones de `:active` y `:hover` en `Button`, `IconButton` y `Cell`. Un keyframe para un estado que el navegador ya mantiene sería peor — se pelearía con el estado real del elemento.
+
+### Decisiones que tomó esta fase
+
+**`<Modal>` sobre `<dialog>` nativo.** La trampa de foco, `Esc`, la inercia de la página de atrás y el top layer los da la plataforma. Un modal hecho a mano se equivoca en al menos uno de esos cuatro. El costo: jsdom 30 no implementa **ningún** método de `<dialog>`, así que `tests/setup.ts` los stubea. Consecuencia honesta: los tests cubren abrir, cerrar y que todo cierre pase por un solo handler — **`Esc`, la trampa de foco y la inercia no están cubiertas** y quedan para la auditoría de teclado de la Fase 7.
+
+**El desenlace se anuncia una sola vez.** Al terminar la partida, el estado no se repite en la región `aria-live`: el nombre accesible del modal ya lo anuncia al abrirse. Tenerlo en los dos lados hacía que un lector de pantalla leyera la victoria dos veces.
+
+**`<Cell>` con `memo` obligatorio.** Un tablero experto de Buscaminas son ~480 celdas; sin `memo` cada jugada re-renderiza las 480. El área táctil de 44px la agrega un pseudo-elemento centrado, no padding: el padding deformaría la geometría del grid.
+
+**`<Grid>` no asume tablero cuadrado.** `rows` puede diferir de `cols` desde el día uno — es justo el supuesto que la Fase 6 existe para romper, y romperlo ahora cuesta una línea.
+
+**La secuencia de entrada corre una vez por sesión** (`sessionStorage`). Volver a Home desde un juego usa `view-in`. Una animación que ya viste es latencia.
+
+**Estado del build:** inicial **97.5 kB gzip** (93.2 JS + 4.3 CSS; presupuesto 120 kB). `KitchenSink` y `GameRoute` van en chunks aparte.
 
 ---
 

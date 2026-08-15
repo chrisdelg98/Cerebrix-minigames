@@ -1,0 +1,24 @@
+@layer components {
+  /*
+   * Set by the component (docs/STYLING.md §5): --cols, --rows, and optionally
+   * --board-max and --board-gap. --cell-size is derived here and read back by
+   * <Cell> to scale its font.
+   *
+   * 168px is the header + action bar budget; dvh, never vh, because the mobile
+   * URL bar breaks vh (docs/DESIGN_SYSTEM.md §7.3).
+   */
+  .grid {
+    --board-max-resolved: min(100vw - (2 * var(--sp-4)), 100dvh - 168px, var(--board-max, 560px));
+    --cell-size: calc(
+      (var(--board-max-resolved) - (var(--cols) - 1) * var(--board-gap, var(--sp-1))) / var(--cols)
+    );
+
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap: var(--board-gap, var(--sp-1));
+    inline-size: var(--board-max-resolved);
+
+    /* The board is as tall as its rows require: not every game is square. */
+    aspect-ratio: var(--cols) / var(--rows);
+  }
+}

@@ -1,0 +1,45 @@
+@layer components {
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    padding: var(--sp-3) var(--sp-4);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-hair) solid var(--c-border-hairline);
+    border-radius: var(--r-md);
+  }
+
+  .icon {
+    color: var(--c-accent);
+  }
+
+  .value {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-1);
+    font-family: var(--font-num);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-tight);
+  }
+
+  .trend {
+    font-size: var(--fs-2xs);
+  }
+
+  .trend[data-trend='up'] {
+    color: var(--c-success);
+  }
+
+  .trend[data-trend='down'] {
+    color: var(--c-danger);
+  }
+
+  .label {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+}

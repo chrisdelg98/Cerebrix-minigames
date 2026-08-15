@@ -1,0 +1,43 @@
+@layer components {
+  .modal {
+    max-inline-size: min(100% - (2 * var(--sp-4)), 420px);
+    padding: 0;
+    background-color: var(--c-surface);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-pop);
+    color: var(--c-text);
+  }
+
+  .modal::backdrop {
+    background-color: rgb(0 0 0 / 55%);
+  }
+
+  .modal[open] {
+    animation: slide-up var(--d-slow) var(--e-out);
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    padding: var(--sp-5);
+  }
+
+  .title {
+    font-size: var(--fs-xl);
+  }
+
+  .body {
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    justify-content: flex-end;
+    margin-block-start: var(--sp-2);
+  }
+}

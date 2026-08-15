@@ -80,7 +80,8 @@ describe('the shell runs a game it does not know', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Ganar' }));
 
-    expect(await screen.findByText('¡Ganaste!')).toBeInTheDocument();
+    // The outcome is announced by the modal's accessible name, and only there.
+    expect(await screen.findByRole('heading', { name: '¡Ganaste!' })).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
     expect(screen.getByRole('button', { name: 'Jugar otra vez' })).toBeInTheDocument();
   });

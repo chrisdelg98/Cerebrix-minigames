@@ -54,6 +54,12 @@
     font-size: var(--fs-sm);
     text-align: center;
   }
+
+  .outcome {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
 }
 
 /* On phones the difficulty picker drops to its own line so the timer and the

@@ -1,0 +1,97 @@
+@layer components {
+  /*
+   * Public knobs a board may set on an ancestor (docs/STYLING.md §7):
+   *   --cell-bg · --cell-radius · --cell-size
+   */
+  .cell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
+    aspect-ratio: 1;
+    background-color: var(--cell-bg, var(--c-cell));
+    border: var(--bw-hair) solid var(--c-border-hairline);
+    border-radius: var(--cell-radius, var(--r-sm));
+    color: var(--c-text);
+    font-family: var(--font-num);
+
+    /* Scales with the cell, not with the base font — docs/DESIGN_SYSTEM.md §3. */
+    font-size: clamp(1rem, calc(var(--cell-size, 2rem) * 0.52), 2rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--fw-medium);
+    transition-property: background-color, color, border-color, transform;
+    transition-duration: var(--d-instant);
+    transition-timing-function: var(--e-snap);
+  }
+
+  /*
+   * A cell smaller than 44px keeps its visual size but grows its touch area
+   * with a pseudo-element, so the grid geometry is not deformed by padding.
+   * WCAG 2.5.5 — docs/DESIGN_SYSTEM.md §7.3.
+   */
+  .cell::after {
+    position: absolute;
+    inset: 50%;
+    inline-size: var(--touch-min);
+    block-size: var(--touch-min);
+    translate: -50% -50%;
+    content: '';
+  }
+
+  .cell[data-state='fixed'] {
+    background-color: var(--c-cell-fixed);
+
+    /* Colour is never the only carrier: fixed cells are also bolder. */
+    font-weight: var(--fw-black);
+  }
+
+  .cell[data-state='peer'] {
+    background-color: var(--c-cell-peer);
+  }
+
+  .cell[data-state='selected'] {
+    background-color: var(--c-cell-active);
+    border-color: var(--c-accent);
+  }
+
+  .cell[data-state='error'] {
+    background-color: var(--c-cell-error);
+    color: var(--c-danger);
+  }
+
+  .cell[data-state='hint'] {
+    background-color: var(--c-cell-hint);
+    border-color: var(--c-info);
+  }
+
+  /* Block dividers drawn with inset shadows: no extra nodes in a 480-cell board. */
+  .cell[data-edge-top='true'] {
+    box-shadow: inset 0 2px 0 0 var(--c-border-strong);
+  }
+
+  .cell[data-edge-right='true'] {
+    box-shadow: inset -2px 0 0 0 var(--c-border-strong);
+  }
+
+  .cell[data-edge-bottom='true'] {
+    box-shadow: inset 0 -2px 0 0 var(--c-border-strong);
+  }
+
+  .cell[data-edge-left='true'] {
+    box-shadow: inset 2px 0 0 0 var(--c-border-strong);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cell:hover:not(:disabled, [data-state='fixed']) {
+      background-color: var(--c-cell-hover);
+    }
+  }
+
+  .cell:active:not(:disabled, [data-state='fixed']) {
+    transform: scale(0.96);
+  }
+
+  .cell:disabled {
+    cursor: default;
+  }
+}

@@ -1,12 +1,16 @@
-import { Link, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { Button } from '@design/components/Button';
 import { DifficultyPicker } from '@design/components/DifficultyPicker';
+import { Modal } from '@design/components/Modal';
 import { Skeleton } from '@design/components/Skeleton';
 import { Timer } from '@design/components/Timer';
+import { useToast } from '@design/components/Toast';
+import { Trophy } from '@design/sprites/Trophy';
 
 import { type Difficulty } from '../contract';
-import { defaultDifficultyFor, difficultyOptions } from '../difficulty';
+import { DIFFICULTY_LABELS, defaultDifficultyFor, difficultyOptions } from '../difficulty';
 import { useGameSession } from '../hooks/useGameSession';
 import { findEntry, type RegistryEntry } from '../registry';
 import { AppShell } from './AppShell';
@@ -16,7 +20,7 @@ import s from './GameRoute.module.css';
 
 /**
  * Turns a URL into a running game. The shell owns the timer, the difficulty,
- * undo, hints and the terminal modal; the game owns its rules and its board.
+ * undo, hints and the outcome modal; the game owns its rules and its board.
  * Reference: docs/GAME_CONTRACT.md §5.
  */
 export function GameRoute() {
@@ -32,7 +36,20 @@ export function GameRoute() {
 
 function GameSession({ entry }: { entry: RegistryEntry }) {
   const session = useGameSession(entry.load, defaultDifficultyFor(entry.preview.difficulties));
+  const navigate = useNavigate();
+  const toast = useToast();
+
+  // Which round's outcome the player already dismissed, so closing the modal
+  // does not reopen it on the next render.
+  const [dismissedRound, setDismissedRound] = useState<string | null>(null);
+
   const playing = session.status.kind === 'playing';
+  const outcomeOpen = !playing && session.phase === 'ready' && dismissedRound !== session.roundId;
+
+  const changeDifficulty = (next: Difficulty) => {
+    session.setDifficulty(next);
+    toast.show(`Nueva partida en ${DIFFICULTY_LABELS[next]}`, { tone: 'info' });
+  };
 
   const header = (
     <>
@@ -49,7 +66,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
           options={difficultyOptions(
             session.module?.meta.difficulties ?? entry.preview.difficulties
           )}
-          onChange={session.setDifficulty}
+          onChange={changeDifficulty}
         />
       </span>
     </>
@@ -77,6 +94,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
   }
 
   const { View, actions = [] } = session.module;
+  const won = session.status.kind === 'won';
 
   const footer = (
     <>
@@ -113,29 +131,57 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
           key={session.rejection?.nonce ?? 'clean'}
           className={session.rejection ? 'anim-shake' : undefined}
         >
-          <View
-            state={session.state}
-            dispatch={session.dispatch}
-            status={session.status}
-            difficulty={session.difficulty}
-            interactive={playing}
-            hint={session.hint}
-          />
+          <div className={won ? 'anim-win-burst' : undefined}>
+            <View
+              state={session.state}
+              dispatch={session.dispatch}
+              status={session.status}
+              difficulty={session.difficulty}
+              interactive={playing}
+              hint={session.hint}
+            />
+          </div>
         </div>
 
-        {/* The shell is the only voice: rules, hints and outcome all announce here. */}
+        {/*
+          In-play messages only — rejected moves and hints. The outcome is NOT
+          repeated here: the modal's accessible name already announces it when
+          it opens, and saying it twice makes a screen reader read the win
+          twice over.
+        */}
         <p className={s.live} role="status" aria-live="polite">
-          {session.status.kind === 'won' && '¡Ganaste!'}
-          {session.status.kind === 'lost' && `Perdiste. ${session.status.reason ?? ''}`}
-          {playing && (session.rejection?.reason ?? session.hint?.message ?? '')}
+          {playing ? (session.rejection?.reason ?? session.hint?.message ?? '') : ''}
         </p>
-
-        {!playing && (
-          <Button variant="primary" onClick={session.restart}>
-            Jugar otra vez
-          </Button>
-        )}
       </div>
+
+      <Modal
+        open={outcomeOpen}
+        onClose={() => {
+          setDismissedRound(session.roundId);
+        }}
+        title={won ? '¡Ganaste!' : 'Se terminó'}
+        actions={
+          <>
+            <Button
+              onClick={() => {
+                void navigate('/');
+              }}
+            >
+              Inicio
+            </Button>
+            <Button variant="primary" onClick={session.restart}>
+              Jugar otra vez
+            </Button>
+          </>
+        }
+      >
+        <span className={s.outcome}>
+          {won && <Trophy size={32} state="unlocked" />}
+          {won
+            ? `Completado en ${DIFFICULTY_LABELS[session.difficulty]}.`
+            : (session.status.kind === 'lost' && session.status.reason) || 'Probá de nuevo.'}
+        </span>
+      </Modal>
     </AppShell>
   );
 }

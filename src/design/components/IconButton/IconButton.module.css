@@ -1,0 +1,39 @@
+@layer components {
+  .iconButton {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+
+    /* Never smaller than the touch target, whatever the icon measures. */
+    inline-size: var(--touch-min);
+    block-size: var(--touch-min);
+    border-radius: var(--r-md);
+    color: var(--c-text-muted);
+    transition-property: transform, background-color, color;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .iconButton[data-variant='solid'] {
+    background-color: var(--c-surface-raised);
+    border: var(--bw-base) solid var(--c-border-strong);
+    box-shadow: var(--sh-sm);
+    color: var(--c-text);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .iconButton:hover:not(:disabled) {
+      background-color: var(--c-cell-hover);
+      color: var(--c-text);
+    }
+  }
+
+  .iconButton:active:not(:disabled) {
+    transform: scale(0.94);
+  }
+
+  .iconButton:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}

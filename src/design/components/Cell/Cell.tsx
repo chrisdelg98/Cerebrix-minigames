@@ -1,0 +1,67 @@
+import { memo, type ReactNode } from 'react';
+
+import { type CSSVars } from '../../types';
+
+import s from './Cell.module.css';
+
+export type CellState = 'empty' | 'filled' | 'fixed' | 'selected' | 'peer' | 'error' | 'hint';
+
+/** Which sides carry a thick block divider — Sudoku's 3×3 boxes, and anything like them. */
+export type BlockEdge = 'top' | 'right' | 'bottom' | 'left';
+
+export interface CellProps {
+  state?: CellState;
+  value?: ReactNode;
+  /** Required: "fila 3, columna 5, vacía" is what a screen reader reads out. */
+  label: string;
+  onActivate?: () => void;
+  disabled?: boolean;
+  blockEdges?: readonly BlockEdge[];
+  /** Distance from the origin of a reveal, for wave cascades. */
+  distance?: number;
+  animate?: 'pop-in' | 'reveal-wave' | 'none';
+}
+
+/**
+ * ONE cell for every game. Sudoku and Minesweeper use this exact component;
+ * what differs is the state and the knobs the board sets around it
+ * (docs/DESIGN_SYSTEM.md §9).
+ *
+ * memo is not an optimisation here, it is a requirement: an expert Minesweeper
+ * board is ~480 of these, and without it every dispatch re-renders all of them.
+ *
+ * It renders a real <button> so it is keyboard-reachable and pressable, with
+ * role=gridcell so the board reads as a grid rather than 480 loose buttons.
+ */
+export const Cell = memo(function Cell({
+  state = 'empty',
+  value,
+  label,
+  onActivate,
+  disabled = false,
+  blockEdges,
+  distance,
+  animate = 'none',
+}: CellProps) {
+  const animationClass =
+    animate === 'pop-in' ? 'anim-pop-in' : animate === 'reveal-wave' ? 'anim-reveal-wave' : '';
+
+  return (
+    <button
+      type="button"
+      role="gridcell"
+      className={`${s.cell} ${animationClass}`}
+      data-state={state}
+      data-edge-top={blockEdges?.includes('top')}
+      data-edge-right={blockEdges?.includes('right')}
+      data-edge-bottom={blockEdges?.includes('bottom')}
+      data-edge-left={blockEdges?.includes('left')}
+      style={distance === undefined ? undefined : ({ '--dist': distance } as CSSVars)}
+      aria-label={label}
+      disabled={disabled}
+      onClick={onActivate}
+    >
+      {value}
+    </button>
+  );
+});

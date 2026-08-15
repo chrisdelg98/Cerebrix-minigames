@@ -1,0 +1,13 @@
+@layer components {
+  .flame {
+    color: var(--c-text-subtle);
+  }
+
+  .flame[data-alive='true'] {
+    color: var(--c-gold);
+    transform-origin: bottom center;
+
+    /* A 2s wobble, and nothing at all once the streak is broken. */
+    animation: pulse-soft 2s var(--e-in-out) infinite;
+  }
+}

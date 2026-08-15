@@ -1,0 +1,24 @@
+@layer components {
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-6) var(--sp-4);
+    text-align: center;
+  }
+
+  .sprite {
+    color: var(--c-text-subtle);
+  }
+
+  .title {
+    font-size: var(--fs-lg);
+  }
+
+  .description {
+    max-inline-size: 42ch;
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+  }
+}

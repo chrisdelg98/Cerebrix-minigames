@@ -1,0 +1,16 @@
+@keyframes clock-hand {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@layer components {
+  .hand {
+    transform-origin: 12px 12px;
+    transform-box: fill-box;
+  }
+
+  .hand[data-running='true'] {
+    animation: clock-hand 60s steps(60) infinite;
+  }
+}

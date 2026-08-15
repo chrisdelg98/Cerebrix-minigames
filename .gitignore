@@ -74,3 +74,8 @@ $RECYCLE.BIN/
 # Los puzzles pregenerados SÍ se versionan (src/games/*/data/*.json).
 # Lo que se genera en build no:
 public/sprites-generated/
+
+# ---------- Skills de agentes ----------
+# El contenido se restaura desde skills-lock.json, igual que node_modules
+# desde package-lock.json. Se versiona el lock, no las 18k líneas de prosa.
+.agents/

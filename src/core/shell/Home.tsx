@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@design/components/Badge';
 import { EmptyState } from '@design/components/EmptyState';
 import { SettingsToggles } from '@design/components/SettingsToggles';
 import { StatTile } from '@design/components/StatTile';
@@ -9,12 +8,12 @@ import { Clock } from '@design/sprites/Clock';
 import { LogoCerebrix } from '@design/sprites/LogoCerebrix';
 import { Streak } from '@design/sprites/Streak';
 import { Trophy } from '@design/sprites/Trophy';
-import { type CSSVars } from '@design/types';
 
 import { usePrefetch } from '../hooks/usePrefetch';
 import { useGlobalStats, useSavedSessions } from '../hooks/useStoredData';
 import { REGISTRY, type RegistryEntry } from '../registry';
 import { DataControls } from './DataControls';
+import { GameCard } from './GameCard';
 
 import s from './Home.module.css';
 
@@ -57,13 +56,27 @@ export function Home({ entries = REGISTRY }: HomeProps) {
 
   return (
     <div className={s.home} id="main" data-intro={intro}>
+      {/*
+        Two rows on purpose. Squeezing the brand and the controls onto one line
+        is what left the header clipped on a phone; below 640px they stack and
+        the controls get their own row rather than fighting for the last 40px.
+      */}
       <header className={s.masthead}>
-        <LogoCerebrix size={36} />
-        <div>
-          <h1 className={s.title}>Cerebrix</h1>
-          <p className={s.tagline}>Minijuegos para la concentración.</p>
+        <div className={s.brand}>
+          <LogoCerebrix size={40} />
+          <div>
+            <h1 className={s.title}>Cerebrix</h1>
+            <p className={s.tagline}>Minijuegos para la concentración.</p>
+          </div>
         </div>
-        <SettingsToggles />
+
+        <div className={s.controls}>
+          <Link to="/historial" className={s.historyLink}>
+            <Clock size={18} />
+            Mi historial
+          </Link>
+          <SettingsToggles />
+        </div>
       </header>
 
       {stats !== null && stats.played > 0 && (
@@ -95,50 +108,17 @@ export function Home({ entries = REGISTRY }: HomeProps) {
         />
       ) : (
         <ul className={s.grid}>
-          {entries.map((entry, i) => {
-            const Icon = entry.icon;
-            const saved = sessions[entry.id];
-
-            return (
-              <li
-                key={entry.id}
-                className={`${s.card} anim-stagger`}
-                style={{ '--i': i } as CSSVars}
-              >
-                <Link
-                  to={`/game/${entry.id}`}
-                  className={s.cardLink}
-                  // The chunk is usually there by the time the finger lifts.
-                  onPointerEnter={() => {
-                    prefetch(entry.load);
-                  }}
-                  onPointerDown={() => {
-                    prefetch(entry.load);
-                  }}
-                >
-                  <span className={s.cardIcon}>
-                    <Icon size={28} />
-                  </span>
-
-                  <span className={s.cardBody}>
-                    <span className={s.cardName}>{entry.preview.name}</span>
-                    <span className={s.cardTagline}>{entry.preview.tagline}</span>
-
-                    <span className={s.cardMeta}>
-                      {saved !== undefined && <Badge tone="success">Continuar</Badge>}
-                      {entry.preview.tags.map((tag) => (
-                        <Badge key={tag}>{tag}</Badge>
-                      ))}
-                      <Badge tone="accent">
-                        {entry.preview.estimatedMinutes[0]}–{entry.preview.estimatedMinutes[1]} min
-                      </Badge>
-                      <Badge>{entry.preview.difficulties.length} niveles</Badge>
-                    </span>
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
+          {entries.map((entry, i) => (
+            <GameCard
+              key={entry.id}
+              entry={entry}
+              index={i}
+              continueAt={sessions[entry.id]?.difficulty}
+              onPrefetch={() => {
+                prefetch(entry.load);
+              }}
+            />
+          ))}
         </ul>
       )}
 

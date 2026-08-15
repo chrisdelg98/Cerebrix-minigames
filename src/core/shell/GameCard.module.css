@@ -1,0 +1,91 @@
+@layer components {
+  .card {
+    background-color: var(--c-surface);
+    border: var(--bw-base) solid var(--c-border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-md);
+    overflow: hidden;
+    transition-property: transform, box-shadow, border-color;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .link {
+    display: flex;
+    flex-direction: column;
+    block-size: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* The art block is the half that makes this read as a game and not a row. */
+  .art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding-block: var(--sp-6);
+    background-image: linear-gradient(160deg, var(--c-accent-soft), transparent 70%);
+    border-block-end: var(--bw-hair) solid var(--c-border-hairline);
+  }
+
+  .icon {
+    display: grid;
+    place-items: center;
+    color: var(--c-accent);
+    transition-property: transform;
+    transition-duration: var(--d-base);
+    transition-timing-function: var(--e-spring);
+  }
+
+  .resume {
+    position: absolute;
+    inset-block-start: var(--sp-2);
+    inset-inline-end: var(--sp-2);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    padding: var(--sp-4);
+  }
+
+  .name {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+    letter-spacing: var(--ls-tight);
+    line-height: var(--lh-tight);
+  }
+
+  .tagline {
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1);
+    margin-block-start: var(--sp-2);
+  }
+
+  /* Hover only where a real pointer exists — docs/DESIGN_SYSTEM.md §7.3 */
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--sh-lg);
+      border-color: var(--c-accent);
+    }
+
+    /* The sprite leans in. Transform only, so it stays on the compositor. */
+    .card:hover .icon {
+      transform: scale(1.12) rotate(-4deg);
+    }
+  }
+
+  .card:active {
+    transform: translate(3px, 3px);
+    box-shadow: var(--sh-none);
+  }
+}

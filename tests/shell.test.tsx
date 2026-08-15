@@ -29,13 +29,14 @@ describe('the shell runs a game it does not know', () => {
     const { user } = renderAt('/game/_dummy');
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
-    expect(tiles).toHaveLength(6); // difficulty 3 for a game declaring [1, 3, 5]
+    // A game never played opens on the EASIEST level it declares — 1 of [1, 3, 5].
+    expect(tiles).toHaveLength(3);
 
     await user.click(tiles[0]!);
 
     expect(tiles[0]!).toHaveAttribute('aria-pressed', 'true');
     await waitFor(() => {
-      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '17');
+      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '33');
     });
   });
 
@@ -49,7 +50,7 @@ describe('the shell runs a game it does not know', () => {
 
     expect(await screen.findByText(/ya está marcada/)).toBeInTheDocument();
     await waitFor(() => {
-      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '17');
+      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '33');
     });
   });
 
@@ -93,7 +94,7 @@ describe('the shell runs a game it does not know', () => {
     const levels = within(picker).getAllByRole('radio');
 
     expect(levels.map((level) => level.textContent)).toEqual(['Fácil', 'Normal', 'Experto']);
-    expect(levels[1]).toHaveAttribute('aria-checked', 'true');
+    expect(levels[0]).toHaveAttribute('aria-checked', 'true');
   });
 
   it('rebuilds the board when the difficulty changes', async () => {

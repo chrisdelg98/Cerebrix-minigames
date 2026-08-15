@@ -107,6 +107,11 @@ export class IndexedDbDriver implements StorageDriver {
     return db.getAll('results');
   }
 
+  async listResults(): Promise<GameResult[]> {
+    const results = await this.#allResults();
+    return results.sort((a, b) => b.finishedAt - a.finishedAt);
+  }
+
   async getStats(gameId: string): Promise<GameStats> {
     return computeStats(gameId, await this.#allResults());
   }

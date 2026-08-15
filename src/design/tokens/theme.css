@@ -16,7 +16,9 @@
   --c-text: var(--raw-slate-50);
   --c-text-muted: var(--raw-slate-400);
   --c-text-subtle: var(--raw-slate-500);
-  --c-text-on-accent: var(--raw-white);
+
+  /* Dark type on the bright accent — see the accent block below. */
+  --c-text-on-accent: var(--raw-slate-950);
 
   /* Borders */
   --c-border: var(--raw-slate-700);
@@ -24,31 +26,33 @@
   --c-border-hairline: var(--raw-slate-800);
 
   /*
-   * Accent — TWO tokens, because the accent does two jobs that pull in
-   * opposite directions on a near-black background:
+   * Accent — TWO tokens, because it does two jobs:
    *
    *   --c-accent          reads AS a colour on the background (logo, icons,
    *                       badge text, borders, fills with no text on them)
    *   --c-accent-surface  sits UNDER --c-text-on-accent as a button fill
    *
-   * Brighter helps the first and ruins the second. One value doing both was
-   * violet-500, which scored 4.46:1 as foreground and 4.23:1 under white —
-   * failing the 4.5 AA minimum of docs/DESIGN_SYSTEM.md §2.3 in BOTH
-   * directions at once. Split, each side clears it comfortably.
+   * They are the same value here and differ in light, which is the point of
+   * having two names: whichever theme is on, a component asks for the job it
+   * needs and never for a specific colour.
    *
-   * The light theme keeps a single value for both because violet-600 happens
-   * to satisfy each job there (5.01 as foreground, 5.33 under white). That is
-   * why light already read as "defined" and dark did not.
+   * Both directions are asserted in tests/tokens.test.ts, computed from these
+   * tokens rather than hardcoded — the previous accent failed AA in both at
+   * once and nothing caught it until someone looked at the screen.
    */
-  --c-accent: var(--raw-violet-400); /* 6.93:1 on --c-bg */
-  --c-accent-hover: var(--raw-violet-300);
-  --c-accent-surface: var(--raw-violet-600); /* white on it: 5.33:1 */
-  --c-accent-surface-hover: var(--raw-violet-500);
-  --c-accent-press: var(--raw-violet-700);
+  --c-accent: var(--raw-teal-400); /* 10.20:1 on --c-bg */
+  --c-accent-hover: var(--raw-teal-300);
 
-  /* Tints need more mix on near-black: 18% of a mid violet left no chroma. */
-  --c-accent-soft: color-mix(in oklab, var(--raw-violet-400) 24%, transparent);
-  --c-accent-ring: color-mix(in oklab, var(--raw-violet-300) 60%, transparent);
+  /* Same bright value for both jobs, because the TEXT flips instead of the
+     fill: dark on bright teal is 10.20:1, where white on it would be 1.86. A
+     bright accent wants dark type; muffling it under white to keep the type
+     light is what makes an accent look washed. */
+  --c-accent-surface: var(--raw-teal-400);
+  --c-accent-surface-hover: var(--raw-teal-300);
+  --c-accent-press: var(--raw-teal-600);
+
+  --c-accent-soft: color-mix(in oklab, var(--raw-teal-400) 18%, transparent);
+  --c-accent-ring: color-mix(in oklab, var(--raw-teal-300) 55%, transparent);
 
   /* Highlight — streaks, records, achievements */
   --c-gold: var(--raw-amber-400);
@@ -59,8 +63,8 @@
   --c-success-soft: color-mix(in oklab, var(--raw-green-500) 16%, transparent);
   --c-danger: var(--raw-red-500);
   --c-danger-soft: color-mix(in oklab, var(--raw-red-500) 16%, transparent);
-  --c-info: var(--raw-blue-500);
-  --c-info-soft: color-mix(in oklab, var(--raw-blue-500) 16%, transparent);
+  --c-info: var(--raw-indigo-400);
+  --c-info-soft: color-mix(in oklab, var(--raw-indigo-400) 18%, transparent);
 
   /*
    * Difficulty ramp — reuses the semantic tokens instead of inventing five new
@@ -79,7 +83,7 @@
   --c-cell-hover: var(--raw-slate-700);
   --c-cell-active: var(--c-accent-soft);
   --c-cell-fixed: var(--raw-slate-900);
-  --c-cell-peer: color-mix(in oklab, var(--raw-violet-400) 12%, transparent);
+  --c-cell-peer: color-mix(in oklab, var(--raw-teal-400) 10%, transparent);
   --c-cell-error: var(--c-danger-soft);
   --c-cell-hint: var(--c-info-soft);
 
@@ -104,14 +108,16 @@
   --c-border-strong: var(--raw-slate-400);
   --c-border-hairline: var(--raw-slate-200);
 
-  /* Both jobs collapse onto one value here — see the note in the dark block. */
-  --c-accent: var(--raw-violet-600);
-  --c-accent-hover: var(--raw-violet-500);
-  --c-accent-surface: var(--raw-violet-600);
-  --c-accent-surface-hover: var(--raw-violet-500);
-  --c-accent-press: var(--raw-violet-700);
-  --c-accent-soft: color-mix(in oklab, var(--raw-violet-600) 12%, transparent);
-  --c-accent-ring: color-mix(in oklab, var(--raw-violet-600) 45%, transparent);
+  /* Light inverts the trick: on a white page the accent has to go DARK to be
+     legible, and then white type on it works (5.47:1). Same two tokens, both
+     directions covered, and the components never learn which theme they are in. */
+  --c-accent: var(--raw-teal-700);
+  --c-accent-hover: var(--raw-teal-600);
+  --c-accent-surface: var(--raw-teal-700);
+  --c-accent-surface-hover: var(--raw-teal-800);
+  --c-accent-press: var(--raw-teal-800);
+  --c-accent-soft: color-mix(in oklab, var(--raw-teal-600) 14%, transparent);
+  --c-accent-ring: color-mix(in oklab, var(--raw-teal-700) 45%, transparent);
 
   --c-gold: var(--raw-amber-600);
   --c-gold-soft: color-mix(in oklab, var(--raw-amber-500) 20%, transparent);
@@ -120,14 +126,14 @@
   --c-success-soft: color-mix(in oklab, var(--raw-green-600) 14%, transparent);
   --c-danger: var(--raw-red-600);
   --c-danger-soft: color-mix(in oklab, var(--raw-red-600) 12%, transparent);
-  --c-info: var(--raw-blue-600);
-  --c-info-soft: color-mix(in oklab, var(--raw-blue-600) 12%, transparent);
+  --c-info: var(--raw-indigo-600);
+  --c-info-soft: color-mix(in oklab, var(--raw-indigo-600) 12%, transparent);
 
   --c-cell: var(--raw-white);
   --c-cell-hover: var(--raw-slate-100);
   --c-cell-active: var(--c-accent-soft);
   --c-cell-fixed: var(--raw-slate-100);
-  --c-cell-peer: color-mix(in oklab, var(--raw-violet-600) 7%, transparent);
+  --c-cell-peer: color-mix(in oklab, var(--raw-teal-700) 9%, transparent);
   --c-cell-error: var(--c-danger-soft);
   --c-cell-hint: var(--c-info-soft);
 

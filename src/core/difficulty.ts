@@ -29,7 +29,8 @@ export const DIFFICULTY_COLORS: Readonly<Record<Difficulty, string>> = {
   5: 'var(--c-difficulty-5)',
 };
 
-export const DEFAULT_DIFFICULTY: Difficulty = 3;
+/** Only a fallback for a game that declares nothing. */
+export const DEFAULT_DIFFICULTY: Difficulty = 1;
 
 /** Options for `<DifficultyPicker>`, limited to what a game actually implements. */
 export function difficultyOptions(
@@ -42,10 +43,17 @@ export function difficultyOptions(
   }));
 }
 
-/** The level a game starts on: its default if supported, else its easiest. */
+/**
+ * The level a game opens on when it has never been played: the EASIEST one it
+ * declares.
+ *
+ * Not the middle of the scale. A first board should be winnable — landing
+ * someone on "Normal" the first time they open a game they have never seen is
+ * how a puzzle stops being inviting. Once they have played, the level they
+ * chose is remembered per game and wins over this.
+ */
 export function defaultDifficultyFor(available: readonly Difficulty[]): Difficulty {
-  if (available.includes(DEFAULT_DIFFICULTY)) return DEFAULT_DIFFICULTY;
-  return available[0] ?? DEFAULT_DIFFICULTY;
+  return DIFFICULTIES.find((level) => available.includes(level)) ?? DEFAULT_DIFFICULTY;
 }
 
 /**

@@ -49,9 +49,10 @@ describe('the scale', () => {
     }
   });
 
-  it('falls back to the easiest level a game supports', () => {
-    expect(defaultDifficultyFor([1, 3, 5])).toBe(3);
+  it('opens a never-played game on the easiest level it declares', () => {
+    expect(defaultDifficultyFor([1, 3, 5])).toBe(1);
     expect(defaultDifficultyFor([4, 5])).toBe(4);
+    expect(defaultDifficultyFor([3])).toBe(3);
   });
 
   it('refuses a stored level the game no longer declares', () => {
@@ -90,8 +91,8 @@ describe('changing difficulty', () => {
     expect(
       await screen.findByRole('heading', { name: '¿Cambiar la dificultad?' })
     ).toBeInTheDocument();
-    // Still the old board, still six tiles, still marked.
-    expect(screen.getAllByRole('button', { name: /^Casilla/ })).toHaveLength(6);
+    // Still the old board — the easy one, three tiles, still marked.
+    expect(screen.getAllByRole('button', { name: /^Casilla/ })).toHaveLength(3);
   });
 
   it('keeps the board when the player backs out', async () => {
@@ -108,7 +109,7 @@ describe('changing difficulty', () => {
       ).not.toBeInTheDocument();
     });
     expect(screen.getByRole('button', { name: 'Casilla 1, marcada' })).toBeInTheDocument();
-    expect(within(await picker()).getByRole('radio', { name: 'Normal' })).toHaveAttribute(
+    expect(within(await picker()).getByRole('radio', { name: 'Fácil' })).toHaveAttribute(
       'aria-checked',
       'true'
     );
@@ -136,22 +137,23 @@ describe('the choice persists', () => {
   it('comes back at the level last chosen for that game', async () => {
     const first = renderAt('/game/_dummy');
 
-    await first.user.click(within(await picker()).getByRole('radio', { name: 'Fácil' }));
+    // Away from the easy default, so the assertion cannot pass by accident.
+    await first.user.click(within(await picker()).getByRole('radio', { name: 'Experto' }));
     await waitFor(async () => {
-      expect(await storage.loadDifficulty('_dummy')).toBe(1);
+      expect(await storage.loadDifficulty('_dummy')).toBe(5);
     });
 
     first.unmount();
     renderAt('/game/_dummy');
 
-    // Not the default of 3: the level outlives the session it was played in.
+    // Not the easy default: the level outlives the session it was played in.
     await waitFor(async () => {
-      expect(within(await picker()).getByRole('radio', { name: 'Fácil' })).toHaveAttribute(
+      expect(within(await picker()).getByRole('radio', { name: 'Experto' })).toHaveAttribute(
         'aria-checked',
         'true'
       );
     });
-    expect(screen.getAllByRole('button', { name: /^Casilla/ })).toHaveLength(3);
+    expect(screen.getAllByRole('button', { name: /^Casilla/ })).toHaveLength(9);
   });
 
   it('lets a saved board win over the remembered level', async () => {

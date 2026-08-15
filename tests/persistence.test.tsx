@@ -76,9 +76,10 @@ describe('autosave and resume', () => {
 
     renderAt('/game/_dummy');
 
-    const timer = await screen.findByRole('timer');
+    // Re-queried inside the wait: adopting the saved level changes the round,
+    // which remounts the timer — a node captured before that is stale.
     await waitFor(() => {
-      expect(timer.textContent).toBe('01:05');
+      expect(screen.getByRole('timer').textContent).toBe('01:05');
     });
   });
 

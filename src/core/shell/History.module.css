@@ -1,0 +1,104 @@
+@layer components {
+  .page {
+    inline-size: min(100%, 720px);
+    margin-inline: auto;
+    padding: var(--sp-5) var(--sp-4);
+    padding-block-end: calc(var(--sp-6) + env(safe-area-inset-bottom));
+    animation: view-in var(--d-slow) var(--e-out) backwards;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-block-end: var(--sp-5);
+  }
+
+  .back {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: var(--touch-min);
+    block-size: var(--touch-min);
+    border-radius: var(--r-md);
+    color: var(--c-text);
+    text-decoration: none;
+  }
+
+  .title {
+    font-size: var(--fs-2xl);
+  }
+
+  .loading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    list-style: none;
+  }
+
+  /*
+   * Four columns on a wide screen; on a phone the name takes the first line
+   * and everything else wraps under it, rather than being squeezed to nothing.
+   */
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background-color: var(--c-surface);
+    border: var(--bw-hair) solid var(--c-border-hairline);
+    border-radius: var(--r-md);
+  }
+
+  /* --bp-sm — docs/DESIGN_SYSTEM.md §7.1 */
+  @media (width < 480px) {
+    .row {
+      grid-template-columns: 1fr auto;
+    }
+
+    .tags {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .game {
+    font-weight: var(--fw-bold);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1);
+  }
+
+  .time {
+    color: var(--c-text);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+
+  .when {
+    color: var(--c-text-subtle);
+    font-size: var(--fs-xs);
+    white-space: nowrap;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--touch-min);
+    padding-inline: var(--sp-4);
+    background-color: var(--c-accent-surface);
+    border-radius: var(--r-md);
+    color: var(--c-text-on-accent);
+    font-weight: var(--fw-bold);
+    text-decoration: none;
+  }
+}

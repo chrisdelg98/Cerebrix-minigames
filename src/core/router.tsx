@@ -25,6 +25,13 @@ export const routes: RouteObject[] = [
         },
       },
       {
+        path: 'historial',
+        lazy: async () => {
+          const { History } = await import('./shell/History');
+          return { Component: History };
+        },
+      },
+      {
         // The design system, documenting itself. Lazily routed: nobody
         // downloads it unless they go looking for it.
         path: 'kitchen-sink',

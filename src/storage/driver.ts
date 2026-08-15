@@ -22,6 +22,8 @@ export interface StorageDriver {
   listSessions(): Promise<SavedSession[]>;
 
   recordResult(gameId: string, result: GameResult): Promise<void>;
+  /** The raw log, newest first — what the history view reads. */
+  listResults(): Promise<GameResult[]>;
   getStats(gameId: string): Promise<GameStats>;
   getGlobalStats(): Promise<GlobalStats>;
 

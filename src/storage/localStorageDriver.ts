@@ -93,6 +93,10 @@ export class LocalStorageDriver implements StorageDriver {
     return Promise.resolve();
   }
 
+  listResults(): Promise<GameResult[]> {
+    return Promise.resolve([...this.#results()].sort((a, b) => b.finishedAt - a.finishedAt));
+  }
+
   getStats(gameId: string): Promise<GameStats> {
     return Promise.resolve(computeStats(gameId, this.#results()));
   }

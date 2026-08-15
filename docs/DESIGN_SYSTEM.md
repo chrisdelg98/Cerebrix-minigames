@@ -311,6 +311,7 @@ Cerebrix son **juegos de concentración**. El diseño trabaja para la atención,
 | `pop-in`      | Cifra que entra en una celda     | `scale(0.6) → 1` + `opacity 0 → 1`                 | `--d-fast` / `--e-spring`   |
 | `shake`       | Jugada inválida                  | `translateX: 0,-4,4,-3,3,0`                        | `--d-base` / `--e-in-out`   |
 | `pulse-soft`  | Celda con pista activa           | `opacity .55 ↔ 1`, infinito                        | 1.6s / `--e-in-out`         |
+| `breathe`     | Logo en reposo (§6.3)            | `scale(1 ↔ 1.04)`, infinito, arranca tras el trazo | 4s / `--e-in-out`           |
 | `reveal-wave` | Cascada al despejar zona         | `scale(.4)→1` + `opacity`, delay por distancia     | `--d-base` / `--e-out`      |
 | `flip`        | Carta / celda que se da vuelta   | `rotateY(0→180deg)`, `backface-visibility: hidden` | `--d-base` / `--e-in-out`   |
 | `slide-up`    | Entrada de panel o modal         | `translateY(16px)→0` + `opacity`                   | `--d-slow` / `--e-out`      |

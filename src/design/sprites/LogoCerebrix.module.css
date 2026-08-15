@@ -1,11 +1,22 @@
 @layer components {
+  /*
+   * docs/DESIGN_SYSTEM.md §6.3 — the stroke draws itself once, and after that
+   * the logo breathes, slowly and barely.
+   *
+   * The two run on different elements (the svg breathes, its paths draw), so
+   * they compose instead of fighting over one transform. The breath waits for
+   * the draw and the nodes to finish rather than starting underneath them.
+   */
   .logo {
     color: var(--c-accent);
     flex-shrink: 0;
+    transform-origin: center;
+    animation: breathe 4s var(--e-in-out) infinite;
+    animation-delay: calc(var(--d-slower) + var(--d-base));
   }
 
-  /* Drawn once on load. The end state is the finished logo, so it is correct
-     even when the animation never runs (reduced motion). */
+  /* The end state is the finished logo, so it is correct even when the
+     animation never runs (reduced motion, either channel). */
   .stroke {
     stroke-dasharray: 100;
     animation: draw-stroke var(--d-slower) var(--e-out) backwards;

@@ -119,6 +119,29 @@
   }
 }
 
+/*
+ * Ambient breathing. Slow and barely there on purpose: it is the only thing in
+ * the app that moves while nothing is happening, so it has to read as alive
+ * rather than as motion. Rests at scale(1), so suppressing it is a no-op.
+ */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+/* The second hand jumps, it does not glide — see .anim-clock-hand below. */
+@keyframes clock-hand {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Victory. The overshoot lands back on scale(1), so the end state is correct
    even when the animation is suppressed. */
 @keyframes win-burst {
@@ -186,4 +209,17 @@
 
 .anim-win-burst {
   animation: win-burst var(--d-slower) var(--e-spring);
+}
+
+/*
+ * Long ambient loops carry a literal duration: the --d-* scale tops out at
+ * 600ms because it exists for interaction feedback, and stretching it to cover
+ * a 4s breath would make those tokens mean two different things.
+ */
+.anim-breathe {
+  animation: breathe 4s var(--e-in-out) infinite;
+}
+
+.anim-clock-hand {
+  animation: clock-hand 60s steps(60) infinite;
 }

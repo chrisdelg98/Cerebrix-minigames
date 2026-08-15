@@ -142,6 +142,44 @@ describe.each(drivers)('$name', ({ create }) => {
     expect(await storage.loadSession('_dummy')).not.toBeNull();
   });
 
+  it('remembers a per-game difficulty, separately from the session', async () => {
+    expect(await storage.loadDifficulty('_dummy')).toBeNull();
+
+    await storage.saveDifficulty('_dummy', 5);
+    await storage.saveDifficulty('other', 1);
+
+    expect(await storage.loadDifficulty('_dummy')).toBe(5);
+    expect(await storage.loadDifficulty('other')).toBe(1);
+  });
+
+  it('keeps the difficulty when the session it was played in is cleared', async () => {
+    await storage.saveDifficulty('_dummy', 5);
+    await storage.saveSession('_dummy', session({ difficulty: 5 }));
+
+    // What happens at the end of every game.
+    await storage.clearSession('_dummy');
+
+    expect(await storage.loadSession('_dummy')).toBeNull();
+    expect(await storage.loadDifficulty('_dummy')).toBe(5);
+  });
+
+  it('carries preferences through an export and back', async () => {
+    await storage.saveDifficulty('_dummy', 5);
+    const backup = await storage.exportAll();
+
+    await storage.saveDifficulty('_dummy', 1);
+    await storage.importAll(backup);
+
+    expect(await storage.loadDifficulty('_dummy')).toBe(5);
+  });
+
+  it('still accepts a backup written before preferences existed', async () => {
+    const old = JSON.stringify({ schemaVersion: 1, exportedAt: 1, sessions: [], results: [] });
+
+    // Additive and optional: refusing it would strand every older export.
+    await expect(storage.importAll(old)).resolves.toBeUndefined();
+  });
+
   it('drops a session it cannot read instead of failing forever', async () => {
     // A record from a build that does not exist yet.
     await storage.saveSession('_dummy', session({ schemaVersion: 99 }));

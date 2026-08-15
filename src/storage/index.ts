@@ -8,7 +8,15 @@ export { computeGlobalStats, computeStats } from './stats';
 export { IndexedDbDriver } from './indexedDbDriver';
 export { LocalStorageDriver } from './localStorageDriver';
 export { SCHEMA_VERSION } from './types';
-export type { Backup, GameResult, GameStats, GlobalStats, Outcome, SavedSession } from './types';
+export type {
+  Backup,
+  GameResult,
+  GameStats,
+  GlobalStats,
+  Outcome,
+  SavedSession,
+  StoredPreference,
+} from './types';
 
 /**
  * Picks the best driver this browser will allow.

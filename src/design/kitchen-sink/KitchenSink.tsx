@@ -34,7 +34,7 @@ import s from './KitchenSink.module.css';
 const CELL_STATES: CellState[] = ['empty', 'filled', 'fixed', 'selected', 'peer', 'error', 'hint'];
 
 export function KitchenSink() {
-  const [difficulty, setDifficulty] = useState<3 | 1 | 5>(3);
+  const [difficulty, setDifficulty] = useState<1 | 2 | 3 | 4 | 5>(3);
   const [modalOpen, setModalOpen] = useState(false);
   const toast = useToast();
 
@@ -124,12 +124,16 @@ export function KitchenSink() {
       </Section>
 
       <Section title="DifficultyPicker">
+        {/* The whole scale, to see the five level colours side by side. A real
+            game only ever gets the levels it declares. */}
         <DifficultyPicker
           value={difficulty}
           options={[
-            { value: 1, label: 'Fácil' },
-            { value: 3, label: 'Normal' },
-            { value: 5, label: 'Experto' },
+            { value: 1, label: 'Fácil', color: 'var(--c-difficulty-1)' },
+            { value: 2, label: 'Casual', color: 'var(--c-difficulty-2)' },
+            { value: 3, label: 'Normal', color: 'var(--c-difficulty-3)' },
+            { value: 4, label: 'Difícil', color: 'var(--c-difficulty-4)' },
+            { value: 5, label: 'Experto', color: 'var(--c-difficulty-5)' },
           ]}
           onChange={setDifficulty}
         />

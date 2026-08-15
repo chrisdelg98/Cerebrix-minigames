@@ -48,7 +48,12 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
 
   const changeDifficulty = (next: Difficulty) => {
     session.setDifficulty(next);
-    toast.show(`Nueva partida en ${DIFFICULTY_LABELS[next]}`, { tone: 'info' });
+    // The session may hold the change back for confirmation instead of taking
+    // it, so announcing a new board here would be announcing something that
+    // has not happened. The toast moves to where the change actually lands.
+    if (session.pendingDifficulty === null && next !== session.difficulty) {
+      toast.show(`Nueva partida en ${DIFFICULTY_LABELS[next]}`, { tone: 'info' });
+    }
   };
 
   const header = (
@@ -157,6 +162,36 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
           {playing ? (session.rejection?.reason ?? session.hint?.message ?? '') : ''}
         </p>
       </div>
+
+      <Modal
+        open={session.pendingDifficulty !== null}
+        onClose={session.cancelDifficulty}
+        title="¿Cambiar la dificultad?"
+        actions={
+          <>
+            <Button onClick={session.cancelDifficulty}>Seguir jugando</Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                const next = session.pendingDifficulty;
+                session.confirmDifficulty();
+                if (next !== null) {
+                  toast.show(`Nueva partida en ${DIFFICULTY_LABELS[next]}`, { tone: 'info' });
+                }
+              }}
+            >
+              Empezar de nuevo
+            </Button>
+          </>
+        }
+      >
+        {session.pendingDifficulty !== null && (
+          <>
+            Pasar a {DIFFICULTY_LABELS[session.pendingDifficulty]} empieza un tablero nuevo. Se
+            pierde la partida que tenés en curso.
+          </>
+        )}
+      </Modal>
 
       <Modal
         open={outcomeOpen}

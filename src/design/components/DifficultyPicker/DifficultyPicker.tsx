@@ -1,8 +1,12 @@
+import { type CSSVars } from '../../types';
+
 import s from './DifficultyPicker.module.css';
 
 export interface DifficultyOption<T extends number> {
   value: T;
   label: string;
+  /** A colour token reference, e.g. `var(--c-difficulty-3)`. Optional. */
+  color?: string;
 }
 
 export interface DifficultyPickerProps<T extends number> {
@@ -15,8 +19,8 @@ export interface DifficultyPickerProps<T extends number> {
 
 /**
  * Identical in every game — the difficulty scale is the shell's, its meaning is
- * the game's. /design cannot import /core, so the levels arrive as options.
- * Reference: docs/PLAN.md, Phase 4.
+ * the game's. /design cannot import /core, so the levels arrive as options and
+ * this component never learns what a difficulty is.
  */
 export function DifficultyPicker<T extends number>({
   value,
@@ -34,6 +38,9 @@ export function DifficultyPicker<T extends number>({
           aria-checked={option.value === value}
           className={s.option}
           data-selected={option.value === value}
+          style={
+            option.color === undefined ? undefined : ({ '--level-color': option.color } as CSSVars)
+          }
           onClick={() => {
             onChange(option.value);
           }}

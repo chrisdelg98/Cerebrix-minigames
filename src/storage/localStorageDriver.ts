@@ -8,10 +8,12 @@ import {
   type GameStats,
   type GlobalStats,
   type SavedSession,
+  type StoredPreference,
 } from './types';
 
 const SESSION_PREFIX = 'cerebrix:session:';
 const RESULTS_KEY = 'cerebrix:results';
+const DIFFICULTY_PREFIX = 'cerebrix:difficulty:';
 
 /**
  * The fallback, for private-mode browsers and anything where IndexedDB is
@@ -99,12 +101,42 @@ export class LocalStorageDriver implements StorageDriver {
     return Promise.resolve(computeGlobalStats(this.#results()));
   }
 
+  saveDifficulty(gameId: string, difficulty: number): Promise<void> {
+    this.#write(`${DIFFICULTY_PREFIX}${gameId}`, {
+      schemaVersion: SCHEMA_VERSION,
+      gameId,
+      difficulty,
+    });
+    return Promise.resolve();
+  }
+
+  loadDifficulty(gameId: string): Promise<number | null> {
+    const stored = this.#read<StoredPreference | null>(`${DIFFICULTY_PREFIX}${gameId}`, null);
+    return Promise.resolve(stored?.difficulty ?? null);
+  }
+
+  #preferences(): StoredPreference[] {
+    const preferences: StoredPreference[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key === null || !key.startsWith(DIFFICULTY_PREFIX)) continue;
+        const stored = this.#read<StoredPreference | null>(key, null);
+        if (stored) preferences.push(stored);
+      }
+    } catch {
+      /* a broken record must not hide the readable ones */
+    }
+    return preferences;
+  }
+
   async exportAll(): Promise<string> {
     const backup: Backup = {
       schemaVersion: SCHEMA_VERSION,
       exportedAt: Date.now(),
       sessions: await this.listSessions(),
       results: this.#results(),
+      preferences: this.#preferences(),
     };
     return JSON.stringify(backup, null, 2);
   }
@@ -127,6 +159,16 @@ export class LocalStorageDriver implements StorageDriver {
     }
     for (const session of sessions) {
       await this.saveSession(session.gameId, session);
+    }
+    for (const existing of this.#preferences()) {
+      try {
+        localStorage.removeItem(`${DIFFICULTY_PREFIX}${existing.gameId}`);
+      } catch {
+        /* nothing to do */
+      }
+    }
+    for (const preference of backup.preferences) {
+      await this.saveDifficulty(preference.gameId, preference.difficulty);
     }
     this.#write(RESULTS_KEY, results);
   }

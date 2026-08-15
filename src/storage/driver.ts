@@ -25,6 +25,10 @@ export interface StorageDriver {
   getStats(gameId: string): Promise<GameStats>;
   getGlobalStats(): Promise<GlobalStats>;
 
+  /** Per-game difficulty, remembered across sessions. Null when never chosen. */
+  saveDifficulty(gameId: string, difficulty: number): Promise<void>;
+  loadDifficulty(gameId: string): Promise<number | null>;
+
   exportAll(): Promise<string>;
   importAll(json: string): Promise<void>;
 }
@@ -62,5 +66,8 @@ export function parseBackup(json: string): Backup {
     exportedAt: typeof candidate.exportedAt === 'number' ? candidate.exportedAt : Date.now(),
     sessions: candidate.sessions,
     results: candidate.results,
+    // Additive and optional: a backup written before preferences existed is
+    // still a valid backup, and refusing it would strand old exports.
+    preferences: Array.isArray(candidate.preferences) ? candidate.preferences : [],
   };
 }

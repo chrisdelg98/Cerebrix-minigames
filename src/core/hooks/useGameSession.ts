@@ -9,6 +9,7 @@ import {
   type GameStatus,
   type Hint,
 } from '../contract';
+import { asDifficulty } from '../difficulty';
 import { useStorage } from '../storageContext';
 import { useAutosave } from './useAutosave';
 
@@ -46,6 +47,11 @@ export interface Session {
   canHint: boolean;
   /** Identifies the current board. The shell keys the timer off it. */
   roundId: string;
+  /**
+   * A difficulty change waiting on the player, because taking it would throw
+   * away a board they have already worked on. Null when nothing is pending.
+   */
+  pendingDifficulty: Difficulty | null;
   /** Time carried over from a resumed session; the clock continues from here. */
   elapsedMs: number;
   /** True when this board came back from storage rather than being generated. */
@@ -55,6 +61,8 @@ export interface Session {
   restart: () => void;
   requestHint: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
+  confirmDifficulty: () => void;
+  cancelDifficulty: () => void;
 }
 
 const PLAYING: GameStatus = { kind: 'playing' };
@@ -90,6 +98,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
   const [lastHint, setLastHint] = useState<OfRound<Hint | null> | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [resumed, setResumed] = useState(false);
+  const [pendingDifficulty, setPendingDifficulty] = useState<Difficulty | null>(null);
 
   // Everything below is DERIVED from the current round rather than cleared when
   // it changes: an effect that calls setState synchronously just to reset state
@@ -144,6 +153,21 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
         bootedRef.current = true;
 
         const saved = await storage.loadSession(module.meta.id);
+
+        if (!saved) {
+          // No board to continue, but the level they last chose for THIS game
+          // outlives the session that was played at it.
+          const preferred = asDifficulty(
+            await storage.loadDifficulty(module.meta.id),
+            module.meta.difficulties
+          );
+          if (preferred !== null && preferred !== difficulty && !cancelled) {
+            // Re-runs this effect, which then builds the board at that level.
+            setDifficulty(preferred);
+            return;
+          }
+        }
+
         if (saved && !cancelled) {
           try {
             const state = module.engine.deserialize(saved.state, saved.stateVersion);
@@ -277,9 +301,36 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     setLastHint({ round, value: module.engine.getHint(state) });
   }, [module, state, round]);
 
-  const changeDifficulty = useCallback((next: Difficulty) => {
-    // Phase 4 adds the "are you sure?" confirmation for changing mid-game.
-    setDifficulty(next);
+  const applyDifficulty = useCallback(
+    (next: Difficulty) => {
+      setDifficulty(next);
+      setPendingDifficulty(null);
+      if (module) void storage.saveDifficulty(module.meta.id, next);
+    },
+    [module, storage]
+  );
+
+  const requestDifficulty = useCallback(
+    (next: Difficulty) => {
+      if (next === difficulty) return;
+
+      // Only ask when there is something to lose. A board nobody has touched
+      // costs nothing to rebuild, and a confirmation nobody needs is friction.
+      if (history.length > 1 && playing) {
+        setPendingDifficulty(next);
+        return;
+      }
+      applyDifficulty(next);
+    },
+    [difficulty, history.length, playing, applyDifficulty]
+  );
+
+  const confirmDifficulty = useCallback(() => {
+    if (pendingDifficulty !== null) applyDifficulty(pendingDifficulty);
+  }, [pendingDifficulty, applyDifficulty]);
+
+  const cancelDifficulty = useCallback(() => {
+    setPendingDifficulty(null);
   }, []);
 
   return {
@@ -295,13 +346,16 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     canUndo: history.length > 1 && playing,
     canHint: typeof module?.engine.getHint === 'function' && playing,
     roundId: round,
+    pendingDifficulty,
     elapsedMs,
     resumed,
     dispatch,
     undo,
     restart,
     requestHint,
-    setDifficulty: changeDifficulty,
+    setDifficulty: requestDifficulty,
+    confirmDifficulty,
+    cancelDifficulty,
   };
 }
 

@@ -10,10 +10,11 @@ import {
   type GameStats,
   type GlobalStats,
   type SavedSession,
+  type StoredPreference,
 } from './types';
 
 const DB_NAME = 'cerebrix';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 interface CerebrixDb extends DBSchema {
   sessions: {
@@ -24,6 +25,10 @@ interface CerebrixDb extends DBSchema {
     key: number;
     value: GameResult & { id?: number };
     indexes: { byGame: string };
+  };
+  preferences: {
+    key: string;
+    value: StoredPreference;
   };
 }
 
@@ -50,6 +55,12 @@ export class IndexedDbDriver implements StorageDriver {
         if (!db.objectStoreNames.contains('results')) {
           const results = db.createObjectStore('results', { keyPath: 'id', autoIncrement: true });
           results.createIndex('byGame', 'gameId');
+        }
+        // Added in DB version 2. The guard is what makes the same upgrade
+        // function correct both for a fresh database and for one coming from
+        // version 1 with games already saved in it.
+        if (!db.objectStoreNames.contains('preferences')) {
+          db.createObjectStore('preferences', { keyPath: 'gameId' });
         }
       },
     });
@@ -104,12 +115,29 @@ export class IndexedDbDriver implements StorageDriver {
     return computeGlobalStats(await this.#allResults());
   }
 
+  async saveDifficulty(gameId: string, difficulty: number): Promise<void> {
+    const db = await this.#open();
+    await db.put('preferences', { schemaVersion: SCHEMA_VERSION, gameId, difficulty });
+  }
+
+  async loadDifficulty(gameId: string): Promise<number | null> {
+    const db = await this.#open();
+    const stored = await db.get('preferences', gameId);
+    return stored?.difficulty ?? null;
+  }
+
+  async #allPreferences(): Promise<StoredPreference[]> {
+    const db = await this.#open();
+    return db.getAll('preferences');
+  }
+
   async exportAll(): Promise<string> {
     const backup: Backup = {
       schemaVersion: SCHEMA_VERSION,
       exportedAt: Date.now(),
       sessions: await this.listSessions(),
       results: await this.#allResults(),
+      preferences: await this.#allPreferences(),
     };
     return JSON.stringify(backup, null, 2);
   }
@@ -129,11 +157,14 @@ export class IndexedDbDriver implements StorageDriver {
     }
 
     const db = await this.#open();
-    const tx = db.transaction(['sessions', 'results'], 'readwrite');
+    const tx = db.transaction(['sessions', 'results', 'preferences'], 'readwrite');
     await tx.objectStore('sessions').clear();
     await tx.objectStore('results').clear();
+    await tx.objectStore('preferences').clear();
     for (const session of sessions) await tx.objectStore('sessions').put(session);
     for (const result of results) await tx.objectStore('results').add(result);
+    for (const preference of backup.preferences)
+      await tx.objectStore('preferences').put(preference);
     await tx.done;
   }
 }

@@ -62,6 +62,18 @@
   --c-info: var(--raw-blue-500);
   --c-info-soft: color-mix(in oklab, var(--raw-blue-500) 16%, transparent);
 
+  /*
+   * Difficulty ramp — reuses the semantic tokens instead of inventing five new
+   * hues, so the scale inherits their contrast and their theme behaviour. The
+   * progression reads as it means: calm, informational, the brand, a warning,
+   * a risk.
+   */
+  --c-difficulty-1: var(--c-success);
+  --c-difficulty-2: var(--c-info);
+  --c-difficulty-3: var(--c-accent);
+  --c-difficulty-4: var(--c-gold);
+  --c-difficulty-5: var(--c-danger);
+
   /* Board cells — shared by every game */
   --c-cell: var(--raw-slate-800);
   --c-cell-hover: var(--raw-slate-700);

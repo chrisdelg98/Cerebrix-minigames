@@ -8,6 +8,11 @@
     border-radius: var(--r-full);
   }
 
+  /*
+   * --level-color comes from the caller as a token reference (docs/STYLING.md
+   * §5). It falls back to the accent, so a picker used without per-level
+   * colours still looks like the rest of the app.
+   */
   .option {
     padding: var(--sp-1) var(--sp-3);
     border-radius: var(--r-full);
@@ -20,10 +25,19 @@
     transition-timing-function: var(--e-out);
   }
 
-  /* Carries text, so it uses the surface accent, not the foreground one. */
+  /*
+   * The level colour tints the chip rather than filling it: a solid fill in
+   * five different hues would put five saturated colours on screen at once,
+   * against the two-colour cap of docs/DESIGN_SYSTEM.md §1. The selected state
+   * is carried by weight and background presence, not by hue alone.
+   */
   .option[data-selected='true'] {
-    background-color: var(--c-accent-surface);
-    color: var(--c-text-on-accent);
+    background-color: color-mix(
+      in oklab,
+      var(--level-color, var(--c-accent)) 22%,
+      var(--c-surface-raised)
+    );
+    color: var(--level-color, var(--c-accent));
   }
 
   @media (hover: hover) and (pointer: fine) {

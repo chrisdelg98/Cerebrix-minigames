@@ -260,13 +260,29 @@ type Difficulty = 1 | 2 | 3 | 4 | 5;
 // 1 Fácil · 2 Casual · 3 Normal · 4 Difícil · 5 Experto
 ```
 
-- [ ] `core/difficulty.ts`: escala, etiquetas, colores por nivel (tokens)
-- [ ] `getDifficultyConfig(d)` en cada engine → su configuración interna
-- [ ] `<DifficultyPicker>` conectado al registro: solo muestra las dificultades que el juego declara en su metadata
-- [ ] La dificultad elegida persiste **por juego**
-- [ ] Cambiar dificultad a mitad de partida pide confirmación
+- [x] `core/difficulty.ts`: escala, etiquetas, colores por nivel (tokens)
+- [x] `getDifficultyConfig(d)` en cada engine → su configuración interna _(ya estaba desde la Fase 1)_
+- [x] `<DifficultyPicker>` conectado al registro: solo muestra las dificultades que el juego declara en su metadata _(ya estaba desde la Fase 1)_
+- [x] La dificultad elegida persiste **por juego**
+- [x] Cambiar dificultad a mitad de partida pide confirmación
 
-**✅ Aceptación:** el dummy declara soportar `[1,3,5]` y el picker muestra exactamente esos tres, sin código específico del dummy en el shell.
+**✅ Aceptación — cumplida.** El dummy declara `[1,3,5]` y el picker muestra exactamente esos tres, sin una línea del dummy en el shell (`tests/shell.test.tsx`). `tests/difficulty.test.tsx` cubre el resto: confirmación, cancelación, reconstrucción y persistencia.
+
+### Decisiones que tomó esta fase
+
+**La confirmación solo aparece cuando hay algo que perder.** Un tablero que nadie tocó no cuesta nada de reconstruir, así que preguntar ahí es fricción pura. La condición es que haya jugadas en la pila de deshacer y la partida siga en curso.
+
+**La preferencia vive fuera de la sesión.** Guardar la dificultad dentro de `SavedSession` habría sido gratis, pero la sesión se borra apenas termina la partida — y entonces el jugador volvería al nivel por defecto después de cada victoria. Va en un registro aparte (`preferences`), que sobrevive al borrado. Hay un test que lo fija justamente así: guardar sesión, terminarla, y verificar que el nivel sigue.
+
+**Si la sesión guardada y la preferencia no coinciden, gana la sesión.** Son dos fuentes con distinta autoridad: la preferencia dice "en qué nivel te gusta jugar", la sesión dice "en qué nivel está el tablero que dejaste a medias". Continuar el tablero es lo que el jugador espera.
+
+**`asDifficulty()` narrowea lo que vuelve de storage.** `/storage` no puede importar `/core`, así que devuelve un `number` pelado. Sin ese chequeo, un nivel guardado por una versión donde el juego soportaba más dificultades reviviría un nivel que el juego ya no declara.
+
+**El color del nivel tiñe, no rellena.** Cinco chips rellenos con cinco tonos saturados romperían el tope de dos colores saturados a la vez de DESIGN_SYSTEM.md §1. El estado elegido lo carga el fondo y el peso, no el tono solo. Los cinco tokens `--c-difficulty-*` reusan los semánticos existentes en vez de inventar cinco tonos nuevos, así heredan su contraste y su comportamiento entre temas.
+
+**La base de IndexedDB sube a la versión 2** para agregar el store `preferences`. El guard `if (!contains(...))` hace que la misma función de upgrade sirva tanto para una base nueva como para una que viene de la v1 con partidas adentro. El `Backup` gana `preferences` de forma aditiva y opcional: un export escrito antes de que existieran sigue importándose, y hay un test que lo verifica.
+
+**Estado del build:** inicial **103.0 kB gzip** (97.9 JS + 5.1 CSS; presupuesto 120 kB).
 
 ---
 

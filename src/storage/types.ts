@@ -61,10 +61,25 @@ export interface GlobalStats {
   byGame: Record<string, GameStats>;
 }
 
+/**
+ * A choice that outlives the game it was made in.
+ *
+ * Separate from SavedSession on purpose: a session is cleared the moment the
+ * game ends, and the difficulty you picked has to survive that. Storing it
+ * inside the session would reset the player to the default after every win.
+ */
+export interface StoredPreference {
+  schemaVersion: number;
+  gameId: string;
+  difficulty: number;
+}
+
 /** The shape of an export file. */
 export interface Backup {
   schemaVersion: number;
   exportedAt: number;
   sessions: SavedSession[];
   results: GameResult[];
+  /** Absent in backups written before preferences existed. */
+  preferences: StoredPreference[];
 }

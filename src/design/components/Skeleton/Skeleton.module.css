@@ -1,0 +1,24 @@
+@layer components {
+  /*
+   * Knobs, set from the component as custom properties (docs/STYLING.md §5):
+   *   --skeleton-w · --skeleton-h · --skeleton-radius
+   */
+  .skeleton {
+    position: relative;
+    display: block;
+    inline-size: var(--skeleton-w, 100%);
+    block-size: var(--skeleton-h, var(--sp-6));
+    overflow: hidden;
+    background-color: var(--c-surface-raised);
+    border-radius: var(--skeleton-radius, var(--r-md));
+  }
+
+  /* A transform-only sweep: no layout, no paint of the box itself. */
+  .skeleton::after {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(90deg, transparent, var(--c-cell-hover), transparent);
+    animation: shimmer calc(var(--d-slower) * 2) var(--e-in-out) infinite;
+    content: '';
+  }
+}

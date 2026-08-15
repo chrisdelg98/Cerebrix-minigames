@@ -1,0 +1,69 @@
+@layer components {
+  .back {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: var(--touch-min);
+    block-size: var(--touch-min);
+    border-radius: var(--r-md);
+    color: var(--c-text);
+    font-size: var(--fs-lg);
+    text-decoration: none;
+  }
+
+  .title {
+    overflow: hidden;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+    letter-spacing: var(--ls-tight);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .headerEnd {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-inline-start: auto;
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+    animation: view-in var(--d-slow) var(--e-out) backwards;
+  }
+
+  .loading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    inline-size: min(100%, 480px);
+  }
+
+  .live {
+    min-block-size: var(--sp-5);
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    text-align: center;
+  }
+
+  .message {
+    color: var(--c-danger);
+    font-size: var(--fs-sm);
+    text-align: center;
+  }
+}
+
+/* On phones the difficulty picker drops to its own line so the timer and the
+   title keep their space at 360px — docs/DESIGN_SYSTEM.md §7.2. */
+@layer components {
+  @media (width < 480px) {
+    .headerEnd {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--sp-2);
+    }
+  }
+}

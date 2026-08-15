@@ -1,7 +1,7 @@
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { ESLint } from 'eslint';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 /**
  * The architecture rules of docs/PLAN.md are only worth anything if they
@@ -9,105 +9,132 @@ import { afterAll, describe, expect, it } from 'vitest';
  * different ways and passed silently both times — a rule that never triggers is
  * worse than no rule, because it buys false confidence.
  *
- * Each case writes a real fixture file (the TypeScript parser needs the file to
- * exist to build its program), lints it, and asserts the violation is caught.
- * Fixture names are prefixed so they can never collide with real source files.
+ * Every fixture is written BEFORE the first lint, and all of them are linted in
+ * a single pass. That is not a style preference. typescript-eslint builds the
+ * TypeScript Program on the first `lintFiles()` call and caches it, so a
+ * fixture created after that call is absent from the program and comes back as
+ *
+ *     Parsing error: "parserOptions.project" has been provided ...
+ *     but the file was not found in any of the provided project(s)
+ *
+ * That parse error REPLACES the rule message. Assertions that only look for
+ * their own message therefore fail, and — worse — assertions of the
+ * `not.toMatch` kind pass for entirely the wrong reason. Hence the explicit
+ * "no parse error" guard in every case: this failure mode must never again be
+ * able to disguise itself.
  */
 
+interface Case {
+  /** Repo-relative path. Prefixed so it can never collide with real source. */
+  readonly file: string;
+  readonly code: string;
+  /** The rule message this illegal code must produce. */
+  readonly mustMatch?: RegExp;
+  /** A message this legal code must NOT produce. */
+  readonly mustNotMatch?: RegExp;
+}
+
+const CASES: Record<string, Case> = {
+  '/core must not import a game': {
+    file: 'src/core/__fixture_core__.ts',
+    code: `import { x } from '@games/sudoku';\nexport const a = x;\n`,
+    mustMatch: /must not import a game/,
+  },
+  'a game must not import another game': {
+    file: 'src/games/__fixture_a__/index.ts',
+    code: `import { x } from '@games/__fixture_b__';\nexport const a = x;\n`,
+    mustMatch: /must not import another game/,
+  },
+  'a game engine must not import React': {
+    file: 'src/games/__fixture_a__/engine/__fixture_react__.ts',
+    code: `import { useState } from 'react';\nexport const a = useState;\n`,
+    mustMatch: /framework-free/,
+  },
+  'a game engine must not import the design system': {
+    file: 'src/games/__fixture_a__/engine/__fixture_design__.ts',
+    code: `import type { CSSVars } from '@design/types';\nexport type A = CSSVars;\n`,
+    mustMatch: /framework-free/,
+  },
+  '/design must not import /core': {
+    file: 'src/design/__fixture_design__.ts',
+    code: `import { x } from '@core/router';\nexport const a = x;\n`,
+    mustMatch: /lowest layer/,
+  },
+  '/storage must not import /design': {
+    file: 'src/storage/__fixture_storage__.ts',
+    code: `import type { CSSVars } from '@design/types';\nexport type A = CSSVars;\n`,
+    mustMatch: /stay independent/,
+  },
+  'an inline style with a real CSS property is rejected': {
+    file: 'src/design/__fixture_bad_style__.tsx',
+    code: `export const B = () => <div style={{ padding: 16 }} />;\n`,
+    mustMatch: /Inline styles are not allowed/,
+  },
+  'an inline style holding only custom properties is allowed': {
+    file: 'src/design/__fixture_good_style__.tsx',
+    code:
+      `import type { CSSVars } from './types';\n` +
+      `export const G = ({ i }: { i: number }) => <div style={{ '--i': i } as CSSVars} />;\n`,
+    mustNotMatch: /Inline styles are not allowed/,
+  },
+};
+
 const root = process.cwd();
-const eslint = new ESLint({ cwd: root });
 
-const created: string[] = [];
+/** Errors keyed by repo-relative fixture path. */
+const errorsByFile = new Map<string, string>();
 
-function fixture(relPath: string, code: string): string {
-  const absolute = join(root, relPath);
-  mkdirSync(dirname(absolute), { recursive: true });
-  writeFileSync(absolute, code, 'utf8');
-  created.push(absolute);
-  return absolute;
+/** Directories this test created, so cleanup removes only its own mess. */
+const createdDirs: string[] = [];
+
+function ensureDir(absolute: string): void {
+  const dir = dirname(absolute);
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+    createdDirs.push(dir);
+  }
 }
 
-async function errorsFor(relPath: string, code: string): Promise<string> {
-  const absolute = fixture(relPath, code);
-  const results = await eslint.lintFiles([absolute]);
-  return (results[0]?.messages ?? [])
-    .filter((m) => m.severity === 2)
-    .map((m) => m.message)
-    .join('\n');
-}
+beforeAll(async () => {
+  const paths = Object.values(CASES).map(({ file, code }) => {
+    const absolute = join(root, file);
+    ensureDir(absolute);
+    writeFileSync(absolute, code, 'utf8');
+    return absolute;
+  });
+
+  // One pass, one TypeScript Program, every fixture already on disk.
+  const results = await new ESLint({ cwd: root }).lintFiles(paths);
+
+  for (const result of results) {
+    const relative = result.filePath.slice(root.length + 1).replaceAll('\\', '/');
+    errorsByFile.set(
+      relative,
+      result.messages
+        .filter((message) => message.severity === 2)
+        .map((message) => message.message)
+        .join('\n')
+    );
+  }
+  // Building the program from cold is slow on a first CI run; the whole suite
+  // is one pass, so the budget is generous on purpose.
+}, 120_000);
 
 afterAll(() => {
-  for (const file of created) rmSync(file, { force: true });
-  // Directories that only ever held fixtures.
-  rmSync(join(root, 'src/games/__fixture_a__'), { recursive: true, force: true });
-  rmSync(join(root, 'src/games/__fixture_b__'), { recursive: true, force: true });
+  for (const { file } of Object.values(CASES)) rmSync(join(root, file), { force: true });
+  // Deepest first, so a nested fixture directory is gone before its parent.
+  for (const dir of [...createdDirs].reverse()) rmSync(dir, { recursive: true, force: true });
 });
 
-describe('boundary rules', () => {
-  it('rejects /core importing a game', async () => {
-    const errors = await errorsFor(
-      'src/core/__fixture_core__.ts',
-      `import { x } from '@games/sudoku';\nexport const a = x;\n`
-    );
-    expect(errors).toMatch(/must not import a game/);
-  });
+describe.each(Object.entries(CASES))('%s', (_name, testCase) => {
+  it('is enforced by the lint config', () => {
+    const errors = errorsByFile.get(testCase.file);
 
-  it('rejects one game importing another', async () => {
-    const errors = await errorsFor(
-      'src/games/__fixture_a__/index.ts',
-      `import { x } from '@games/__fixture_b__';\nexport const a = x;\n`
-    );
-    expect(errors).toMatch(/must not import another game/);
-  });
+    expect(errors, `no lint result for ${testCase.file}`).toBeDefined();
+    // Guards the failure mode described at the top of this file.
+    expect(errors).not.toMatch(/Parsing error/);
 
-  it('rejects a game engine importing React', async () => {
-    const errors = await errorsFor(
-      'src/games/__fixture_a__/engine/__fixture_react__.ts',
-      `import { useState } from 'react';\nexport const a = useState;\n`
-    );
-    expect(errors).toMatch(/framework-free/);
-  });
-
-  it('rejects a game engine importing the design system', async () => {
-    const errors = await errorsFor(
-      'src/games/__fixture_a__/engine/__fixture_design__.ts',
-      `import type { CSSVars } from '@design/types';\nexport type A = CSSVars;\n`
-    );
-    expect(errors).toMatch(/framework-free/);
-  });
-
-  it('rejects /design importing /core', async () => {
-    const errors = await errorsFor(
-      'src/design/__fixture_design__.ts',
-      `import { x } from '@core/router';\nexport const a = x;\n`
-    );
-    expect(errors).toMatch(/lowest layer/);
-  });
-
-  it('rejects /storage importing /design', async () => {
-    const errors = await errorsFor(
-      'src/storage/__fixture_storage__.ts',
-      `import type { CSSVars } from '@design/types';\nexport type A = CSSVars;\n`
-    );
-    expect(errors).toMatch(/stay independent/);
-  });
-});
-
-describe('inline style rule', () => {
-  it('rejects a real CSS property in an inline style', async () => {
-    const errors = await errorsFor(
-      'src/design/__fixture_bad_style__.tsx',
-      `export const B = () => <div style={{ padding: 16 }} />;\n`
-    );
-    expect(errors).toMatch(/Inline styles are not allowed/);
-  });
-
-  it('allows an inline style holding only custom properties', async () => {
-    const errors = await errorsFor(
-      'src/design/__fixture_good_style__.tsx',
-      `import type { CSSVars } from './types';\n` +
-        `export const G = ({ i }: { i: number }) => <div style={{ '--i': i } as CSSVars} />;\n`
-    );
-    expect(errors).not.toMatch(/Inline styles are not allowed/);
+    if (testCase.mustMatch) expect(errors).toMatch(testCase.mustMatch);
+    if (testCase.mustNotMatch) expect(errors).not.toMatch(testCase.mustNotMatch);
   });
 });

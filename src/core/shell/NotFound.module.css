@@ -1,0 +1,16 @@
+@layer components {
+  .notFound {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+    min-block-size: 100dvh;
+    justify-content: center;
+    padding: var(--sp-4);
+    text-align: center;
+  }
+
+  .text {
+    color: var(--c-text-muted);
+  }
+}

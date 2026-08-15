@@ -1,0 +1,49 @@
+/*
+ * Layer 4 — game style. @layer game wins over @layer components without
+ * !important and without specificity games (docs/STYLING.md §1).
+ */
+@layer game {
+  /* --cols is set by the view: it depends on the difficulty, so it cannot live
+     in a static stylesheet (docs/STYLING.md §5). */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 3), 1fr);
+    gap: var(--sp-2);
+    inline-size: min(100%, 320px);
+  }
+
+  .tile {
+    aspect-ratio: 1;
+    background-color: var(--c-cell);
+    border: var(--bw-base) solid var(--c-border);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-sm);
+    transition-property: transform, background-color, border-color, box-shadow;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .tile[data-marked='true'] {
+    background-color: var(--c-accent);
+    border-color: var(--c-accent-press);
+  }
+
+  .tile[data-hinted='true'] {
+    border-color: var(--c-info);
+    animation: pulse-soft 1.6s var(--e-in-out) infinite;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tile:hover:not(:disabled) {
+      background-color: var(--c-cell-hover);
+    }
+  }
+
+  .tile:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  .tile:disabled {
+    cursor: default;
+  }
+}

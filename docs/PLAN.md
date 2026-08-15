@@ -107,6 +107,8 @@ cerebrix/
 | `/design` → `@core/*`     | `/design` es la capa más baja                                        |
 
 > Durante esta fase la config de `boundaries` estuvo mal escrita **dos veces** y el lint pasó en verde igual. De ahí el test: una regla de arquitectura que nunca dispara es peor que no tenerla, porque da confianza falsa.
+>
+> Y el propio test cayó en la misma trampa una tercera vez: llamaba a `lintFiles()` una vez por caso, pero typescript-eslint construye el `Program` en la primera llamada y lo cachea, así que los fixtures escritos después no existían para el parser. El `Parsing error` resultante **reemplaza** el mensaje de la regla — los casos negativos fallaban y el caso positivo (`not.toMatch`) pasaba por el motivo equivocado. Ahora todos los fixtures se escriben antes del primer lint, se lintean en una sola pasada, y **cada caso asserta explícitamente que no hubo `Parsing error`**. Sin esa aserción, este modo de fallo puede volver a disfrazarse de verde.
 
 **Estado del build:** bundle inicial **60.5 kB gzip** (presupuesto: 120 kB).
 
@@ -116,19 +118,33 @@ cerebrix/
 
 **Objetivo:** un esqueleto que carga juegos que no conoce.
 
-- [ ] `core/contract.ts` — tipos completos (ver [`GAME_CONTRACT.md`](./GAME_CONTRACT.md))
-- [ ] `core/registry.ts` — manifiesto con metadata + loader perezoso
-- [ ] Tokens mínimos de `design/tokens/` conectados (colores, espaciado, motion)
-- [ ] `AppShell`: header (timer + dificultad) / área central / footer de acciones
-- [ ] `Home`: grid de tarjetas leído **del registro**, nunca hardcodeado
-- [ ] Router con `lazy` + `Suspense` + un `<Skeleton>` de fallback
-- [ ] `games/_dummy/` — botón "Ganar", implementa el contrato completo
+- [x] `core/contract.ts` — tipos completos (ver [`GAME_CONTRACT.md`](./GAME_CONTRACT.md))
+- [x] `core/registry.ts` — manifiesto con metadata + loader perezoso
+- [x] Tokens mínimos de `design/tokens/` conectados (colores, espaciado, motion)
+- [x] `AppShell`: header (timer + dificultad) / área central / footer de acciones
+- [x] `Home`: grid de tarjetas leído **del registro**, nunca hardcodeado
+- [x] Router con `lazy` + `Suspense` + un `<Skeleton>` de fallback
+- [x] `games/_dummy/` — botón "Ganar", implementa el contrato completo
 
-**✅ Aceptación:**
+**✅ Aceptación — cumplida.** Verificada por tests, no por inspección:
 
-- Se juega el dummy desde Home.
-- Un `grep -r "games/" src/core/` devuelve **solo** `registry.ts`.
-- Agregar un segundo juego falso al registro lo hace aparecer en Home **sin tocar ningún otro archivo**.
+| Criterio                                                     | Dónde se verifica                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------------- |
+| Se juega el dummy desde Home                                 | `tests/shell.test.tsx` — navega, juega, deshace y gana en el router |
+| `grep -r "games/" src/core/` devuelve **solo** `registry.ts` | `tests/architecture.test.ts` — escanea `/core` entero               |
+| Un juego nuevo aparece en Home sin tocar ningún otro archivo | `tests/registry.test.tsx` — inyecta una entrada inventada           |
+| `preview` del registro no se desincroniza del `meta` real    | `tests/registry.test.tsx` — compara contra el módulo cargado        |
+| El motor se testea sin DOM ni renderer                       | `tests/dummyEngine.test.ts` — pureza, round-trip, rechazo, pista    |
+
+### Decisiones que tomó esta fase
+
+**`defineGame()` — el único cast del repo.** El shell guarda módulos cuyos tipos no puede nombrar. Borrarlos a `unknown` funciona para el motor (los métodos son bivariantes en sus parámetros) pero **no** para `View`: las props de un componente están en posición contravariante, así que ningún truco de varianza hace que `GameModule<SudokuState, …>` sea asignable a `GameModule<unknown, …>`. En vez de esparcir `any` por el shell, el borrado ocurre **una sola vez**, en `defineGame()`. Adentro de cada juego los tipos son completos y reales; afuera el shell es ciego a propósito.
+
+**El estado de la sesión es derivado, no reseteado.** Al cambiar de dificultad o empezar de nuevo, la pila de deshacer, el rechazo y la pista no se limpian con `setState` dentro de un efecto — cada uno lleva la identidad de su ronda y se ignora si no coincide. Un `setState` sincrónico en un efecto encadena renders para nada, y el lint de React lo marca como error.
+
+**El timer no re-renderiza el árbol.** Su tick vive en un `rAF` que escribe `textContent` y solo cuando el string cambia. Un `setState` por segundo volvería a renderizar el tablero entero por un dígito cosmético.
+
+**Estado del build:** inicial **95.5 kB gzip** (91.7 JS + 3.7 CSS; presupuesto 120 kB) · chunk del dummy **1.9 kB gzip** (presupuesto 60 kB). La subida desde los 60.5 kB de la Fase 0 es React Router. El shell del juego (`GameRoute`) también está code-splitteado: quien solo mira Home no lo descarga.
 
 ---
 

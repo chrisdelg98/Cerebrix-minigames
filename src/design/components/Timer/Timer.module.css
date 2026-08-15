@@ -1,0 +1,13 @@
+@layer components {
+  .timer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Wide enough for mm:ss so the header does not reflow on the first tick. */
+    min-inline-size: 5ch;
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+}

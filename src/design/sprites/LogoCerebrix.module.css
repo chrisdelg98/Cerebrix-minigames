@@ -1,0 +1,18 @@
+@layer components {
+  .logo {
+    color: var(--c-accent);
+    flex-shrink: 0;
+  }
+
+  /* Drawn once on load. The end state is the finished logo, so it is correct
+     even when the animation never runs (reduced motion). */
+  .stroke {
+    stroke-dasharray: 100;
+    animation: draw-stroke var(--d-slower) var(--e-out) backwards;
+  }
+
+  .node {
+    animation: pop-in var(--d-base) var(--e-spring) backwards;
+    animation-delay: var(--d-slow);
+  }
+}

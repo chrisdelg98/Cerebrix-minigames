@@ -88,9 +88,12 @@ export default tseslint.config(
             {
               // A game engine is pure logic: no React, no CSS, no design system.
               // Enforced further by the no-restricted-imports override below.
+              // It may read /core, because /core is where the contract it
+              // implements is declared — and that import is types only.
               from: [{ element: { type: 'game-engine' } }],
               allow: [
                 { to: { element: { type: 'game-engine', captured: { id: '{{from.id}}' } } } },
+                { to: { element: { type: 'core' } } },
               ],
             },
             {

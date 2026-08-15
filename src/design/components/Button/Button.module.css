@@ -1,0 +1,87 @@
+@layer components {
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+
+    /* WCAG 2.5.5 — the thumb is the cursor. */
+    min-block-size: var(--touch-min);
+    padding-inline: var(--sp-4);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-md);
+    color: var(--c-text);
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+    line-height: 1;
+    transition-property: transform, box-shadow, background-color, opacity;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .button[data-size='sm'] {
+    min-block-size: var(--touch-min);
+    padding-inline: var(--sp-3);
+    font-size: var(--fs-xs);
+  }
+
+  .button[data-size='lg'] {
+    min-block-size: var(--sp-7);
+    padding-inline: var(--sp-5);
+    font-size: var(--fs-md);
+  }
+
+  .button[data-block='true'] {
+    inline-size: 100%;
+  }
+
+  .button[data-variant='primary'] {
+    background-color: var(--c-accent);
+    border-color: var(--c-accent-press);
+    color: var(--c-text-on-accent);
+  }
+
+  .button[data-variant='danger'] {
+    background-color: var(--c-danger-soft);
+    border-color: var(--c-danger);
+    color: var(--c-danger);
+  }
+
+  .button:disabled {
+    opacity: 0.45;
+    box-shadow: var(--sh-sm);
+    cursor: not-allowed;
+  }
+
+  /* Hover only where a real pointer exists — docs/DESIGN_SYSTEM.md §7.3 */
+  @media (hover: hover) and (pointer: fine) {
+    .button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: var(--sh-lg);
+      background-color: var(--c-cell-hover);
+    }
+
+    .button[data-variant='primary']:hover:not(:disabled) {
+      background-color: var(--c-accent-hover);
+    }
+  }
+
+  .button:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: var(--sh-none);
+  }
+
+  .icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

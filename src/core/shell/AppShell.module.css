@@ -1,0 +1,51 @@
+@layer components {
+  .shell {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-block-size: 100dvh;
+  }
+
+  .header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-4);
+    background-color: var(--c-surface);
+    border-block-end: var(--bw-hair) solid var(--c-border-hairline);
+  }
+
+  .headerRow {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    min-block-size: var(--header-h);
+  }
+
+  .board {
+    display: grid;
+    place-items: center;
+    padding: var(--sp-4);
+
+    /* The board never causes horizontal scroll, and pull-to-refresh must not
+       fire while dragging on it — docs/DESIGN_SYSTEM.md §7.3. */
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+
+  /* Within thumb reach on mobile, clear of the home indicator. */
+  .footer {
+    position: sticky;
+    inset-block-end: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    justify-content: center;
+    padding: var(--sp-3) var(--sp-4);
+    padding-block-end: calc(var(--sp-3) + env(safe-area-inset-bottom));
+    background-color: var(--c-surface);
+    border-block-start: var(--bw-hair) solid var(--c-border-hairline);
+  }
+}

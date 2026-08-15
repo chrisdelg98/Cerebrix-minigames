@@ -1,0 +1,10 @@
+@layer components {
+  .fallback {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    inline-size: min(100%, 560px);
+    margin-inline: auto;
+    padding: var(--sp-6) var(--sp-4);
+  }
+}

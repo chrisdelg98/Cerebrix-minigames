@@ -1,0 +1,20 @@
+@layer components {
+  .track {
+    inline-size: 100%;
+    block-size: var(--sp-1);
+    overflow: hidden;
+    background-color: var(--c-surface-sunken);
+    border-radius: var(--r-full);
+  }
+
+  /* --progress (0–1) comes from the component — docs/STYLING.md §5. */
+  .fill {
+    block-size: 100%;
+    background-color: var(--c-accent);
+    transform: scaleX(var(--progress, 0));
+    transform-origin: left center;
+    transition-property: transform;
+    transition-duration: var(--d-base);
+    transition-timing-function: var(--e-out);
+  }
+}

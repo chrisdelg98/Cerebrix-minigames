@@ -10,13 +10,13 @@ _Sudoku, Buscaminas y más — en una arquitectura donde agregar el próximo jue
 
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
 [![PWA](https://img.shields.io/badge/PWA-offline-6C4CF1?style=for-the-badge&logo=pwa&logoColor=white)](#-características)
 [![License](https://img.shields.io/badge/License-MIT-2FBF71?style=for-the-badge)](#-licencia)
 
 <br/>
 
-**🚧 En construcción — Fase 0** · [📋 Plan](docs/PLAN.md) · [🎨 Diseño](docs/DESIGN_SYSTEM.md) · [🧵 Estilos](docs/STYLING.md) · [🔌 Contrato](docs/GAME_CONTRACT.md)
+**🚧 En construcción — Fase 2** · [📋 Plan](docs/PLAN.md) · [🎨 Diseño](docs/DESIGN_SYSTEM.md) · [🧵 Estilos](docs/STYLING.md) · [🔌 Contrato](docs/GAME_CONTRACT.md)
 
 </div>
 
@@ -202,8 +202,8 @@ cerebrix/
 
 ```
 ✅ Fase 0  Andamiaje            tooling, alias, lint de fronteras, CI
-🚧 Fase 1  Contrato + shell     el esqueleto que carga juegos que no conoce
-📋 Fase 2  Design system        tokens, componentes, animaciones
+✅ Fase 1  Contrato + shell     el esqueleto que carga juegos que no conoce
+🚧 Fase 2  Design system        tokens, componentes, animaciones
 📋 Fase 3  Persistencia         autosave, estadísticas, migraciones
 📋 Fase 4  Dificultad           escala 1–5 unificada
 📋 Fase 5  Sudoku               el primer juego real

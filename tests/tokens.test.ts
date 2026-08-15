@@ -26,6 +26,90 @@ function cssFiles(dir: string): string[] {
     .filter((entry) => entry.endsWith('.css'));
 }
 
+/* ─────────── Contrast, computed from the tokens themselves ─────────── */
+
+function parseHex(hex: string): [number, number, number] {
+  const value = hex.trim().replace('#', '');
+  const full =
+    value.length === 3
+      ? value
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : value;
+  const n = parseInt(full, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function luminance(hex: string): number {
+  const channel = (c: number): number => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  const [r, g, b] = parseHex(hex).map(channel) as [number, number, number];
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function contrast(a: string, b: string): number {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x) as [number, number];
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+/** --raw-* name → literal value, read straight from palette.css. */
+function palette(): Map<string, string> {
+  const source = read('palette.css');
+  return new Map(
+    [...source.matchAll(/(--raw-[\w-]+):\s*(#[0-9a-fA-F]{3,8});/g)].map((m) => [
+      m[1] ?? '',
+      m[2] ?? '',
+    ])
+  );
+}
+
+/** Resolves one semantic token inside one theme block down to a literal colour. */
+function resolve(block: string, token: string, colours: Map<string, string>): string {
+  const declaration = new RegExp(`${token}:\\s*var\\((--raw-[\\w-]+)\\);`).exec(block);
+  expect(declaration, `${token} is not declared as a plain palette reference`).not.toBeNull();
+  const value = colours.get(declaration?.[1] ?? '');
+  expect(value, `${token} points at a palette entry that does not exist`).toBeDefined();
+  return value ?? '';
+}
+
+describe('accent contrast', () => {
+  /**
+   * The accent has to clear AA in two directions at once, and those directions
+   * fight each other: brighter reads better ON the background and worse UNDER
+   * white text. A single token failed both in dark (4.46 and 4.23) until it was
+   * split into --c-accent and --c-accent-surface.
+   *
+   * Computed from the tokens rather than hardcoded, so changing a palette value
+   * is what this catches — that is the whole point of the token layer.
+   * docs/DESIGN_SYSTEM.md §2.3
+   */
+  const theme = read('theme.css');
+  const [dark = '', light = ''] = theme.split(/\[data-theme='light'\]/);
+
+  it.each([
+    ['dark', dark],
+    ['light', light],
+  ])('clears AA in the %s theme, in both directions', (_name, block) => {
+    const colours = palette();
+
+    const background = resolve(block, '--c-bg', colours);
+    const accent = resolve(block, '--c-accent', colours);
+    const surface = resolve(block, '--c-accent-surface', colours);
+    const onAccent = resolve(block, '--c-text-on-accent', colours);
+
+    expect(
+      contrast(accent, background),
+      'accent read AS a colour on the background'
+    ).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(onAccent, surface), 'text read ON the accent surface').toBeGreaterThanOrEqual(
+      4.5
+    );
+  });
+});
+
 describe('the token chain', () => {
   it('routes every accent token through the palette', () => {
     const theme = read('theme.css');

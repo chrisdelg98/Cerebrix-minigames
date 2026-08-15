@@ -23,12 +23,32 @@
   --c-border-strong: var(--raw-slate-600);
   --c-border-hairline: var(--raw-slate-800);
 
-  /* Accent */
-  --c-accent: var(--raw-violet-500);
-  --c-accent-hover: var(--raw-violet-400);
-  --c-accent-press: var(--raw-violet-600);
-  --c-accent-soft: color-mix(in oklab, var(--raw-violet-500) 18%, transparent);
-  --c-accent-ring: color-mix(in oklab, var(--raw-violet-400) 55%, transparent);
+  /*
+   * Accent — TWO tokens, because the accent does two jobs that pull in
+   * opposite directions on a near-black background:
+   *
+   *   --c-accent          reads AS a colour on the background (logo, icons,
+   *                       badge text, borders, fills with no text on them)
+   *   --c-accent-surface  sits UNDER --c-text-on-accent as a button fill
+   *
+   * Brighter helps the first and ruins the second. One value doing both was
+   * violet-500, which scored 4.46:1 as foreground and 4.23:1 under white —
+   * failing the 4.5 AA minimum of docs/DESIGN_SYSTEM.md §2.3 in BOTH
+   * directions at once. Split, each side clears it comfortably.
+   *
+   * The light theme keeps a single value for both because violet-600 happens
+   * to satisfy each job there (5.01 as foreground, 5.33 under white). That is
+   * why light already read as "defined" and dark did not.
+   */
+  --c-accent: var(--raw-violet-400); /* 6.93:1 on --c-bg */
+  --c-accent-hover: var(--raw-violet-300);
+  --c-accent-surface: var(--raw-violet-600); /* white on it: 5.33:1 */
+  --c-accent-surface-hover: var(--raw-violet-500);
+  --c-accent-press: var(--raw-violet-700);
+
+  /* Tints need more mix on near-black: 18% of a mid violet left no chroma. */
+  --c-accent-soft: color-mix(in oklab, var(--raw-violet-400) 24%, transparent);
+  --c-accent-ring: color-mix(in oklab, var(--raw-violet-300) 60%, transparent);
 
   /* Highlight — streaks, records, achievements */
   --c-gold: var(--raw-amber-400);
@@ -47,7 +67,7 @@
   --c-cell-hover: var(--raw-slate-700);
   --c-cell-active: var(--c-accent-soft);
   --c-cell-fixed: var(--raw-slate-900);
-  --c-cell-peer: color-mix(in oklab, var(--raw-violet-500) 8%, transparent);
+  --c-cell-peer: color-mix(in oklab, var(--raw-violet-400) 12%, transparent);
   --c-cell-error: var(--c-danger-soft);
   --c-cell-hint: var(--c-info-soft);
 
@@ -72,8 +92,11 @@
   --c-border-strong: var(--raw-slate-400);
   --c-border-hairline: var(--raw-slate-200);
 
+  /* Both jobs collapse onto one value here — see the note in the dark block. */
   --c-accent: var(--raw-violet-600);
   --c-accent-hover: var(--raw-violet-500);
+  --c-accent-surface: var(--raw-violet-600);
+  --c-accent-surface-hover: var(--raw-violet-500);
   --c-accent-press: var(--raw-violet-700);
   --c-accent-soft: color-mix(in oklab, var(--raw-violet-600) 12%, transparent);
   --c-accent-ring: color-mix(in oklab, var(--raw-violet-600) 45%, transparent);

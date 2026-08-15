@@ -186,6 +186,8 @@ Referencia normativa completa: [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md).
 
 **La secuencia de entrada corre una vez por sesión** (`sessionStorage`). Volver a Home desde un juego usa `view-in`. Una animación que ya viste es latencia.
 
+**El acento son dos tokens, no uno** _(corrección posterior, al mirar la app corriendo)_. El violeta hacía dos trabajos que tiran para lados opuestos: leerse **como** color sobre el fondo casi negro (logo, iconos, texto de badges) y servir **de** fondo bajo texto blanco (botón primario, dificultad elegida). Más brillante mejora el primero y arruina el segundo. Con un solo valor, `--raw-violet-500` daba **4.46:1** como frente y **4.23:1** bajo blanco: fallaba el mínimo AA de §2.3 **en las dos direcciones a la vez**. Separado en `--c-accent` (violet-400, 6.93:1) y `--c-accent-surface` (violet-600, 5.33:1 bajo blanco), cada lado pasa cómodo. En el tema claro los dos trabajos coinciden en violet-600 — por eso ese tema ya se veía definido y el oscuro no. `tests/tokens.test.ts` calcula el contraste desde los tokens y lo deja fijado.
+
 **Estado del build:** inicial **97.5 kB gzip** (93.2 JS + 4.3 CSS; presupuesto 120 kB). `KitchenSink` y `GameRoute` van en chunks aparte.
 
 ---

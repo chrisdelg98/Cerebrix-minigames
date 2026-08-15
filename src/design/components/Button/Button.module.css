@@ -37,8 +37,9 @@
     inline-size: 100%;
   }
 
+  /* Carries text, so it uses the surface accent, not the foreground one. */
   .button[data-variant='primary'] {
-    background-color: var(--c-accent);
+    background-color: var(--c-accent-surface);
     border-color: var(--c-accent-press);
     color: var(--c-text-on-accent);
   }
@@ -64,7 +65,7 @@
     }
 
     .button[data-variant='primary']:hover:not(:disabled) {
-      background-color: var(--c-accent-hover);
+      background-color: var(--c-accent-surface-hover);
     }
   }
 

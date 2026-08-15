@@ -20,8 +20,9 @@
     transition-timing-function: var(--e-out);
   }
 
+  /* Carries text, so it uses the surface accent, not the foreground one. */
   .option[data-selected='true'] {
-    background-color: var(--c-accent);
+    background-color: var(--c-accent-surface);
     color: var(--c-text-on-accent);
   }
 

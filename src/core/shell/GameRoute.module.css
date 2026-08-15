@@ -86,26 +86,31 @@
   }
 
   .gateTitle {
-    font-size: var(--fs-2xl);
+    font-size: var(--fs-3xl);
   }
 
   .gateLevel {
+    max-inline-size: 34ch;
     color: var(--c-text-muted);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-lg);
+    line-height: var(--lh-snug);
+  }
+
+  .gateActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    justify-content: center;
+    margin-block-start: var(--sp-2);
   }
 
   .rules {
     display: flex;
     flex-direction: column;
-    gap: var(--sp-2);
-    inline-size: 100%;
-    padding: var(--sp-4);
-    background-color: var(--c-surface);
-    border: var(--bw-hair) solid var(--c-border-hairline);
-    border-radius: var(--r-lg);
-    color: var(--c-text-muted);
-    font-size: var(--fs-sm);
-    line-height: var(--lh-snug);
+    gap: var(--sp-3);
+    color: var(--c-text);
+    font-size: var(--fs-md);
+    line-height: var(--lh-body);
     list-style: none;
     text-align: start;
   }
@@ -125,7 +130,7 @@
 
   .gateNote {
     color: var(--c-text-subtle);
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
   }
 
   .message {

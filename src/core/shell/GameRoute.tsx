@@ -44,6 +44,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
   // Which round's outcome the player already dismissed, so closing the modal
   // does not reopen it on the next render.
   const [dismissedRound, setDismissedRound] = useState<string | null>(null);
+  const [rulesOpen, setRulesOpen] = useState(false);
 
   const playing = session.status.kind === 'playing';
   const outcomeOpen = !playing && session.phase === 'ready' && dismissedRound !== session.roundId;

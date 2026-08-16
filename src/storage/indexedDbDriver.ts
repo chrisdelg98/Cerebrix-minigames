@@ -136,6 +136,15 @@ export class IndexedDbDriver implements StorageDriver {
     return db.getAll('preferences');
   }
 
+  async clearAll(): Promise<void> {
+    const db = await this.#open();
+    const tx = db.transaction(['sessions', 'results', 'preferences'], 'readwrite');
+    await tx.objectStore('sessions').clear();
+    await tx.objectStore('results').clear();
+    await tx.objectStore('preferences').clear();
+    await tx.done;
+  }
+
   async exportAll(): Promise<string> {
     const backup: Backup = {
       schemaVersion: SCHEMA_VERSION,

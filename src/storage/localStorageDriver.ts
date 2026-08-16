@@ -134,6 +134,18 @@ export class LocalStorageDriver implements StorageDriver {
     return preferences;
   }
 
+  async clearAll(): Promise<void> {
+    for (const session of await this.listSessions()) await this.clearSession(session.gameId);
+    for (const preference of this.#preferences()) {
+      try {
+        localStorage.removeItem(`${DIFFICULTY_PREFIX}${preference.gameId}`);
+      } catch {
+        /* nothing to do */
+      }
+    }
+    this.#write(RESULTS_KEY, []);
+  }
+
   async exportAll(): Promise<string> {
     const backup: Backup = {
       schemaVersion: SCHEMA_VERSION,

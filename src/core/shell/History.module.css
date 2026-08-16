@@ -100,4 +100,130 @@
     font-weight: var(--fw-bold);
     text-decoration: none;
   }
+
+  /* ── Progreso ── */
+
+  .progress {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    margin-block-end: var(--sp-5);
+  }
+
+  .sectionTitle {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .progressCard {
+    padding: var(--sp-4);
+    background-color: var(--c-surface);
+    border: var(--bw-hair) solid var(--c-border);
+    border-radius: var(--r-lg);
+  }
+
+  .progressHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    margin-block-end: var(--sp-3);
+  }
+
+  .progressTotals {
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  .levels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+    gap: var(--sp-2);
+    list-style: none;
+  }
+
+  /* A level with no record yet is present but quiet: it is the next thing to
+     beat, not a gap in the data. */
+  .level {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--sp-2);
+    background-color: var(--c-surface-sunken);
+    border-radius: var(--r-md);
+    opacity: 0.5;
+    text-align: center;
+  }
+
+  .level[data-done='true'] {
+    opacity: 1;
+  }
+
+  .levelName {
+    color: var(--c-text-muted);
+    font-size: var(--fs-2xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .levelBest {
+    color: var(--c-text);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+  }
+
+  /* ── Filtros ── */
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin-block-end: var(--sp-3);
+  }
+
+  .tab {
+    min-block-size: var(--touch-min);
+    padding-inline: var(--sp-4);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-hair) solid var(--c-border);
+    border-radius: var(--r-full);
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    transition-property: background-color, color, border-color;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .tab[aria-selected='true'] {
+    background-color: var(--c-accent-soft);
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+  }
+
+  .more {
+    display: flex;
+    justify-content: center;
+    margin-block-start: var(--sp-4);
+  }
+
+  /* ── Borrado ── */
+
+  .danger {
+    display: flex;
+    justify-content: center;
+    margin-block-start: var(--sp-6);
+    padding-block-start: var(--sp-4);
+    border-block-start: var(--bw-hair) solid var(--c-border-hairline);
+  }
+
+  .warning {
+    font-size: var(--fs-reading);
+    line-height: var(--lh-body);
+  }
 }

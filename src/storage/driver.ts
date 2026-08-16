@@ -31,6 +31,9 @@ export interface StorageDriver {
   saveDifficulty(gameId: string, difficulty: number): Promise<void>;
   loadDifficulty(gameId: string): Promise<number | null>;
 
+  /** Wipes everything: sessions, results and preferences. No way back. */
+  clearAll(): Promise<void>;
+
   exportAll(): Promise<string>;
   importAll(json: string): Promise<void>;
 }

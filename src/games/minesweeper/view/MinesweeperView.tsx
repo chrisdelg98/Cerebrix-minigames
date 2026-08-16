@@ -58,7 +58,7 @@ export function MinesweeperView({
           <Flag size={18} />
           <span className="tabular">{remaining}</span>
         </span>
-        <span className={s.hintText}>Mantené apretado para poner una bandera</span>
+        <span className={s.hintText}>Mantené apretado: bandera</span>
       </div>
 
       <Grid cols={state.cols} rows={state.rows} label="Campo minado" gap="var(--sp-1)" framed>

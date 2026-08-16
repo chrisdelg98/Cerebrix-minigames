@@ -29,15 +29,24 @@
   }
 
   .hintText {
+    overflow: hidden;
     color: var(--c-text-subtle);
     font-size: var(--fs-xs);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  /* Una línea entera de recordatorio cuesta lo mismo que dos filas de casillas.
-     Lo mismo está en "Cómo se juega", que es donde se busca cuando hace falta. */
+  /*
+   * Se achica, no se esconde.
+   *
+   * Estaba en `display: none` en pantalla chica para ahorrar alto — justo donde
+   * más falta hace: en escritorio la bandera se pone con clic derecho y se
+   * descubre sola, en un celular no hay forma de adivinarla. Ahora el texto es
+   * corto, va en la misma fila que el contador y no cuesta ni un píxel de alto.
+   */
   @media (height < 700px), (width < 480px) {
     .hintText {
-      display: none;
+      font-size: var(--fs-2xs);
     }
 
     .minesweeper {

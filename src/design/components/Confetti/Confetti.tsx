@@ -35,7 +35,7 @@ interface Piece {
  * is 90 style recalculations per frame, on the one screen where the player is
  * meant to feel good (docs/DESIGN_SYSTEM.md §5.2, rule 4).
  */
-export function Confetti({ active, pieces = 90 }: ConfettiProps) {
+export function Confetti({ active, pieces = 180 }: ConfettiProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

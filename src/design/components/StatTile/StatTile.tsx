@@ -52,7 +52,13 @@ export function StatTile({ label, value, icon, format, trend }: StatTileProps) {
 
   return (
     <div className={s.tile}>
-      {icon !== undefined && <span className={s.icon}>{icon}</span>}
+      {/* Behind the numbers, not beside them: it gives the card an identity
+          without spending a row on it. */}
+      {icon !== undefined && (
+        <span className={s.icon} aria-hidden="true">
+          {icon}
+        </span>
+      )}
 
       <span className={s.value}>
         {numeric === null ? value : <span ref={ref} className="tabular" />}

@@ -1,16 +1,33 @@
 @layer components {
   .tile {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--sp-1);
-    padding: var(--sp-3) var(--sp-4);
+    gap: 0;
+    overflow: hidden;
+    padding: var(--sp-3);
     background-color: var(--c-surface-raised);
     border: var(--bw-hair) solid var(--c-border-hairline);
     border-radius: var(--r-md);
   }
 
+  /* Large, faint and bled off the corner: identity without competing with the
+     number, which is the thing being read. */
   .icon {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: calc(var(--sp-3) * -1);
     color: var(--c-accent);
+    opacity: 0.14;
+    pointer-events: none;
+    translate: 0 -50%;
+  }
+
+  /* Wins over any colour or animation the sprite sets for itself: as a backdrop
+     it is one flat tint, and a pulsing one would pull the eye off the number. */
+  .icon svg {
+    color: var(--c-accent);
+    animation: none;
   }
 
   .value {

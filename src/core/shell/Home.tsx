@@ -6,7 +6,7 @@ import { InstallButton } from '@design/components/InstallButton';
 import { SettingsToggles } from '@design/components/SettingsToggles';
 import { StatTile } from '@design/components/StatTile';
 import { Clock } from '@design/sprites/Clock';
-import { InstallIcon } from '@design/sprites/SettingsIcons';
+import { GamepadIcon, InstallIcon, TargetIcon } from '@design/sprites/SettingsIcons';
 import { LogoCerebrix } from '@design/sprites/LogoCerebrix';
 import { Streak } from '@design/sprites/Streak';
 import { Trophy } from '@design/sprites/Trophy';
@@ -83,22 +83,22 @@ export function Home({ entries = REGISTRY }: HomeProps) {
 
       {stats !== null && stats.played > 0 && (
         <section className={s.stats} aria-label="Tus estadísticas">
-          <StatTile label="Partidas" value={stats.played} icon={<Trophy size={18} />} />
+          <StatTile label="Partidas" value={stats.played} icon={<GamepadIcon size={64} />} />
           <StatTile
             label="Completadas"
             value={stats.completed}
-            icon={<Trophy size={18} state="unlocked" />}
+            icon={<Trophy size={64} state="unlocked" />}
           />
           <StatTile
             label="Éxito"
             value={Math.round(stats.successRate * 100)}
             format={(value) => `${String(Math.round(value))}%`}
-            icon={<Clock size={18} />}
+            icon={<TargetIcon size={64} />}
           />
           <StatTile
             label="Racha"
             value={stats.currentStreak}
-            icon={<Streak size={18} count={stats.currentStreak} />}
+            icon={<Streak size={64} />}
           />
         </section>
       )}

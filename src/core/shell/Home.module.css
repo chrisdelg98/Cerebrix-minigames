@@ -87,11 +87,23 @@
     transform: scale(0.97);
   }
 
+  /*
+   * Fixed track counts, not auto-fit: with `minmax(130px, 1fr)` there is a band
+   * of widths where exactly three tiles fit and the fourth drops alone onto a
+   * second row. Four stats only ever read well as 4×1 or 2×2, so the layout
+   * names those two shapes and nothing in between can happen.
+   */
   .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--sp-2);
     margin-block-end: var(--sp-5);
+  }
+
+  @media (width >= 600px) {
+    .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   /* Taller cards need more room each, so the track grows with them. */

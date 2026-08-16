@@ -108,6 +108,25 @@ export function RedoIcon({ size = 18 }: SpriteProps) {
   );
 }
 
+export function TargetIcon({ size = 18 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="1.5" />
+    </svg>
+  );
+}
+
+export function GamepadIcon({ size = 18 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <path d="M7 12h4M9 10v4M15 11h.01M17.5 13h.01" />
+      <path d="M17.3 6H6.7a4.7 4.7 0 0 0-4.6 3.8l-1 5A3.6 3.6 0 0 0 4.6 19c1 0 1.9-.5 2.5-1.3L8.6 16h6.8l1.5 1.7a3 3 0 0 0 2.5 1.3 3.6 3.6 0 0 0 3.5-4.2l-1-5A4.7 4.7 0 0 0 17.3 6z" />
+    </svg>
+  );
+}
+
 export function MotionOffIcon({ size = 20 }: SpriteProps) {
   return (
     <svg width={size} height={size} {...base}>

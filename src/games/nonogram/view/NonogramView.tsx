@@ -258,18 +258,21 @@ export function NonogramView({
         </span>
       </div>
 
-      <Grid
-        cols={clueCols + size}
-        rows={clueRows + size}
-        label="Tablero de nonograma"
-        gap="0px"
-        // A ceiling on the cell, not just on the board: without it a 3×3 turned
-        // into three enormous squares stretched across the whole budget.
-        maxSize="min(560px, calc(var(--cols) * 46px))"
-        framed
-      >
-        {cells}
-      </Grid>
+      <div className={s.boardScroll}>
+        <Grid
+          cols={clueCols + size}
+          rows={clueRows + size}
+          label="Tablero de nonograma"
+          gap="0px"
+          // Un techo por celda además del techo del tablero: sin esto un 3×3
+          // se estiraba a tres cuadrados enormes. El límite de viewport ya lo
+          // pone <Grid> para todos.
+          maxSize="min(560px, calc(var(--cols) * 76px))"
+          framed
+        >
+          {cells}
+        </Grid>
+      </div>
     </div>
   );
 }

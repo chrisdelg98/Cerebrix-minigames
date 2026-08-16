@@ -18,7 +18,19 @@
    * exactly how a wide-but-short window ended up under the action bar.
    */
   .frame {
-    inline-size: min(calc((100dvh - 215px) * var(--cols) / var(--rows)), var(--board-max, 560px));
+    inline-size: min(
+      calc((100dvh - 215px) * var(--cols) / var(--rows)),
+      /*
+       * El límite duro, y va acá para TODOS los juegos.
+       *
+       * `max-inline-size: 100%` no alcanza: un porcentaje se resuelve contra el
+       * ancestro, y si algún eslabón de esa cadena se dimensionó por contenido,
+       * el 100% ya vale más que la pantalla — que es como Sudoku y Buscaminas se
+       * salían del borde en un celular. El viewport no depende de nadie.
+       */
+        calc(100vw - var(--sp-4)),
+      var(--board-max, 560px)
+    );
     max-inline-size: 100%;
     margin-inline: auto;
     padding: var(--sp-2);

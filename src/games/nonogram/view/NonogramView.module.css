@@ -6,6 +6,10 @@
     align-items: center;
     inline-size: 100%;
 
+    /* Centrado en un flex column: si un hijo se pasa de ancho, se desborda por
+       los dos lados en vez de recortarse. */
+    max-inline-size: 100%;
+
     /*
      * Square corners on the board.
      *
@@ -16,12 +20,20 @@
     --cell-radius: 0;
   }
 
+  /* Red de seguridad: si aun así el tablero no entra, se desplaza dentro de su
+     propia caja. Nunca la página entera. */
+  .boardScroll {
+    inline-size: 100%;
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+
   .modes {
     display: flex;
     gap: var(--sp-2);
     align-items: center;
     inline-size: 100%;
-    max-inline-size: var(--board-max, 560px);
+    max-inline-size: min(var(--board-max, 560px), 100%, calc(100vw - var(--sp-4)));
   }
 
   .mode {
@@ -71,8 +83,17 @@
    * of the text on their own.
    */
   .nonogram [role='grid'] {
+    /*
+     * Fracciones, no píxeles.
+     *
+     * La canaleta valía `calc(var(--cell-size) * 0.72)`, y --cell-size se
+     * calcula del presupuesto del tablero, no del ancho que la grilla terminó
+     * teniendo. Cuando los dos no coincidían, las pistas quedaban fijas, las
+     * columnas del tablero no podían achicarse lo suficiente, y el tablero se
+     * salía de la pantalla. Con todas las pistas flexibles siempre entra.
+     */
     grid-template-columns:
-      repeat(var(--clue-cols), calc(var(--cell-size) * 0.72))
+      repeat(var(--clue-cols), minmax(0, 0.72fr))
       repeat(var(--board-cols), minmax(0, 1fr));
 
     /* Painting is a drag, and the browser's default is to read a drag on the

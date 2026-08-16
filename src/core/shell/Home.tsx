@@ -55,15 +55,15 @@ export function Home({ entries = REGISTRY }: HomeProps) {
   };
 
   return (
-    <div className={s.home} id="main" data-intro={intro}>
+    <div className={`${s.home} ${intro ? '' : 'anim-view-in'}`} id="main" data-intro={intro}>
       {/*
         Two rows on purpose. Squeezing the brand and the controls onto one line
         is what left the header clipped on a phone; below 640px they stack and
         the controls get their own row rather than fighting for the last 40px.
       */}
-      <header className={s.masthead}>
+      <header className={`${s.masthead} ${intro ? 'anim-slide-up' : ''}`}>
         <div className={s.brand}>
-          <LogoCerebrix size={40} />
+          <LogoCerebrix size={56} />
           <div>
             <h1 className={s.title}>Cerebrix</h1>
             <p className={s.tagline}>Minijuegos para la concentración.</p>

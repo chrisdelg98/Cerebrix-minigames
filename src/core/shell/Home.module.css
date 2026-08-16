@@ -11,10 +11,6 @@
    * Home of the session. On the way back from a game it is a single, shorter
    * view-in — see claimIntro() in Home.tsx.
    */
-  .home[data-intro='false'] {
-    animation: view-in var(--d-slow) var(--e-out) backwards;
-  }
-
   .masthead {
     display: flex;
     flex-wrap: wrap;
@@ -25,7 +21,6 @@
   }
 
   .home[data-intro='true'] .masthead {
-    animation: slide-up var(--d-slow) var(--e-out) backwards;
     animation-delay: var(--d-instant);
   }
 

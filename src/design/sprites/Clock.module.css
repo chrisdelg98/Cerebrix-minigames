@@ -3,10 +3,4 @@
     transform-origin: 12px 12px;
     transform-box: fill-box;
   }
-
-  /* Keyframes live in the catalogue, never next to the component that uses
-     them — docs/DESIGN_SYSTEM.md §5.3. */
-  .hand[data-running='true'] {
-    animation: clock-hand 60s steps(60) infinite;
-  }
 }

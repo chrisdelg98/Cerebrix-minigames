@@ -11,19 +11,40 @@
     color: var(--c-accent);
     flex-shrink: 0;
     transform-origin: center;
-    animation: breathe 4s var(--e-in-out) infinite;
-    animation-delay: calc(var(--d-slower) + var(--d-base));
+
+    /* The class carries the keyframe; the module only retimes it. Declaring
+       `animation` here would name a keyframe CSS Modules renames to something
+       that does not exist. */
+    animation-duration: 4s;
+    animation-delay: 1400ms;
   }
 
-  /* The end state is the finished logo, so it is correct even when the
-     animation never runs (reduced motion, either channel). */
+  /*
+   * The end state is the finished logo, so it is correct even when the
+   * animation never runs (reduced motion, either channel).
+   *
+   * Durations are literal: --d-* tops out at 600ms because it exists for
+   * interaction feedback, and a logo drawing itself is a first impression, not
+   * a response to a tap.
+   */
   .stroke {
-    stroke-dasharray: 100;
-    animation: draw-stroke var(--d-slower) var(--e-out) backwards;
+    animation-duration: 900ms;
+  }
+
+  /* Stroke by stroke, so it reads as being drawn rather than fading in. */
+  .stroke:nth-of-type(2) {
+    animation-delay: 140ms;
+  }
+
+  .stroke:nth-of-type(3) {
+    animation-delay: 280ms;
+  }
+
+  .stroke:nth-of-type(4) {
+    animation-delay: 420ms;
   }
 
   .node {
-    animation: pop-in var(--d-base) var(--e-spring) backwards;
-    animation-delay: var(--d-slow);
+    animation-delay: 1080ms;
   }
 }

@@ -44,7 +44,7 @@ export function History() {
   }, [storage]);
 
   return (
-    <div className={s.page} id="main">
+    <div className={`${s.page} anim-view-in`} id="main">
       <header className={s.header}>
         <Link to="/" className={s.back} aria-label="Volver al inicio">
           <ArrowLeftIcon />

@@ -118,7 +118,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
   if (!session.started) {
     return (
       <AppShell header={header} subheader={subheader}>
-        <div className={s.gate}>
+        <div className={`${s.gate} anim-slide-up`}>
           <h2 className={s.gateTitle}>{session.module.meta.name}</h2>
           <p className={s.gateLevel}>
             {session.resumed ? 'Tenés una partida a medias en ' : 'Vas a jugar en '}
@@ -225,7 +225,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
     <AppShell header={header} subheader={subheader} footer={footer} progress={session.progress}>
       <Confetti active={won} />
 
-      <div className={s.stage}>
+      <div className={`${s.stage} anim-view-in`}>
         {/* Remounting on every rejection is what replays the shake. */}
         <div
           key={session.rejection?.nonce ?? 'clean'}
@@ -251,12 +251,12 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
         */}
         <div className={s.live} role="status" aria-live="polite">
           {playing && session.rejection && (
-            <p className={s.notice} data-tone="error">
+            <p className={`${s.notice} anim-pop-in`} data-tone="error">
               {session.rejection.reason}
             </p>
           )}
           {playing && !session.rejection && session.hint && (
-            <p className={s.notice} data-tone="hint">
+            <p className={`${s.notice} anim-pop-in`} data-tone="hint">
               <HintIcon size={20} />
               {session.hint.message}
             </p>

@@ -15,6 +15,19 @@
        cell at all, and the faint one disappeared under the row/column tint. */
     border: var(--bw-hair) solid var(--c-border-strong);
     border-radius: var(--cell-radius, var(--r-sm));
+
+    /* Block dividers, composed from four knobs so a corner cell keeps BOTH of
+       its lines — four separate box-shadow rules would override each other. */
+    --edge-top: 0 0;
+    --edge-right: 0 0;
+    --edge-bottom: 0 0;
+    --edge-left: 0 0;
+
+    box-shadow:
+      inset 0 var(--edge-top) 0 0 var(--c-board-line),
+      inset var(--edge-right) 0 0 0 var(--c-board-line),
+      inset 0 var(--edge-bottom) 0 0 var(--c-board-line),
+      inset var(--edge-left) 0 0 0 var(--c-board-line);
     color: var(--c-text);
     font-family: var(--font-num);
 
@@ -91,21 +104,27 @@
     color: var(--c-info);
   }
 
-  /* Block dividers drawn with inset shadows: no extra nodes in a 480-cell board. */
+  /*
+   * Block dividers drawn with inset shadows: no extra nodes in a 480-cell board.
+   *
+   * Composed from four custom properties rather than four rules. Four separate
+   * `box-shadow` declarations do not stack — the last matching one wins — so a
+   * cell on the CORNER of a 3×3 box was losing one of its two lines.
+   */
   .cell[data-edge-top='true'] {
-    box-shadow: inset 0 2px 0 0 var(--c-border-strong);
+    --edge-top: var(--bw-thick);
   }
 
   .cell[data-edge-right='true'] {
-    box-shadow: inset -2px 0 0 0 var(--c-border-strong);
+    --edge-right: calc(var(--bw-thick) * -1);
   }
 
   .cell[data-edge-bottom='true'] {
-    box-shadow: inset 0 -2px 0 0 var(--c-border-strong);
+    --edge-bottom: calc(var(--bw-thick) * -1);
   }
 
   .cell[data-edge-left='true'] {
-    box-shadow: inset 2px 0 0 0 var(--c-border-strong);
+    --edge-left: var(--bw-thick);
   }
 
   @media (hover: hover) and (pointer: fine) {

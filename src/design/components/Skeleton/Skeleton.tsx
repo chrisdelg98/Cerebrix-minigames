@@ -29,6 +29,8 @@ export function Skeleton({
       aria-hidden={label === undefined ? true : undefined}
       role={label === undefined ? undefined : 'status'}
       aria-label={label}
-    />
+    >
+      <span className={`${s.sheen} anim-shimmer`} />
+    </span>
   );
 }

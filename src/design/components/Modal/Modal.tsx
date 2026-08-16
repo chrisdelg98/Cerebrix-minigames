@@ -46,7 +46,7 @@ export function Modal({ open, onClose, title, children, actions }: ModalProps) {
   return (
     <dialog
       ref={ref}
-      className={s.modal}
+      className={`${s.modal} ${open ? 'anim-slide-up' : ''}`}
       aria-labelledby="modal-title"
       // The backdrop is part of the dialog box, so a click landing on the
       // element itself (not on its content) is a click outside.

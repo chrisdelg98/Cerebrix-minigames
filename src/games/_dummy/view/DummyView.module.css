@@ -30,7 +30,6 @@
 
   .tile[data-hinted='true'] {
     border-color: var(--c-info);
-    animation: pulse-soft 1.6s var(--e-in-out) infinite;
   }
 
   @media (hover: hover) and (pointer: fine) {

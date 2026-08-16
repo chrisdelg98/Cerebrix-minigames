@@ -87,6 +87,13 @@
   --c-cell-error: var(--c-danger-soft);
   --c-cell-hint: var(--c-info-soft);
 
+  /*
+   * Box dividers. Deliberately NOT --c-border-strong: that is the colour every
+   * cell already outlines itself with, so a divider drawn in it disappeared
+   * into the grid it was supposed to break up.
+   */
+  --c-board-line: var(--raw-slate-400);
+
   /* Solid neobrutalist shadow */
   --c-shadow: var(--raw-black);
 
@@ -136,6 +143,7 @@
   --c-cell-peer: color-mix(in oklab, var(--raw-teal-700) 9%, transparent);
   --c-cell-error: var(--c-danger-soft);
   --c-cell-hint: var(--c-info-soft);
+  --c-board-line: var(--raw-slate-500);
 
   --c-shadow: var(--raw-slate-900);
 

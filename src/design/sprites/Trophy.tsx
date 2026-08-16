@@ -8,7 +8,7 @@ export interface TrophyProps {
 
 export function Trophy({ size = 24, state = 'idle' }: TrophyProps) {
   return (
-    <span className={s.wrap} data-state={state}>
+    <span className={`${s.wrap} ${state === 'unlocked' ? 'anim-pop-in' : ''}`} data-state={state}>
       <svg
         width={size}
         height={size}
@@ -25,6 +25,7 @@ export function Trophy({ size = 24, state = 'idle' }: TrophyProps) {
         <path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" />
         <path d="M9 20h6M12 14v6" />
       </svg>
+      {state === 'unlocked' && <span className={`${s.shine} anim-shimmer`} />}
     </span>
   );
 }

@@ -13,12 +13,12 @@
     border-radius: var(--skeleton-radius, var(--r-md));
   }
 
-  /* A transform-only sweep: no layout, no paint of the box itself. */
-  .skeleton::after {
+  /* A transform-only sweep: no layout, no paint of the box itself. A real
+     element and not ::after, because a pseudo-element cannot carry the global
+     animation class the catalogue exposes. */
+  .sheen {
     position: absolute;
     inset: 0;
     background-image: linear-gradient(90deg, transparent, var(--c-cell-hover), transparent);
-    animation: shimmer calc(var(--d-slower) * 2) var(--e-in-out) infinite;
-    content: '';
   }
 }

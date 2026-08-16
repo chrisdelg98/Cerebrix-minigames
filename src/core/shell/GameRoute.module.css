@@ -32,7 +32,6 @@
     flex-direction: column;
     align-items: center;
     gap: var(--sp-4);
-    animation: view-in var(--d-slow) var(--e-out) backwards;
   }
 
   .loading {
@@ -66,7 +65,6 @@
     font-weight: var(--fw-bold);
     line-height: var(--lh-snug);
     text-align: center;
-    animation: pop-in var(--d-base) var(--e-spring);
   }
 
   .notice[data-tone='hint'] {
@@ -89,7 +87,6 @@
     inline-size: min(100%, 480px);
     padding: var(--sp-6) var(--sp-4);
     text-align: center;
-    animation: slide-up var(--d-slow) var(--e-out) backwards;
   }
 
   .gateTitle {

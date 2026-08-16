@@ -9,7 +9,7 @@ export interface StreakProps {
 export function Streak({ size = 24, count = 0 }: StreakProps) {
   return (
     <svg
-      className={s.flame}
+      className={`${s.flame} ${count > 0 ? 'anim-pulse-soft' : ''}`}
       data-alive={count > 0}
       width={size}
       height={size}

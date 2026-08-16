@@ -32,7 +32,7 @@ export function DummyView({
           // The tiles are a fixed-length positional grid: the index IS the identity.
           key={index}
           type="button"
-          className={s.tile}
+          className={`${s.tile} ${index === hinted ? 'anim-pulse-soft' : ''}`}
           data-marked={marked}
           data-hinted={index === hinted}
           disabled={!interactive}

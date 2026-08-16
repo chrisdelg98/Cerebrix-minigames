@@ -99,9 +99,15 @@
   }
 }
 
+/*
+ * Draws a path from nothing. The element MUST carry pathLength="1" and
+ * stroke-dasharray: 1, so the offset is a fraction of the path itself.
+ * The old version mixed units — dasharray in user units, dashoffset in
+ * percent of the viewport — and barely moved.
+ */
 @keyframes draw-stroke {
   from {
-    stroke-dashoffset: 100%;
+    stroke-dashoffset: 1;
   }
 
   to {
@@ -209,6 +215,15 @@
 
 .anim-win-burst {
   animation: win-burst var(--d-slower) var(--e-spring);
+}
+
+.anim-draw-stroke {
+  stroke-dasharray: 1;
+  animation: draw-stroke var(--d-slower) var(--e-out) backwards;
+}
+
+.anim-shimmer {
+  animation: shimmer calc(var(--d-slower) * 2) var(--e-in-out) infinite;
 }
 
 /*

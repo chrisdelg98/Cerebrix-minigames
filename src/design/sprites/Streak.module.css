@@ -7,7 +7,7 @@
     color: var(--c-gold);
     transform-origin: bottom center;
 
-    /* A 2s wobble, and nothing at all once the streak is broken. */
-    animation: pulse-soft 2s var(--e-in-out) infinite;
+    /* A 2s wobble; the class supplies the keyframe. */
+    animation-duration: 2s;
   }
 }

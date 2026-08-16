@@ -22,7 +22,7 @@ export function Clock({ size = 24, running = false }: ClockProps) {
       <circle cx="12" cy="12" r="9" />
       <path d="M12 7v5" />
       {/* The second hand ticks in steps(60) — it jumps, it does not glide. */}
-      <path className={s.hand} data-running={running} d="M12 12h3.5" />
+      <path className={`${s.hand} ${running ? 'anim-clock-hand' : ''}`} d="M12 12h3.5" />
     </svg>
   );
 }

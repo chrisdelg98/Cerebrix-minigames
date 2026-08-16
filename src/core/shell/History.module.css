@@ -4,7 +4,6 @@
     margin-inline: auto;
     padding: var(--sp-5) var(--sp-4);
     padding-block-end: calc(var(--sp-6) + env(safe-area-inset-bottom));
-    animation: view-in var(--d-slow) var(--e-out) backwards;
   }
 
   .header {

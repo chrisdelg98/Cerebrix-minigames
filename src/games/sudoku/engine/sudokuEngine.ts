@@ -16,6 +16,7 @@ import {
   parseGrid,
   toggleNote,
 } from './grid';
+import { type GeneratedPuzzle } from './generate';
 import { type SudokuConfig, type SudokuMove, type SudokuState } from './types';
 
 /**
@@ -71,13 +72,9 @@ export const sudokuEngine: GameEngine<SudokuState, SudokuMove, SudokuConfig> = {
   },
 
   async createInitialState(config, seed) {
-    const load = PUZZLE_FILES[config.difficulty] ?? PUZZLE_FILES[3];
-    if (!load) throw new Error(`No puzzles for difficulty ${String(config.difficulty)}`);
-
-    const file = await load();
-    const puzzles = file.default.puzzles;
-    const chosen = puzzles[pickIndex(seed, puzzles.length)];
-    if (!chosen) throw new Error('Empty puzzle file');
+    // A freshly generated board first, the shipped ones as the safety net.
+    const chosen =
+      (await generateInWorker(config.difficulty, seed)) ?? (await fromFile(config, seed));
 
     const values = parseGrid(chosen.p);
     return {
@@ -202,6 +199,71 @@ export const sudokuEngine: GameEngine<SudokuState, SudokuMove, SudokuConfig> = {
     };
   },
 };
+
+/** The shipped puzzles: instant, and what everything falls back to. */
+async function fromFile(config: SudokuConfig, seed: string | undefined): Promise<GeneratedPuzzle> {
+  const load = PUZZLE_FILES[config.difficulty] ?? PUZZLE_FILES[3];
+  if (!load) throw new Error(`No puzzles for difficulty ${String(config.difficulty)}`);
+
+  const file = await load();
+  const puzzles = file.default.puzzles;
+  const chosen = puzzles[pickIndex(seed, puzzles.length)];
+  if (!chosen) throw new Error('Empty puzzle file');
+  return chosen;
+}
+
+/** How long to wait before giving up and dealing a shipped board instead. */
+const WORKER_TIMEOUT_MS = 2500;
+
+/**
+ * Generates a board on another thread, and resolves to null on ANY problem —
+ * no Worker in this environment (tests, old browsers), a thread that throws, or
+ * one that takes too long. The caller then deals a shipped puzzle.
+ *
+ * Failing quietly is the point: an infinite supply of boards is not worth a
+ * single screen where the player is told the generator had a bad day.
+ */
+function generateInWorker(
+  difficulty: number,
+  seed: string | undefined
+): Promise<GeneratedPuzzle | null> {
+  if (typeof Worker === 'undefined') return Promise.resolve(null);
+
+  return new Promise((resolve) => {
+    let worker: Worker;
+    try {
+      worker = new Worker(new URL('./generator.worker.ts', import.meta.url), { type: 'module' });
+    } catch {
+      resolve(null);
+      return;
+    }
+
+    let settled = false;
+    const finish = (puzzle: GeneratedPuzzle | null) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      worker.terminate();
+      resolve(puzzle);
+    };
+
+    const timer = setTimeout(() => {
+      finish(null);
+    }, WORKER_TIMEOUT_MS);
+
+    worker.onmessage = (event: MessageEvent<{ ok: boolean; puzzle?: GeneratedPuzzle }>) => {
+      finish(event.data.ok && event.data.puzzle ? event.data.puzzle : null);
+    };
+    worker.onerror = () => {
+      finish(null);
+    };
+
+    worker.postMessage({
+      difficulty,
+      seed: seed ?? Math.random().toString(36).slice(2),
+    });
+  });
+}
 
 function isSerialized(value: unknown): value is SerializedSudoku {
   if (typeof value !== 'object' || value === null) return false;

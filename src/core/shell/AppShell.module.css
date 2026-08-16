@@ -13,7 +13,50 @@
 
     .board {
       /* Just enough not to touch the glass. */
-      padding: var(--sp-2) 2px;
+      padding: var(--sp-1) 2px;
+    }
+  }
+
+  /*
+   * On a short screen the action bar is the biggest thing between the player
+   * and the board. Its buttons keep the 44px touch height and give up padding
+   * instead, which is usually the difference between one row and two.
+   */
+
+  /* Buttons may shrink past their content; the label is what gives. */
+  .footer button {
+    min-inline-size: 0;
+    font-size: clamp(0.7rem, 1.8vw, var(--fs-sm));
+  }
+
+  /* --bp-md — four labelled actions stop fitting one row well before this,
+     and a truncated label says less than its icon. */
+  @media (height < 700px), (width < 640px) {
+    /* La dificultad sube a la línea del título en vez de ocupar una fila para
+       ella sola: son ~48px que en una pantalla baja son dos filas de casillas. */
+    .header {
+      grid-template-columns: 1fr auto;
+      gap: var(--sp-1);
+      padding-block: var(--sp-1);
+    }
+
+    .progress {
+      grid-column: 1 / -1;
+    }
+
+    .footer {
+      gap: var(--sp-1);
+      padding: var(--sp-2) var(--sp-2);
+      padding-block-end: calc(var(--sp-2) + env(safe-area-inset-bottom));
+    }
+
+    /* Solo el icono: la etiqueta vive en aria-label y el pie baja a una fila. */
+    .footer button {
+      padding-inline: var(--sp-3);
+    }
+
+    .footer button > :last-child:not(:first-child) {
+      display: none;
     }
   }
 
@@ -70,21 +113,54 @@
 
   .board {
     display: grid;
+
+    /*
+     * An EXPLICIT track, not the implicit auto one.
+     *
+     * With an auto track the width is indefinite, and everything below asks for
+     * a percentage of it — the game wrapper wants 100%, the board frame wants
+     * 100% of that. A percentage against an indefinite width is a cycle, and the
+     * browser resolves it by collapsing to almost nothing: the board rendered at
+     * a fraction of its size, at every difficulty.
+     */
+    grid-template-columns: minmax(0, 1fr);
     place-items: center;
     padding: var(--sp-4);
 
     /* The board never causes horizontal scroll, and pull-to-refresh must not
        fire while dragging on it — docs/DESIGN_SYSTEM.md §7.3. */
-    overflow-x: hidden;
+    overflow: hidden auto;
     overscroll-behavior: contain;
+
+    /*
+     * The play area scrolls on its own instead of pushing the action bar off
+     * screen. min-block-size: 0 is what lets a 1fr grid row shrink below its
+     * content — without it the row grows and the footer walks away.
+     *
+     * The board is sized to fit first; this is the safety net for when it
+     * cannot, and it means a mis-estimated chrome budget costs a scroll rather
+     * than a cut-off board.
+     */
+    min-block-size: 0;
   }
 
-  /* Within thumb reach on mobile, clear of the home indicator. */
+  /*
+   * Within thumb reach on mobile, clear of the home indicator — and always ONE
+   * row.
+   *
+   * Three layers, so it degrades on its own instead of at a single cliff:
+   *   1. nowrap, so a second row is never an option;
+   *   2. the label shrinks with the viewport and then truncates;
+   *   3. below --bp-md the labels go away entirely and only icons remain.
+   * A wrapped action bar costs the board a whole row of cells, and it wraps at
+   * whatever width the longest label happens to need — which is not a decision
+   * anyone made.
+   */
   .footer {
     position: sticky;
     inset-block-end: 0;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: var(--sp-2);
     justify-content: center;
     padding: var(--sp-3) var(--sp-4);

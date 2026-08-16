@@ -53,3 +53,18 @@
     --header-h: 64px;
   }
 }
+
+/*
+ * Short viewports give the chrome less and the board more.
+ *
+ * 700px of dvh is where the two groups of phones split: an iPhone SE or an
+ * older Android lands around 550-620 once the browser draws its own bar, while
+ * a modern 844-tall phone sits at 730-800. Above the line nothing is gained by
+ * squeezing; below it, every row of chrome is a row the board does not get.
+ */
+@media (height < 700px) {
+  :root {
+    --header-h: 48px;
+    --footer-h: 56px;
+  }
+}

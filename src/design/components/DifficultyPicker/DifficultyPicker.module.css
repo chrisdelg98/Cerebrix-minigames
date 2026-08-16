@@ -49,4 +49,100 @@
   .option:active {
     transform: scale(0.96);
   }
+
+  /* El compacto solo existe en pantallas donde el segmentado no entra. */
+  .compact {
+    display: none;
+  }
+
+  /* La hoja de opciones sirve en cualquier ancho: es la que abre el compacto. */
+  .sheet {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    list-style: none;
+  }
+
+  .sheetOption {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    inline-size: 100%;
+    min-block-size: var(--touch-min);
+    padding-inline: var(--sp-4);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-base) solid var(--c-border);
+    border-radius: var(--r-md);
+    color: var(--c-text);
+    font-size: var(--fs-reading);
+    font-weight: var(--fw-bold);
+    text-align: start;
+    transition-property: background-color, border-color, transform;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .sheetOption[data-selected='true'] {
+    background-color: color-mix(in oklab, var(--level-color, var(--c-accent)) 18%, transparent);
+    border-color: var(--level-color, var(--c-accent));
+    color: var(--level-color, var(--c-accent));
+  }
+
+  .sheetOption:active {
+    transform: scale(0.98);
+  }
+
+  /* El color del nivel, presente sin ser el único portador de la selección. */
+  .dot {
+    flex-shrink: 0;
+    inline-size: var(--sp-3);
+    block-size: var(--sp-3);
+    background-color: var(--level-color, var(--c-accent));
+    border-radius: var(--r-full);
+  }
+
+  /* --bp-sm — docs/DESIGN_SYSTEM.md §7.1 */
+  @media (width < 480px) {
+    .picker {
+      display: none;
+    }
+
+    .compact {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      min-block-size: var(--touch-min);
+      padding-inline: var(--sp-4);
+      background-color: var(--c-surface-raised);
+      border: var(--bw-base) solid var(--level-color, var(--c-accent));
+      border-radius: var(--r-full);
+      color: var(--level-color, var(--c-accent));
+    }
+
+    .compactLabel {
+      color: var(--c-text-muted);
+      font-size: var(--fs-xs);
+      font-weight: var(--fw-bold);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+    }
+
+    /* Compartiendo línea con el título no hay lugar para la palabra: el nivel y
+       su color alcanzan, y el aria-label del botón sigue diciéndolo entero. */
+    @media (height < 700px) {
+      .compact {
+        padding-inline: var(--sp-3);
+      }
+
+      .compactLabel {
+        display: none;
+      }
+    }
+
+    /* El valor elegido es lo que tiene que verse, no el control. */
+    .compactValue {
+      font-size: var(--fs-md);
+      font-weight: var(--fw-black);
+    }
+  }
 }

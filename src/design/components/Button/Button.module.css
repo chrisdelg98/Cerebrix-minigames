@@ -93,6 +93,8 @@
     flex-shrink: 0;
   }
 
+  /* Truncates instead of wrapping: a button that grows a second line changes
+     the height of whatever row it sits in. */
   .label {
     overflow: hidden;
     text-overflow: ellipsis;

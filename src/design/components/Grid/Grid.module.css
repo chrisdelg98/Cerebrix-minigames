@@ -1,7 +1,26 @@
 @layer components {
+  /*
+   * The frame's width is DEFINITE and computed from the viewport alone, then
+   * clamped by the container. That order matters.
+   *
+   * The previous version asked for `inline-size: 100%` and let the cap do the
+   * work, which made the width depend on an ancestor chain of percentages —
+   * play area, game wrapper, frame — and a percentage against a width that is
+   * not yet resolved gives a browser permission to guess. It guessed small, and
+   * the board only reached its real size once something forced a second layout
+   * pass (the first click). Sizing from the viewport removes the dependency
+   * entirely; max-inline-size: 100% is what keeps it inside its container, and
+   * a used width is always definite for the grid inside.
+   *
+   * ONE budget for the chrome, not one per breakpoint: 215px covers header,
+   * progress, status row, gaps, a one-row action bar and the safe area. Two
+   * numbers for the same thing drift the moment one gets tuned — which is
+   * exactly how a wide-but-short window ended up under the action bar.
+   */
   .frame {
-    inline-size: fit-content;
+    inline-size: min(calc((100dvh - 215px) * var(--cols) / var(--rows)), var(--board-max, 560px));
     max-inline-size: 100%;
+    margin-inline: auto;
     padding: var(--sp-2);
     background-color: var(--c-surface);
     border: var(--bw-base) solid var(--c-border-strong);
@@ -9,49 +28,35 @@
     box-shadow: var(--sh-lg);
   }
 
-  /*
-   * Set by the component (docs/STYLING.md §5): --cols, --rows, and optionally
-   * --board-max and --board-gap. --cell-size is derived here and read back by
-   * <Cell> to scale its font.
-   *
-   * 168px is the header + action bar budget; dvh, never vh, because the mobile
-   * URL bar breaks vh (docs/DESIGN_SYSTEM.md §7.3).
-   */
   .grid {
-    --board-max-resolved: min(100vw - (2 * var(--sp-4)), 100dvh - 168px, var(--board-max, 560px));
+    --board-max-resolved: min(
+      100vw - (2 * var(--sp-4)),
+      calc((100dvh - 215px) * var(--cols) / var(--rows)),
+      var(--board-max, 560px)
+    );
     --cell-size: calc(
       (var(--board-max-resolved) - (var(--cols) - 1) * var(--board-gap, var(--sp-1))) / var(--cols)
     );
 
     display: grid;
-    grid-template-columns: repeat(var(--cols), 1fr);
-    gap: var(--board-gap, var(--sp-1));
-    inline-size: var(--board-max-resolved);
 
-    /* The board is as tall as its rows require: not every game is square. */
-    aspect-ratio: var(--cols) / var(--rows);
+    /* minmax(0, 1fr), not 1fr: a 1fr track has an automatic min-content floor,
+       so the moment cells hold a digit or an icon the grid refuses to shrink
+       and spills out of its container. */
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    gap: var(--board-gap, var(--sp-1));
+    inline-size: 100%;
   }
 
   /*
-   * --bp-sm — on a phone the board takes the screen.
-   *
-   * Percent of the container, never vw: vw INCLUDES the scrollbar, so 98vw is
-   * wider than the space actually available and the board hangs off to one
-   * side. The frame fills its parent and the parent's padding is what leaves
-   * the sliver of margin.
+   * --bp-sm — on a phone the board takes the screen, and the height budget is
+   * bigger: a second header row, a status line above the board, and an action
+   * bar that wraps to two rows once a game offers undo, redo and a hint.
    * docs/DESIGN_SYSTEM.md §7.1
    */
   @media (width < 480px) {
     .frame {
-      inline-size: 100%;
-      padding: 3px;
-    }
-
-    .frame .grid {
-      /* Only feeds the --cell-size font clamp; the real width is the frame's. */
-      --board-max-resolved: calc(100vw - var(--sp-3));
-
-      inline-size: 100%;
+      padding: 2px;
     }
   }
 }

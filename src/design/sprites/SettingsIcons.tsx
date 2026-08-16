@@ -82,6 +82,32 @@ export function InstallIcon({ size = 18 }: SpriteProps) {
   );
 }
 
+export function ChevronDownIcon({ size = 16 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  );
+}
+
+export function UndoIcon({ size = 18 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <path d="M9 14 4 9l5-5" />
+      <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
+    </svg>
+  );
+}
+
+export function RedoIcon({ size = 18 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <path d="m15 14 5-5-5-5" />
+      <path d="M20 9H10a6 6 0 0 0 0 12h3" />
+    </svg>
+  );
+}
+
 export function MotionOffIcon({ size = 20 }: SpriteProps) {
   return (
     <svg width={size} height={size} {...base}>

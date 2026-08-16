@@ -33,6 +33,18 @@
     font-size: var(--fs-xs);
   }
 
+  /* Una línea entera de recordatorio cuesta lo mismo que dos filas de casillas.
+     Lo mismo está en "Cómo se juega", que es donde se busca cuando hace falta. */
+  @media (height < 700px), (width < 480px) {
+    .hintText {
+      display: none;
+    }
+
+    .minesweeper {
+      gap: var(--sp-1);
+    }
+  }
+
   /*
    * A resolved cell recedes: flat, grey, hairline border. Only Minesweeper has
    * a "done" half of the board, so this lives in @layer game rather than in the

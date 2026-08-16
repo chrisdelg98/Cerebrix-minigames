@@ -36,7 +36,10 @@
     font-family: var(--font-num);
 
     /* Scales with the cell, not with the base font — docs/DESIGN_SYSTEM.md §3. */
-    font-size: clamp(1rem, calc(var(--cell-size, 2rem) * 0.52), 2rem);
+
+    /* El piso baja a 0.55rem: con 14 columnas en 360px la celda mide ~24px, y
+       un dígito de 16px adentro no entra ni deja respirar. */
+    font-size: clamp(0.55rem, calc(var(--cell-size, 2rem) * 0.52), 2rem);
     font-variant-numeric: tabular-nums;
     font-weight: var(--fw-medium);
     transition-property: background-color, color, border-color, transform;
@@ -49,12 +52,24 @@
    * with a pseudo-element, so the grid geometry is not deformed by padding.
    * WCAG 2.5.5 — docs/DESIGN_SYSTEM.md §7.3.
    */
+
+  /*
+   * The hit area claims the gutter around the cell and NOT one pixel more.
+   *
+   * It used to be a fixed 44px box centred on the cell (WCAG 2.5.5). On a
+   * sparse board that is harmless; on Minesweeper expert, where a 14-column
+   * board on a 360px screen gives 19px cells, each target overlapped its
+   * neighbours by twelve pixels and taps landed on the wrong square — the one
+   * later in the DOM wins where they overlap. An expanded target that hits
+   * something else is worse than no expansion at all.
+   *
+   * A dense board genuinely cannot offer 44px targets at that width; 2.5.5
+   * allows the exception where the presentation is essential, and a Minesweeper
+   * grid is exactly that.
+   */
   .cell::after {
     position: absolute;
-    inset: 50%;
-    inline-size: var(--touch-min);
-    block-size: var(--touch-min);
-    translate: -50% -50%;
+    inset: calc(var(--board-gap, 0px) / -2);
     content: '';
   }
 

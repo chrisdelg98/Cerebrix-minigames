@@ -8,7 +8,14 @@ import { Modal } from '@design/components/Modal';
 import { Skeleton } from '@design/components/Skeleton';
 import { Timer } from '@design/components/Timer';
 import { useToast } from '@design/components/Toast';
-import { ArrowLeftIcon, HintIcon, PlayIcon, PlusIcon } from '@design/sprites/SettingsIcons';
+import {
+  ArrowLeftIcon,
+  HintIcon,
+  PlayIcon,
+  PlusIcon,
+  RedoIcon,
+  UndoIcon,
+} from '@design/sprites/SettingsIcons';
 import { Trophy } from '@design/sprites/Trophy';
 
 import { type Difficulty } from '../contract';
@@ -196,14 +203,33 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
 
   const footer = (
     <>
-      <Button onClick={session.restart}>Nueva partida</Button>
-      <Button onClick={session.undo} disabled={!session.canUndo}>
+      {/* Icon + label. On a narrow screen the label is hidden by CSS and the
+          aria-label carries the meaning — four labelled buttons wrapped to two
+          rows and ate more height than the board could spare. */}
+      <Button aria-label="Nueva partida" icon={<PlusIcon />} onClick={session.restart}>
+        Nueva partida
+      </Button>
+      <Button
+        aria-label="Deshacer"
+        icon={<UndoIcon />}
+        onClick={session.undo}
+        disabled={!session.canUndo}
+      >
         Deshacer
       </Button>
-      <Button onClick={session.redo} disabled={!session.canRedo}>
+      <Button
+        aria-label="Rehacer"
+        icon={<RedoIcon />}
+        onClick={session.redo}
+        disabled={!session.canRedo}
+      >
         Rehacer
       </Button>
-      {session.canHint && <Button onClick={session.requestHint}>Pista</Button>}
+      {session.canHint && (
+        <Button aria-label="Pista" icon={<HintIcon />} onClick={session.requestHint}>
+          Pista
+        </Button>
+      )}
 
       {actions.map((action) => {
         const ActionIcon = action.icon;

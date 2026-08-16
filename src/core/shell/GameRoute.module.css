@@ -114,6 +114,38 @@
     margin-block-start: var(--sp-2);
   }
 
+  /*
+   * Restored after a bad edit wiped it: the list had fallen back to browser
+   * defaults, which is why the markers sat flush against the panel.
+   */
+  .rules {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    color: var(--c-text);
+    font-size: var(--fs-reading);
+    line-height: var(--lh-body);
+    list-style: none;
+    text-align: start;
+  }
+
+  .rules li {
+    position: relative;
+    padding-inline-start: var(--sp-5);
+  }
+
+  /* An accent chevron instead of a bullet, hung in the indent so the text of
+     every line starts on the same vertical. */
+  .rules li::before {
+    position: absolute;
+    inset-inline-start: var(--sp-1);
+    color: var(--c-accent);
+    content: '›';
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+    line-height: var(--lh-snug);
+  }
+
   .gateNote {
     color: var(--c-text-muted);
     font-size: var(--fs-md);

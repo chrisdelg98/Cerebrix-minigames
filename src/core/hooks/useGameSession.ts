@@ -44,6 +44,7 @@ export interface Session {
   hint: Hint | null;
   rejection: Rejection | null;
   canUndo: boolean;
+  canRedo: boolean;
   canHint: boolean;
   /** Identifies the current board. The shell keys the timer off it. */
   roundId: string;
@@ -65,6 +66,7 @@ export interface Session {
   start: () => void;
   dispatch: (move: unknown) => void;
   undo: () => void;
+  redo: () => void;
   restart: () => void;
   requestHint: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
@@ -78,6 +80,12 @@ const PLAYING: GameStatus = { kind: 'playing' };
 interface OfRound<T> {
   round: string;
   value: T;
+}
+
+/** Everything played so far, and everything undone but not yet overwritten. */
+interface Timeline {
+  past: unknown[];
+  future: unknown[];
 }
 
 function roundKey(difficulty: number, seed: string | undefined): string {
@@ -98,9 +106,14 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
   const [seed, setSeed] = useState<string | undefined>(undefined);
   const round = roundKey(difficulty, seed);
 
-  // The undo stack IS the state: its last entry is the current position. That
-  // only works because `applyMove` is contractually pure.
-  const [stack, setStack] = useState<OfRound<unknown[]> | null>(null);
+  /*
+   * Past and future, not one array with a pointer. Undo moves a state from one
+   * to the other and redo moves it back; a NEW move throws the future away,
+   * which is the behaviour every editor has trained people to expect.
+   *
+   * All of it only works because `applyMove` is contractually pure.
+   */
+  const [stack, setStack] = useState<OfRound<Timeline> | null>(null);
   const [lastRejection, setLastRejection] = useState<OfRound<Rejection> | null>(null);
   const [lastHint, setLastHint] = useState<OfRound<Hint | null> | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -113,7 +126,8 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
   // Everything below is DERIVED from the current round rather than cleared when
   // it changes: an effect that calls setState synchronously just to reset state
   // buys a cascading render for nothing.
-  const history = stack?.round === round ? stack.value : [];
+  const timeline: Timeline = stack?.round === round ? stack.value : { past: [], future: [] };
+  const history = timeline.past;
   const rejection = lastRejection?.round === round ? lastRejection.value : null;
   const hint = lastHint?.round === round ? lastHint.value : null;
 
@@ -184,7 +198,10 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
             setElapsedMs(saved.elapsedMs);
             setResumed(true);
             setDifficulty(saved.difficulty as Difficulty);
-            setStack({ round: roundKey(saved.difficulty, undefined), value: [state] });
+            setStack({
+              round: roundKey(saved.difficulty, undefined),
+              value: { past: [state], future: [] },
+            });
             return;
           } catch {
             // A save we cannot read is dropped rather than left to fail on
@@ -200,7 +217,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
 
       setElapsedMs(0);
       setResumed(false);
-      setStack({ round, value: [initial] });
+      setStack({ round, value: { past: [initial], future: [] } });
     };
 
     begin().catch((cause: unknown) => {
@@ -293,18 +310,32 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
       setLastRejection(null);
       setLastHint(null);
       setStack((current) =>
-        current === null ? current : { round: current.round, value: [...current.value, next] }
+        current === null
+          ? current
+          : // A new move discards whatever had been undone.
+            { round: current.round, value: { past: [...current.value.past, next], future: [] } }
       );
     },
     [module, state, playing, started, round]
   );
 
   const undo = useCallback(() => {
-    setStack((current) =>
-      current === null || current.value.length <= 1
-        ? current
-        : { round: current.round, value: current.value.slice(0, -1) }
-    );
+    setStack((current) => {
+      if (current === null || current.value.past.length <= 1) return current;
+      const past = [...current.value.past];
+      const undone = past.pop();
+      return { round: current.round, value: { past, future: [...current.value.future, undone] } };
+    });
+    setLastRejection(null);
+  }, []);
+
+  const redo = useCallback(() => {
+    setStack((current) => {
+      if (current === null || current.value.future.length === 0) return current;
+      const future = [...current.value.future];
+      const restored = future.pop();
+      return { round: current.round, value: { past: [...current.value.past, restored], future } };
+    });
     setLastRejection(null);
   }, []);
 
@@ -360,6 +391,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     hint,
     rejection,
     canUndo: history.length > 1 && playing,
+    canRedo: timeline.future.length > 0 && playing,
     canHint: typeof module?.engine.getHint === 'function' && playing,
     roundId: round,
     pendingDifficulty,
@@ -369,6 +401,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     start,
     dispatch,
     undo,
+    redo,
     restart,
     requestHint,
     setDifficulty: requestDifficulty,

@@ -114,6 +114,15 @@ export interface GameViewProps<TState, TMove> {
   interactive: boolean;
   /** The active hint, if the player asked for one. */
   hint: Hint | null;
+  /**
+   * The last move the engine turned down, and the cells it pointed at.
+   *
+   * The contract documented `ValidationResult.cells` as "cells to highlight in
+   * red" and then gave the view no way to receive them: the shell knew which
+   * squares to flag and could not tell the component that draws them. Found
+   * while building Sudoku, closed here.
+   */
+  rejection: { reason: string; cells: CellRef[] } | null;
 }
 
 /* ─────────────────────────── Footer actions ─────────────────────────── */
@@ -124,9 +133,16 @@ export interface GameAction<TMove> {
   icon: ComponentType<{ size?: number }>;
   /** The move to dispatch, or null if it only flips view-local state. */
   toMove?: () => TMove | null;
-  /** If it is a toggle, the shell draws the active state. */
-  toggle?: boolean;
 }
+
+/*
+ * `toggle` used to live here. It was declared and unusable: the shell could
+ * draw an action as active, but the view had no way to read that state back,
+ * so a toggle in the action bar would light up without changing what tapping a
+ * cell did. Sudoku's pencil mode ended up in its own number pad instead, which
+ * is also where the finger already is. Removed rather than propped up —
+ * contract surface nobody can use is worse than no surface.
+ */
 
 /* ─────────────────────────── The module ─────────────────────────── */
 

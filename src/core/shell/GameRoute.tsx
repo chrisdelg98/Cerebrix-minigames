@@ -200,6 +200,9 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
       <Button onClick={session.undo} disabled={!session.canUndo}>
         Deshacer
       </Button>
+      <Button onClick={session.redo} disabled={!session.canRedo}>
+        Rehacer
+      </Button>
       {session.canHint && <Button onClick={session.requestHint}>Pista</Button>}
 
       {actions.map((action) => {
@@ -239,6 +242,11 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
               difficulty={session.difficulty}
               interactive={playing}
               hint={session.hint}
+              rejection={
+                session.rejection === null
+                  ? null
+                  : { reason: session.rejection.reason, cells: session.rejection.cells }
+              }
             />
           </div>
         </div>

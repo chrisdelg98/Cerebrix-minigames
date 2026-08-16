@@ -15,6 +15,23 @@ export type Difficulty = 1 | 2 | 3 | 4 | 5;
 
 export type GameTag = 'lógica' | 'memoria' | 'cálculo' | 'azar' | 'velocidad';
 
+/**
+ * A rule drawn instead of described.
+ *
+ * `howToPlay` says what to do; an example shows what "correcto" looks like next
+ * to what "incorrecto" looks like. For a deduction game that difference is the
+ * whole lesson, and a paragraph is a bad way to teach it — the reference apps
+ * all draw a two-by-two board and let it speak.
+ *
+ * The figure is a component, like `icon`: /core paints it without knowing what
+ * it shows, and it ships inside the game's lazy chunk, not the initial bundle.
+ */
+export interface GameExample {
+  figure: ComponentType;
+  /** One line under the drawing. Complete sentence, no more than two lines. */
+  caption: string;
+}
+
 export interface GameMeta {
   /** Stable identifier. It lives in the URL and in the database: never change it. */
   id: string;
@@ -34,6 +51,11 @@ export interface GameMeta {
    * of them are about — so the rules travel with the game, like everything else.
    */
   howToPlay: string[];
+  /**
+   * Optional worked examples, shown under the steps. A game with a rule that is
+   * easier to recognise than to read should draw it here.
+   */
+  examples?: GameExample[];
   /** Shape version of TState. Bump it whenever the saved shape changes. */
   stateVersion: number;
 }

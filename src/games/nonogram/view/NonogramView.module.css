@@ -1,0 +1,165 @@
+@layer game {
+  .nonogram {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    align-items: center;
+    inline-size: 100%;
+
+    /*
+     * Square corners on the board.
+     *
+     * The default rounding left a white diamond wherever four painted squares
+     * met, so a solid block of ink read as four separate blobs — the one thing
+     * a nonogram cannot afford, since seeing the run is how you count it.
+     */
+    --cell-radius: 0;
+  }
+
+  .modes {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+    inline-size: 100%;
+    max-inline-size: var(--board-max, 560px);
+  }
+
+  .mode {
+    display: inline-flex;
+    gap: var(--sp-2);
+    align-items: center;
+    min-block-size: var(--touch-min);
+    padding-inline: var(--sp-3);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-hair) solid var(--c-border-strong);
+    border-radius: var(--r-md);
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    transition-property: background-color, border-color, color;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .mode[data-selected='true'] {
+    background-color: var(--c-accent-soft);
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+  }
+
+  .count {
+    margin-inline-start: auto;
+    color: var(--c-text-muted);
+    font-family: var(--font-num);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+  }
+
+  .countTotal {
+    color: var(--c-text-subtle);
+  }
+
+  /*
+   * The clue gutters get narrower tracks than the board.
+   *
+   * A number is not a square: giving it one wastes width the board needs, and
+   * at the biggest size the gutter is six columns wide. The board tracks stay
+   * 1fr, so they absorb whatever the gutter gives back.
+   *
+   * Rows are deliberately left alone: <Cell> is aspect-ratio 1, so board rows
+   * size themselves off their width, and the clue rows collapse to the height
+   * of the text on their own.
+   */
+  .nonogram [role='grid'] {
+    grid-template-columns:
+      repeat(var(--clue-cols), calc(var(--cell-size) * 0.72))
+      repeat(var(--board-cols), minmax(0, 1fr));
+
+    /* Painting is a drag, and the browser's default is to read a drag on the
+       board as a scroll. Only the board opts out; the page still scrolls. */
+    touch-action: none;
+  }
+
+  /*
+   * Full contrast, because the clues ARE the puzzle.
+   *
+   * They were muted grey, which is the colour of something you can skip. Every
+   * number on screen is a fact the player needs, and dimming is reserved for
+   * the ones already accounted for.
+   */
+  .clue {
+    display: grid;
+    place-items: center;
+    color: var(--c-text);
+    font-family: var(--font-num);
+
+    /* Scales with the board, like the digits inside a cell do. */
+    font-size: clamp(0.56rem, calc(var(--cell-size, 2rem) * 0.5), 1.05rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--fw-bold);
+  }
+
+  /* A run of ten or more needs two digits in a track sized for one. Shrinking
+     the pair is better than letting it spill over the number beside it. */
+  .clue[data-wide='true'] {
+    font-size: clamp(0.44rem, calc(var(--cell-size, 2rem) * 0.36), 0.85rem);
+    letter-spacing: -0.03em;
+  }
+
+  /* Every other group of five, tinted. On a twelve-wide board the numbers of
+     one line and the next are three pixels apart; the band is what lets the eye
+     walk a number back to the row it belongs to. */
+  .clue[data-band='true'] {
+    background-color: var(--c-cell-hover);
+  }
+
+  /* The line under the pointer. Together with the crosshair on the board it
+     answers the question the player is actually asking: which row is this. */
+  .clue[data-active='true'] {
+    background-color: var(--c-accent-soft);
+    color: var(--c-accent);
+  }
+
+  /* Dimmed once the line's painted runs match its numbers. Derived from the
+     player's own board, so it confirms what they did without revealing where
+     it belongs. */
+  .clue[data-done='true'] {
+    color: var(--c-text-subtle);
+    font-weight: var(--fw-medium);
+  }
+
+  /*
+   * Ink on paper, and the border is deliberately NOT ink.
+   *
+   * Painting the border too made a run of squares read as one black slab with
+   * no seams — you could not count it, which is the only thing the board is
+   * for. Leaving the cell's own hairline showing is what separates one square
+   * from the next.
+   */
+  .nonogram [data-state='filled'] {
+    --cell-bg: var(--c-cell-ink);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    /*
+     * Hovering a painted square used to drop it to the light hover grey, which
+     * looked exactly like it had just been erased — the pointer passing over
+     * the board read as a click that never happened. It now loses a shade and
+     * stays clearly ink.
+     */
+    .nonogram [data-state='filled']:hover:not(:disabled) {
+      background-color: var(--c-cell-ink-hover);
+    }
+  }
+
+  /* No press animation on the board. Painting is a drag, and every square the
+     finger crossed would flinch on the way past. */
+  .nonogram [role='grid'] button:active:not(:disabled) {
+    transform: none;
+  }
+
+  .cross {
+    color: var(--c-text-muted);
+    font-weight: var(--fw-bold);
+  }
+}

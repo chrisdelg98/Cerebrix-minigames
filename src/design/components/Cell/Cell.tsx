@@ -52,6 +52,13 @@ export interface CellProps {
    */
   onContextMenu?: (event: React.MouseEvent) => void;
   onPointerDown?: (event: React.PointerEvent) => void;
+  /**
+   * Painting by dragging: the finger presses one cell and keeps going.
+   *
+   * Needs the board to release the implicit pointer capture on `pointerdown`,
+   * or a touch never leaves the cell it started on and this never fires.
+   */
+  onPointerEnter?: (event: React.PointerEvent) => void;
   onPointerUp?: (event: React.PointerEvent) => void;
   onPointerLeave?: (event: React.PointerEvent) => void;
 }
@@ -80,6 +87,7 @@ export const Cell = memo(function Cell({
   ref,
   onContextMenu,
   onPointerDown,
+  onPointerEnter,
   onPointerUp,
   onPointerLeave,
 }: CellProps) {
@@ -104,6 +112,7 @@ export const Cell = memo(function Cell({
       onClick={onActivate}
       onContextMenu={onContextMenu}
       onPointerDown={onPointerDown}
+      onPointerEnter={onPointerEnter}
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerLeave}
     >

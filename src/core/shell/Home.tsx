@@ -95,11 +95,7 @@ export function Home({ entries = REGISTRY }: HomeProps) {
             format={(value) => `${String(Math.round(value))}%`}
             icon={<TargetIcon size={64} />}
           />
-          <StatTile
-            label="Racha"
-            value={stats.currentStreak}
-            icon={<Streak size={64} />}
-          />
+          <StatTile label="Racha" value={stats.currentStreak} icon={<Streak size={64} />} />
         </section>
       )}
 

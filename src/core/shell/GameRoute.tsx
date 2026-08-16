@@ -191,11 +191,32 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
             </Button>
           }
         >
-          <ul className={s.rules}>
+          {/* Numbered, not bulleted: these are steps in an order, and a reader
+              who stops halfway needs to know where they stopped. */}
+          <ol className={s.rules}>
             {session.module.meta.howToPlay.map((line) => (
               <li key={line}>{line}</li>
             ))}
-          </ul>
+          </ol>
+
+          {session.module.meta.examples !== undefined && (
+            <section className={s.examples}>
+              <h3 className={s.examplesTitle}>Ejemplos</h3>
+              <div className={s.examplesGrid}>
+                {session.module.meta.examples.map((example) => {
+                  const Figure = example.figure;
+                  return (
+                    <figure key={example.caption} className={s.example}>
+                      <div className={s.exampleArt} aria-hidden="true">
+                        <Figure />
+                      </div>
+                      <figcaption>{example.caption}</figcaption>
+                    </figure>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </Modal>
       </AppShell>
     );

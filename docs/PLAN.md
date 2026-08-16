@@ -379,6 +379,53 @@ Buscaminas antes que Solitario a propósito: comparte el modelo de grid (reusa `
 
 ---
 
+## Fase 8 — Nonograma 🖌️
+
+**Objetivo:** el tercer juego, y la primera vez que uno entra sin que se discuta la arquitectura.
+
+- [x] Motor puro: pistas, solucionador por líneas, generador
+- [x] Vista con canaletas de pistas alrededor del tablero
+- [x] Modos «Pintar» y «Descartar», más pulsación larga y clic derecho
+- [x] Pista deducida del propio tablero del jugador
+
+**Lo que sí tocó `/core`, y por qué.** `GameMeta` ganó `examples`. No es un parche
+al shell: `howToPlay` es texto, y hay reglas — qué significa `3 1`, por qué el
+solapamiento obliga una casilla — que en prosa no se entienden y dibujadas sí.
+Es un hueco del contrato, no del juego, y lo van a usar Tango, Queens y Zip
+igual. Los pasos además pasaron a numerarse, porque son pasos.
+
+**Ningún tablero pide adivinar.** El generador dibuja una figura al azar, le lee
+las pistas, y la acepta **solo si esas pistas la reconstruyen razonando línea por
+línea**. Rechazar en vez de reparar: una figura reparada deja de ser azarosa de
+maneras que se notan. Medido: aceptación inmediata en las cinco dificultades,
+0.1 ms por tablero en 5×5 y 6.3 ms en 15×15, así que no hace falta worker.
+
+**Las canaletas usan pistas más angostas que el tablero.** Un número no es un
+cuadrado. En 15×15 la canaleta llega a siete columnas, y dárselas cuadradas se
+come un tercio de la pantalla. Las columnas del tablero quedan en `1fr` y se
+comen lo que la canaleta devuelve.
+
+**Un cuadrado equivocado no se marca.** Igual que los conflictos de Sudoku no se
+bloquean: darse cuenta de que una línea no cierra, y volver atrás, es el juego.
+Lo que sí se atenúa son los números de una línea cuando lo pintado coincide con
+ellos — y eso sale del tablero del jugador, no de la solución.
+
+**Se pinta arrastrando, y un trazo es un solo movimiento.** `<Cell>` ganó
+`onPointerEnter`. El detalle que lo hace funcionar en el celular: en un toque el
+navegador captura el puntero en la casilla donde empezó, así que hay que soltar
+esa captura en `pointerdown` o el arrastre reporta siempre la misma casilla. El
+trazo se dibuja en la vista y se despacha entero al levantar el dedo — si no,
+deshacer un arrastre de ocho casillas serían ocho toques.
+
+**Esquinas rectas en el tablero.** El redondeo por defecto dejaba un rombo blanco
+donde se tocaban cuatro casillas pintadas, y una tira sólida se leía como cuatro
+manchas sueltas. Ver la tira es contarla.
+
+**Tamaños 3×3 a 12×12.** 15×15 era demasiado hasta en escritorio, y la canaleta
+de pistas se comía siete columnas. Con 12×12 el máximo son 18 columnas.
+
+---
+
 ## 🎯 Orden mental
 
 ```
@@ -392,9 +439,65 @@ Las fases 0–4 se sienten como "no estoy haciendo un juego" y dan ansiedad. Ese
 
 ---
 
+## 🎮 Los próximos juegos
+
+Estos seis los eligió Chris, en agosto de 2026, después de probarlos en otras
+plataformas. El orden es de costo, no de gusto: los primeros no piden nada que
+no exista ya.
+
+| Juego          | Reusa tal cual                          | Lo único nuevo                          |
+| -------------- | --------------------------------------- | --------------------------------------- |
+| **Lights Out** | todo                                    | nada                                    |
+| **Tango**      | grid, celda de 3 estados, deshacer      | los signos `=` y `×` **entre** casillas |
+| **Queens**     | grid, `blockEdges`, `--cell-bg`         | tokens de color de región               |
+| **Memoria**    | grid, el estado `covered` de Buscaminas | volteo de carta                         |
+| **Zip**        | grid                                    | trazar un camino arrastrando            |
+| **Flow**       | grid                                    | el mismo trazado que Zip                |
+
+**Lights Out.** Sin riesgo técnico: el generador parte de un tablero apagado y
+aplica K clics al azar, así que tiene solución por construcción, y la pista es
+álgebra lineal en GF(2) que dice el clic exacto siguiente.
+
+**Tango.** 6×6 fijo, así que resolverlo por fuerza bruta es instantáneo y generar
+no tiene riesgo. Lo nuevo es que los signos no viven en una casilla sino en el
+hueco entre dos: hay que agregarle a `<Grid>` una capa sobre las canaletas.
+
+**Queens.** Reusa más de lo que parece: `blockEdges` en `<Cell>` ya es por celda,
+así que los bordes de región salen de preguntar si el vecino es de otra región, y
+`--cell-bg` ya existe como perilla. Todo el costo está en el generador: ubicar N
+reinas que no se toquen ni en diagonal, hacer crecer N regiones desde ellas, y
+verificar que la solución sea única.
+
+**Memoria.** Barato, pero fuerza una decisión: **deshacer te deja des-ver una
+carta**, y no se puede des-saber. Deshacer es del shell y `GameMeta` no tiene
+cómo apagarlo, así que hace falta un `supportsUndo?: boolean` — un hueco del
+contrato, no del juego. Lo otro, que el par no acertado se dé vuelta solo, se
+resuelve sin tocar nada: la vista despacha el movimiento con un `setTimeout`.
+
+**Zip y Flow.** Desde el punto de vista de lo que hay que construir son el mismo
+juego: arrastrar el dedo y dibujar un camino grueso por el centro de las
+casillas. **Se hace una vez.** La diferencia está en el generador — Zip necesita
+un camino hamiltoniano con puntos que lo fuercen; para Flow, generar niveles
+buenos automáticamente es un problema serio, así que van curados como data, que
+es lo que ya hace Sudoku con `game-data`.
+
+**Inversión compartida:** Tango, Queens y Zip necesitan lo mismo — generar,
+contar soluciones, cortar en dos, reintentar. Nonograma y Sudoku ya lo hacen cada
+uno por su lado. Conviene extraerlo antes del segundo de estos tres, no después
+del tercero.
+
+**Lo que NO entra en el contrato actual:** Snake, Tetris, Simon, N-back, Stroop.
+Todos los juegos de hoy son por turnos — una jugada produce un estado y el shell
+apila el anterior. Un juego en tiempo real invierte eso: el reloj genera estados
+sin que el jugador haga nada, y deshacer deja de significar algo. Es una fase,
+no un juego más.
+
+---
+
 ## 🔮 Backlog (post-v1, no distraerse)
 
-- Solitario, 2048, Nonograma, Sopa de letras
+- ~~Nonograma~~ (hecho: primer juego post-Fase 7)
+- Solitario, 2048, Sopa de letras, Kakuro, Hashi
 - Puzzle diario con semilla compartida
 - Sincronización en la nube (la interfaz de `/storage` ya lo permite)
 - Logros y niveles de perfil

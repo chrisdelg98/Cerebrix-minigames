@@ -7,6 +7,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 // exemption for this exact path lives in eslint.config.js.
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
+import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
 import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
 
 /**
@@ -49,6 +50,19 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: MinesweeperIcon,
     load: () => import('@games/minesweeper'),
+  },
+  {
+    id: 'nonogram',
+    preview: {
+      id: 'nonogram',
+      name: 'Nonograma',
+      tagline: 'Los números dicen qué pintar. Sale una figura.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      estimatedMinutes: [3, 20],
+    },
+    icon: NonogramIcon,
+    load: () => import('@games/nonogram'),
   },
   {
     id: '_dummy',

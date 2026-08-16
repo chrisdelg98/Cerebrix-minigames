@@ -97,10 +97,10 @@ inicial ≤ 120 kB gzip, cada juego ≤ 60 kB gzip aparte.
 
 ## Estado actual
 
-Fases 0 a 3 terminadas: andamiaje, contrato + shell, sistema de diseño y
-persistencia. La siguiente es la Fase 4 (dificultad unificada). El detalle, los
-criterios de aceptación y lo que quedó explícitamente pendiente están en
-[`docs/PLAN.md`](docs/PLAN.md).
+Fases 0 a 8 terminadas: andamiaje, contrato + shell, sistema de diseño,
+persistencia, dificultad unificada, Sudoku, Buscaminas, PWA offline e instalable,
+y Nonograma. El detalle, los criterios de aceptación y lo que quedó
+explícitamente pendiente están en [`docs/PLAN.md`](docs/PLAN.md).
 
 `src/games/_dummy` **no se borra** cuando lleguen los juegos reales: es la
 implementación mínima del contrato completo y su test verifica que el shell

@@ -55,6 +55,14 @@
   --c-cell-covered: var(--raw-white);
   --c-cell-done: var(--raw-slate-100);
 
+  /*
+   * Ink: a cell the player filled in solid, rather than wrote a value into.
+   * The hover shade loses a little of it — enough to say "the pointer is here",
+   * not so much that it reads as already erased.
+   */
+  --c-cell-ink: var(--raw-slate-900);
+  --c-cell-ink-hover: var(--raw-slate-700);
+
   --c-cell-error: var(--c-danger-soft);
   --c-cell-hint: var(--c-info-soft);
   --c-board-line: var(--raw-slate-500);
@@ -146,6 +154,10 @@
   --c-cell-active: var(--c-accent-soft);
   --c-cell-fixed: var(--raw-slate-900);
   --c-cell-peer: color-mix(in oklab, var(--raw-teal-400) 10%, transparent);
+
+  /* Inverted, like every other ink on a dark surface. */
+  --c-cell-ink: var(--raw-slate-50);
+  --c-cell-ink-hover: var(--raw-slate-300);
 
   /*
    * Measured, not guessed. --c-cell-done used to be slate-900, which IS the

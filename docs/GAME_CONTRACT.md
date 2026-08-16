@@ -65,8 +65,23 @@ export interface GameMeta {
   tags: ('lógica' | 'memoria' | 'cálculo' | 'azar' | 'velocidad')[];
   /** Minutos estimados por partida. Se muestra en la tarjeta. */
   estimatedMinutes: [min: number, max: number];
+  /**
+   * Las reglas, en pasos. El shell mete cada partida detrás de una pantalla de
+   * inicio y no tiene idea de qué va ningún juego, así que las reglas viajan con
+   * el juego como todo lo demás. Se muestran numeradas.
+   */
+  howToPlay: string[];
+  /** Reglas dibujadas en vez de explicadas. Opcional. */
+  examples?: GameExample[];
   /** Versión del formato de estado. Se incrementa al cambiar la forma de TState. */
   stateVersion: number;
+}
+
+export interface GameExample {
+  /** Un dibujito. Componente, como `icon`: viaja en el chunk perezoso del juego. */
+  figure: ComponentType;
+  /** Una línea abajo del dibujo. */
+  caption: string;
 }
 
 /* ─────────────── Motor (lógica pura) ─────────────── */

@@ -5,12 +5,30 @@
     min-block-size: 100dvh;
   }
 
+  /* --bp-sm — the board takes the width it can get. docs/DESIGN_SYSTEM.md §7.1 */
+  @media (width < 480px) {
+    .header {
+      padding-inline: var(--sp-2);
+    }
+
+    .board {
+      /* Just enough not to touch the glass. */
+      padding: var(--sp-2) 2px;
+    }
+  }
+
+  /*
+   * One line where it fits, two where it does not. A grid rather than a wrap:
+   * the progress bar has to span the full width in both layouts, and wrapping
+   * would let it end up beside the controls.
+   */
   .header {
     position: sticky;
     inset-block-start: 0;
     z-index: 10;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
     gap: var(--sp-2);
     padding: var(--sp-2) var(--sp-4);
     background-color: var(--c-surface);
@@ -22,6 +40,32 @@
     align-items: center;
     gap: var(--sp-3);
     min-block-size: var(--header-h);
+  }
+
+  /* On its own row it scrolls sideways rather than shrinking: five levels at a
+     readable size never fit 360px, and a squeezed picker is worse than one you
+     swipe. */
+  .subRow {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  /* --bp-sm — from here up, the controls sit on the header line.
+     docs/DESIGN_SYSTEM.md §7.1 */
+  @media (width >= 480px) {
+    .header {
+      grid-template-columns: 1fr auto;
+    }
+
+    .subRow {
+      justify-content: flex-end;
+    }
+
+    .progress {
+      grid-column: 1 / -1;
+    }
   }
 
   .board {

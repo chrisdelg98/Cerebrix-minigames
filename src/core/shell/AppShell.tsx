@@ -6,6 +6,14 @@ import s from './AppShell.module.css';
 
 export interface AppShellProps {
   header: ReactNode;
+  /**
+   * The secondary controls of the bar — the difficulty picker, today.
+   *
+   * They share the header line when there is room and drop to their own row
+   * below --bp-sm, where five levels plus a title plus a clock stopped fitting
+   * and the title was being truncated to "Sud...".
+   */
+  subheader?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
   /** 0–1. Omit it and the bar is not rendered at all. */
@@ -17,12 +25,17 @@ export interface AppShellProps {
  * slot-based on purpose — the shell owns the layout, never the contents of a
  * particular game. Reference: docs/DESIGN_SYSTEM.md §7.2.
  */
-export function AppShell({ header, children, footer, progress }: AppShellProps) {
+export function AppShell({ header, subheader, children, footer, progress }: AppShellProps) {
   return (
     <div className={s.shell}>
       <header className={s.header}>
         <div className={s.headerRow}>{header}</div>
-        {progress !== undefined && <ProgressBar value={progress} label="Progreso de la partida" />}
+        {subheader !== undefined && <div className={s.subRow}>{subheader}</div>}
+        {progress !== undefined && (
+          <div className={s.progress}>
+            <ProgressBar value={progress} label="Progreso de la partida" />
+          </div>
+        )}
       </header>
 
       <main className={s.board} id="main">

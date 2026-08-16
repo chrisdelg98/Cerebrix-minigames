@@ -16,17 +16,29 @@ function renderAt(path: string) {
   return { user: userEvent.setup(), ...render(<RouterProvider router={router} />) };
 }
 
+/**
+ * The shell gates every game behind a start screen and does not render the
+ * board before it, so every test that touches a board goes through the door.
+ */
+async function startGame(user: ReturnType<typeof userEvent.setup>): Promise<void> {
+  await user.click(
+    await screen.findByRole('button', { name: /Empezar partida|Continuar partida/ })
+  );
+}
+
 describe('the shell runs a game it does not know', () => {
   it('navigates from a Home card into the game', async () => {
     const { user } = renderAt('/');
 
     await user.click(screen.getByRole('link', { name: /Prueba de contrato/ }));
+    await startGame(user);
 
     expect(await screen.findByRole('group', { name: 'Casillas' })).toBeInTheDocument();
   });
 
   it('plays a move, and the shell reflects it in the progress bar', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
     // A game never played opens on the EASIEST level it declares — 1 of [1, 3, 5].
@@ -42,6 +54,7 @@ describe('the shell runs a game it does not know', () => {
 
   it('announces a rejected move and leaves the state untouched', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
     await user.click(tiles[0]!);
@@ -56,6 +69,7 @@ describe('the shell runs a game it does not know', () => {
 
   it('undoes a move', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
     const undo = screen.getByRole('button', { name: 'Deshacer' });
@@ -78,6 +92,7 @@ describe('the shell runs a game it does not know', () => {
 
   it('runs the game-supplied action and shows the shell victory state', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     await user.click(await screen.findByRole('button', { name: 'Ganar' }));
 
@@ -102,6 +117,8 @@ describe('the shell runs a game it does not know', () => {
 
     const picker = await screen.findByRole('radiogroup', { name: 'Dificultad' });
     await user.click(within(picker).getByRole('radio', { name: 'Experto' }));
+    // A new board is a new game: it asks to be started again.
+    await startGame(user);
 
     await waitFor(() => {
       expect(screen.getAllByRole('button', { name: /^Casilla/ })).toHaveLength(9);

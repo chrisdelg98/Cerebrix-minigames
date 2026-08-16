@@ -73,20 +73,21 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
           running={session.started && session.phase === 'ready' && playing}
           elapsedMs={session.elapsedMs}
         />
-        <DifficultyPicker<Difficulty>
-          value={session.difficulty}
-          options={difficultyOptions(
-            session.module?.meta.difficulties ?? entry.preview.difficulties
-          )}
-          onChange={changeDifficulty}
-        />
       </span>
     </>
   );
 
+  const subheader = (
+    <DifficultyPicker<Difficulty>
+      value={session.difficulty}
+      options={difficultyOptions(session.module?.meta.difficulties ?? entry.preview.difficulties)}
+      onChange={changeDifficulty}
+    />
+  );
+
   if (session.phase === 'error') {
     return (
-      <AppShell header={header}>
+      <AppShell header={header} subheader={subheader}>
         <p role="alert" className={s.message}>
           No se pudo cargar el juego. {session.error?.message}
         </p>
@@ -96,7 +97,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
 
   if (session.phase === 'loading' || !session.module) {
     return (
-      <AppShell header={header}>
+      <AppShell header={header} subheader={subheader}>
         <div className={s.loading}>
           <Skeleton h="var(--sp-8)" label="Cargando el juego" />
           <Skeleton h="var(--sp-8)" />
@@ -116,7 +117,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
    */
   if (!session.started) {
     return (
-      <AppShell header={header}>
+      <AppShell header={header} subheader={subheader}>
         <div className={s.gate}>
           <h2 className={s.gateTitle}>{session.module.meta.name}</h2>
           <p className={s.gateLevel}>
@@ -206,7 +207,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
   );
 
   return (
-    <AppShell header={header} footer={footer} progress={session.progress}>
+    <AppShell header={header} subheader={subheader} footer={footer} progress={session.progress}>
       <Confetti active={won} />
 
       <div className={s.stage}>
@@ -241,7 +242,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
           )}
           {playing && !session.rejection && session.hint && (
             <p className={s.notice} data-tone="hint">
-              <HintIcon size={18} />
+              <HintIcon size={20} />
               {session.hint.message}
             </p>
           )}

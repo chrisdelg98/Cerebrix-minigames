@@ -29,6 +29,16 @@ function renderAt(path: string) {
   return { user: userEvent.setup(), ...utils };
 }
 
+/**
+ * The shell gates every game behind a start screen and does not render the
+ * board before it, so every test that touches a board goes through the door.
+ */
+async function startGame(user: ReturnType<typeof userEvent.setup>): Promise<void> {
+  await user.click(
+    await screen.findByRole('button', { name: /Empezar partida|Continuar partida/ })
+  );
+}
+
 beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
@@ -38,6 +48,7 @@ beforeEach(() => {
 describe('autosave and resume', () => {
   it('restores the exact board after the tab is killed', async () => {
     const first = renderAt('/game/_dummy');
+    await startGame(first.user);
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
     await first.user.click(tiles[0]!);
@@ -51,7 +62,8 @@ describe('autosave and resume', () => {
     // The tab dies. Nothing gets a chance to run on the way out.
     first.unmount();
 
-    renderAt('/game/_dummy');
+    const second = renderAt('/game/_dummy');
+    await startGame(second.user);
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Casilla 1, marcada' })).toBeInTheDocument();
@@ -74,7 +86,8 @@ describe('autosave and resume', () => {
       savedAt: Date.now(),
     });
 
-    renderAt('/game/_dummy');
+    const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     // Re-queried inside the wait: adopting the saved level changes the round,
     // which remounts the timer — a node captured before that is stale.
@@ -86,6 +99,7 @@ describe('autosave and resume', () => {
   it('flushes on visibilitychange instead of waiting out the debounce', async () => {
     const save = vi.spyOn(storage, 'saveSession');
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
     save.mockClear();
@@ -108,6 +122,7 @@ describe('autosave and resume', () => {
 
   it('records the result and drops the save when the game ends', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     await user.click(await screen.findByRole('button', { name: 'Ganar' }));
     await screen.findByRole('heading', { name: '¡Ganaste!' });
@@ -121,6 +136,7 @@ describe('autosave and resume', () => {
 
   it('starts a genuinely new board when the player asks for one', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
     await user.click(tiles[0]!);
@@ -129,6 +145,7 @@ describe('autosave and resume', () => {
     });
 
     await user.click(screen.getByRole('button', { name: 'Nueva partida' }));
+    await startGame(user);
 
     // A restart is an explicit request: it must not resurrect the save.
     await waitFor(() => {

@@ -1,5 +1,7 @@
 @layer components {
   .frame {
+    inline-size: fit-content;
+    max-inline-size: 100%;
     padding: var(--sp-2);
     background-color: var(--c-surface);
     border: var(--bw-base) solid var(--c-border-strong);
@@ -28,5 +30,28 @@
 
     /* The board is as tall as its rows require: not every game is square. */
     aspect-ratio: var(--cols) / var(--rows);
+  }
+
+  /*
+   * --bp-sm — on a phone the board takes the screen.
+   *
+   * Percent of the container, never vw: vw INCLUDES the scrollbar, so 98vw is
+   * wider than the space actually available and the board hangs off to one
+   * side. The frame fills its parent and the parent's padding is what leaves
+   * the sliver of margin.
+   * docs/DESIGN_SYSTEM.md §7.1
+   */
+  @media (width < 480px) {
+    .frame {
+      inline-size: 100%;
+      padding: 3px;
+    }
+
+    .frame .grid {
+      /* Only feeds the --cell-size font clamp; the real width is the frame's. */
+      --board-max-resolved: calc(100vw - var(--sp-3));
+
+      inline-size: 100%;
+    }
   }
 }

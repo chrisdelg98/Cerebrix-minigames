@@ -28,6 +28,9 @@ export function SudokuView({
   const [selected, setSelected] = useState(0);
   const [pencil, setPencil] = useState(false);
   const cellRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  /* Focus follows the ARROW KEYS, never a tap. Moving focus on tap is what
+     makes a phone scroll the board out from under the thumb. */
+  const fromKeyboard = useRef(false);
 
   // Recomputed only when the digits change, not on every selection move: it is
   // 81 × 20 comparisons and selection changes on every arrow key.
@@ -59,10 +62,12 @@ export function SudokuView({
     return row * SIZE + col;
   }, []);
 
-  // Focus follows selection, so the keyboard and the pointer agree on where
-  // the player is. Without it, arrowing away from a clicked cell would leave
-  // focus behind and the next Tab would jump somewhere unrelated.
+  // Keyboard navigation has to drag focus along with the selection, or the
+  // next Tab jumps somewhere unrelated. A tap already put focus where it
+  // belongs, so re-focusing there only risks scrolling the page.
   useEffect(() => {
+    if (!fromKeyboard.current) return;
+    fromKeyboard.current = false;
     cellRefs.current[selected]?.focus({ preventScroll: true });
   }, [selected]);
 
@@ -79,6 +84,7 @@ export function SudokuView({
     if (key in arrows) {
       const [dRow, dCol] = arrows[key] ?? [0, 0];
       event.preventDefault();
+      fromKeyboard.current = true;
       setSelected((current) => move(current, dRow, dCol));
       return;
     }

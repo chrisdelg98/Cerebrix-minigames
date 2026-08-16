@@ -1,9 +1,15 @@
 @layer game {
+  /*
+   * Full width, not content width. As a centred grid item it was sizing to its
+   * contents, so the board could never reach the edges no matter how small the
+   * padding got — the gap was the container, not the spacing.
+   */
   .sudoku {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--sp-4);
+    gap: var(--sp-3);
+    inline-size: 100%;
   }
 
   .boardWrap {

@@ -28,6 +28,16 @@ function renderAt(path: string) {
 
 const picker = () => screen.findByRole('radiogroup', { name: 'Dificultad' });
 
+/**
+ * The shell gates every game behind a start screen and does not render the
+ * board before it, so every test that touches a board goes through the door.
+ */
+async function startGame(user: ReturnType<typeof userEvent.setup>): Promise<void> {
+  await user.click(
+    await screen.findByRole('button', { name: /Empezar partida|Continuar partida/ })
+  );
+}
+
 beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
@@ -68,8 +78,11 @@ describe('the scale', () => {
 describe('changing difficulty', () => {
   it('takes effect immediately on a board nobody has touched', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     await user.click(within(await picker()).getByRole('radio', { name: 'Experto' }));
+    // A new board is a new game: it asks to be started again.
+    await startGame(user);
 
     await waitFor(() => {
       expect(screen.getAllByRole('button', { name: /^Casilla/ })).toHaveLength(9);
@@ -82,6 +95,7 @@ describe('changing difficulty', () => {
 
   it('asks before throwing away a board with moves on it', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
     await user.click(tiles[0]!);
@@ -97,6 +111,7 @@ describe('changing difficulty', () => {
 
   it('keeps the board when the player backs out', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
     await user.click(tiles[0]!);
@@ -117,11 +132,13 @@ describe('changing difficulty', () => {
 
   it('rebuilds the board when the player confirms', async () => {
     const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     const tiles = await screen.findAllByRole('button', { name: /^Casilla/ });
     await user.click(tiles[0]!);
     await user.click(within(await picker()).getByRole('radio', { name: 'Experto' }));
     await user.click(await screen.findByRole('button', { name: 'Empezar de nuevo' }));
+    await startGame(user);
 
     await waitFor(() => {
       expect(screen.getAllByRole('button', { name: /^Casilla/ })).toHaveLength(9);
@@ -144,7 +161,7 @@ describe('the choice persists', () => {
     });
 
     first.unmount();
-    renderAt('/game/_dummy');
+    const second = renderAt('/game/_dummy');
 
     // Not the easy default: the level outlives the session it was played in.
     await waitFor(async () => {
@@ -153,6 +170,7 @@ describe('the choice persists', () => {
         'true'
       );
     });
+    await startGame(second.user);
     expect(screen.getAllByRole('button', { name: /^Casilla/ })).toHaveLength(9);
   });
 
@@ -170,7 +188,8 @@ describe('the choice persists', () => {
       savedAt: Date.now(),
     });
 
-    renderAt('/game/_dummy');
+    const { user } = renderAt('/game/_dummy');
+    await startGame(user);
 
     await waitFor(() => {
       expect(screen.getAllByRole('button', { name: /^Casilla/ })).toHaveLength(9);

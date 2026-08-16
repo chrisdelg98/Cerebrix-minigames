@@ -54,11 +54,18 @@
     display: inline-flex;
     align-items: center;
     gap: var(--sp-2);
-    padding: var(--sp-2) var(--sp-4);
-    border: var(--bw-hair) solid;
+    max-inline-size: 100%;
+    padding: var(--sp-3) var(--sp-5);
+    border: var(--bw-base) solid;
     border-radius: var(--r-full);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-medium);
+
+    /* 14px at ~4.9:1 clears AA and still reads as fine print. The colour stays
+       — it is what ties the message to the ringed cell — and the size carries
+       the legibility instead. */
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    text-align: center;
     animation: pop-in var(--d-base) var(--e-spring);
   }
 

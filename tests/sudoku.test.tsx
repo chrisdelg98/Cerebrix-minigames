@@ -33,6 +33,16 @@ const cellAt = (row: number, col: number) =>
     name: new RegExp(`^fila ${String(row)}, columna ${String(col)}`),
   });
 
+/**
+ * The shell gates every game behind a start screen and does not render the
+ * board before it, so every test that touches a board goes through the door.
+ */
+async function startGame(user: ReturnType<typeof userEvent.setup>): Promise<void> {
+  await user.click(
+    await screen.findByRole('button', { name: /Empezar partida|Continuar partida/ })
+  );
+}
+
 beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
@@ -41,7 +51,8 @@ beforeEach(() => {
 
 describe('the board', () => {
   it('renders 81 cells with the 3×3 dividers', async () => {
-    renderAt('/game/sudoku');
+    const { user } = renderAt('/game/sudoku');
+    await startGame(user);
 
     const grid = await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
     const cells = within(grid).getAllByRole('gridcell');
@@ -54,7 +65,8 @@ describe('the board', () => {
   });
 
   it('marks the clues so they read as given, not as the player’s work', async () => {
-    renderAt('/game/sudoku');
+    const { user } = renderAt('/game/sudoku');
+    await startGame(user);
 
     const grid = await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
     const clues = within(grid)
@@ -66,6 +78,7 @@ describe('the board', () => {
 
   it('highlights the peers of the selected cell, and every twin of its digit', async () => {
     const { user } = renderAt('/game/sudoku');
+    await startGame(user);
     await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
 
     // A clue, so there is a digit to find twins of.
@@ -88,6 +101,7 @@ describe('the board', () => {
 describe('entering digits', () => {
   it('writes with the number pad into the selected cell', async () => {
     const { user } = renderAt('/game/sudoku');
+    await startGame(user);
     await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
 
     const empty = firstEmptyCell();
@@ -101,6 +115,7 @@ describe('entering digits', () => {
 
   it('writes with the physical keyboard and erases with Backspace', async () => {
     const { user } = renderAt('/game/sudoku');
+    await startGame(user);
     await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
 
     const empty = firstEmptyCell();
@@ -119,6 +134,7 @@ describe('entering digits', () => {
 
   it('moves the selection with the arrow keys', async () => {
     const { user } = renderAt('/game/sudoku');
+    await startGame(user);
     await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
 
     await user.click(cellAt(1, 1));
@@ -131,6 +147,7 @@ describe('entering digits', () => {
 
   it('refuses to overwrite a clue, and the shell says why', async () => {
     const { user } = renderAt('/game/sudoku');
+    await startGame(user);
     await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
 
     const grid = screen.getByRole('grid', { name: 'Tablero de Sudoku' });
@@ -148,6 +165,7 @@ describe('entering digits', () => {
 
   it('lets a clashing digit through and marks it, instead of blocking it', async () => {
     const { user } = renderAt('/game/sudoku');
+    await startGame(user);
     await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
 
     // Find a clue and an empty cell in the same row.
@@ -174,11 +192,12 @@ describe('entering digits', () => {
 describe('pencil mode', () => {
   it('writes notes instead of digits while it is on', async () => {
     const { user } = renderAt('/game/sudoku');
+    await startGame(user);
     await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
 
     const empty = firstEmptyCell();
     await user.click(empty);
-    await user.click(screen.getByRole('button', { name: 'Modo lápiz' }));
+    await user.click(screen.getByRole('button', { name: 'Anotar' }));
     await user.click(screen.getByRole('button', { name: /^Escribir 4/ }));
 
     // The note lands, and the cell is still empty as far as the rules go.
@@ -187,7 +206,7 @@ describe('pencil mode', () => {
     });
     expect(empty.getAttribute('aria-label')).toMatch(/vacía/);
 
-    await user.click(screen.getByRole('button', { name: 'Salir del modo lápiz' }));
+    await user.click(screen.getByRole('button', { name: 'Anotando' }));
     await user.click(screen.getByRole('button', { name: /^Escribir 4/ }));
 
     await waitFor(() => {
@@ -224,11 +243,14 @@ describe('inside the shell', () => {
     });
 
     const { user } = renderAt('/game/sudoku');
+    await startGame(user);
     await screen.findByRole('grid', { name: 'Tablero de Sudoku' });
 
-    // The clock came back with the board.
+    // The clock came back with the board and kept going from there. Asserting
+    // an exact value would be a race against a running clock, so the invariant
+    // is what gets checked: it resumed at or after the time that was saved.
     await waitFor(() => {
-      expect(screen.getByRole('timer').textContent).toBe('01:30');
+      expect(seconds(screen.getByRole('timer').textContent)).toBeGreaterThanOrEqual(90);
     });
 
     const target = cellAt(Math.floor(lastEmpty / 9) + 1, (lastEmpty % 9) + 1);
@@ -248,6 +270,12 @@ describe('inside the shell', () => {
     expect(within(picker).getAllByRole('radio')).toHaveLength(5);
   });
 });
+
+/** "01:30" -> 90 */
+function seconds(clock: string | null): number {
+  const [minutes = '0', secs = '0'] = (clock ?? '').split(':');
+  return Number(minutes) * 60 + Number(secs);
+}
 
 function firstEmptyCell(): HTMLElement {
   const grid = screen.getByRole('grid', { name: 'Tablero de Sudoku' });

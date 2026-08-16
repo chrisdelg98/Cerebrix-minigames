@@ -21,21 +21,34 @@ export function Timer({ running, elapsedMs = 0 }: TimerProps) {
     const node = ref.current;
     if (!node) return;
 
-    const startedAt = performance.now();
     let frame = 0;
     let painted = '';
+    /*
+     * Anchored on the FIRST rAF timestamp, never on performance.now(). The two
+     * are not guaranteed to share a time origin — browsers happen to line them
+     * up, jsdom does not, and mixing them made a resumed clock read BELOW the
+     * time it resumed from. One clock, one origin.
+     */
+    let startedAt: number | null = null;
 
-    const paint = (now: number) => {
-      const total = elapsedMs + (running ? now - startedAt : 0);
+    const show = (total: number) => {
       const next = formatDuration(total);
       if (next !== painted) {
         painted = next;
         node.textContent = next;
       }
-      if (running) frame = requestAnimationFrame(paint);
     };
 
-    paint(performance.now());
+    show(elapsedMs);
+    if (!running) return;
+
+    const tick = (now: number) => {
+      startedAt ??= now;
+      show(elapsedMs + (now - startedAt));
+      frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(frame);

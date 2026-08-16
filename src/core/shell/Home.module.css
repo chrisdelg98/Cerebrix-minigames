@@ -103,6 +103,10 @@
   }
 
   .footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    align-items: center;
     margin-block-start: var(--sp-6);
     padding-block-start: var(--sp-4);
     border-block-start: var(--bw-hair) solid var(--c-border-hairline);

@@ -73,6 +73,15 @@ export function PlusIcon({ size = 18 }: SpriteProps) {
   );
 }
 
+export function InstallIcon({ size = 18 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <path d="M12 3v12M8 11l4 4 4-4" />
+      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+    </svg>
+  );
+}
+
 export function MotionOffIcon({ size = 20 }: SpriteProps) {
   return (
     <svg width={size} height={size} {...base}>

@@ -2,11 +2,58 @@ import { fileURLToPath, URL } from 'node:url';
 // `vitest/config` re-exports Vite's defineConfig with the `test` block typed.
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
 const resolvePath = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+
+    /*
+     * Offline is not a nicety here: the app is meant for the five minutes on a
+     * train, which is exactly where the connection is not.
+     *
+     * Everything ships precached — shell, design system, every game chunk and
+     * every puzzle file — because a game you cannot open offline is a game that
+     * is not installed. The whole thing is well under a megabyte, so there is
+     * no reason to be clever about it.
+     */
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      workbox: {
+        // .json is what carries the Sudoku puzzles.
+        globPatterns: ['**/*.{js,css,html,svg,png,json,woff2}'],
+        cleanupOutdatedCaches: true,
+        // Any route falls back to the shell: this is a client-side router, so a
+        // deep link opened offline still has to boot the app.
+        navigateFallback: 'index.html',
+      },
+      manifest: {
+        name: 'Cerebrix',
+        short_name: 'Cerebrix',
+        description: 'Minijuegos de concentración: Sudoku, Buscaminas y más.',
+        lang: 'es',
+        start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#f7f7f8',
+        theme_color: '#0d9488',
+        icons: [
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
+          {
+            src: 'icon-maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+    }),
+  ],
 
   resolve: {
     // Mirrored in tsconfig.app.json — keep both in sync.

@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { EmptyState } from '@design/components/EmptyState';
+import { InstallButton } from '@design/components/InstallButton';
 import { SettingsToggles } from '@design/components/SettingsToggles';
 import { StatTile } from '@design/components/StatTile';
 import { Clock } from '@design/sprites/Clock';
+import { InstallIcon } from '@design/sprites/SettingsIcons';
 import { LogoCerebrix } from '@design/sprites/LogoCerebrix';
 import { Streak } from '@design/sprites/Streak';
 import { Trophy } from '@design/sprites/Trophy';
@@ -123,6 +125,8 @@ export function Home({ entries = REGISTRY }: HomeProps) {
       )}
 
       <footer className={s.footer}>
+        {/* Renders nothing unless the browser says the app can be installed. */}
+        <InstallButton icon={<InstallIcon />} />
         <DataControls onImported={refreshAll} />
       </footer>
     </div>

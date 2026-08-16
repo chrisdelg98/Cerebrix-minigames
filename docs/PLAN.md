@@ -368,7 +368,7 @@ Buscaminas antes que Solitario a propósito: comparte el modelo de grid (reusa `
 
 **Objetivo:** que sirva de verdad en el subte, sin señal y con una mano.
 
-- [ ] PWA: manifest, íconos, service worker (Workbox), instalable
+- [x] PWA: manifest, íconos, service worker (Workbox), instalable
 - [ ] Offline completo — no hay backend, no hay excusa
 - [ ] Vista de estadísticas y logros (lazy)
 - [ ] Presupuestos verificados en CI: bundle inicial ≤ 120 kB gzip, cada juego ≤ 60 kB

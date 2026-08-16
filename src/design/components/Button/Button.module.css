@@ -44,6 +44,14 @@
     color: var(--c-text-on-accent);
   }
 
+  /* Outlined in the accent: reads as part of the same group as `primary`,
+     without competing with it for the eye. */
+  .button[data-variant='accent'] {
+    background-color: var(--c-accent-soft);
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+  }
+
   .button[data-variant='danger'] {
     background-color: var(--c-danger-soft);
     border-color: var(--c-danger);
@@ -66,6 +74,11 @@
 
     .button[data-variant='primary']:hover:not(:disabled) {
       background-color: var(--c-accent-surface-hover);
+    }
+
+    .button[data-variant='accent']:hover:not(:disabled) {
+      background-color: var(--c-cell-active);
+      border-color: var(--c-accent-hover);
     }
   }
 

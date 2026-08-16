@@ -3,7 +3,12 @@ import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 import s from './Button.module.css';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'ghost' | 'danger';
+  /**
+   * `accent` is the quiet sibling of `primary`: same colour, outlined instead
+   * of filled. Two actions of the same kind should look related without both
+   * shouting.
+   */
+  variant?: 'primary' | 'accent' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
   icon?: ReactNode;
   /** Stretches the button to fill its container — the mobile action bar. */

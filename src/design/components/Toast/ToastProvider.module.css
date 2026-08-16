@@ -1,8 +1,15 @@
 @layer components {
-  /* Anchored top on mobile — the bottom belongs to the action bar. */
+  /*
+   * Always at the bottom, at every width. The top is where the game's own
+   * header lives — a toast there covered the title and the level picker, which
+   * is exactly what the toast was announcing.
+   *
+   * It clears the action bar rather than sitting on it, so "new game" never
+   * lands on top of the button the player is about to press.
+   */
   .host {
     position: fixed;
-    inset-block-start: calc(var(--sp-3) + env(safe-area-inset-top));
+    inset-block: auto calc(var(--footer-h) + var(--sp-3) + env(safe-area-inset-bottom));
     inset-inline: var(--sp-4);
     z-index: 50;
     display: flex;
@@ -12,10 +19,10 @@
     pointer-events: none;
   }
 
-  /* --bp-sm — docs/DESIGN_SYSTEM.md §7.1 */
+  /* --bp-sm — out of the centre once there is room beside it.
+     docs/DESIGN_SYSTEM.md §7.1 */
   @media (width >= 480px) {
     .host {
-      inset-block: auto calc(var(--sp-5) + env(safe-area-inset-bottom));
       inset-inline: auto var(--sp-5);
       align-items: flex-end;
     }

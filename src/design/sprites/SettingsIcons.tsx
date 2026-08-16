@@ -65,6 +65,14 @@ export function PlayIcon({ size = 18 }: SpriteProps) {
   );
 }
 
+export function PlusIcon({ size = 18 }: SpriteProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
 export function MotionOffIcon({ size = 20 }: SpriteProps) {
   return (
     <svg width={size} height={size} {...base}>

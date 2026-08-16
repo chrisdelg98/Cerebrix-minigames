@@ -8,7 +8,7 @@ import { Modal } from '@design/components/Modal';
 import { Skeleton } from '@design/components/Skeleton';
 import { Timer } from '@design/components/Timer';
 import { useToast } from '@design/components/Toast';
-import { ArrowLeftIcon, HintIcon, PlayIcon } from '@design/sprites/SettingsIcons';
+import { ArrowLeftIcon, HintIcon, PlayIcon, PlusIcon } from '@design/sprites/SettingsIcons';
 import { Trophy } from '@design/sprites/Trophy';
 
 import { type Difficulty } from '../contract';
@@ -130,16 +130,31 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
             <Button
               variant="primary"
               size="lg"
+              block
               icon={<PlayIcon size={20} />}
               onClick={session.start}
             >
               {session.resumed ? 'Continuar partida' : 'Empezar partida'}
             </Button>
 
+            {/* Only worth offering when there is something to abandon. */}
+            {session.resumed && (
+              <Button
+                variant="accent"
+                size="lg"
+                block
+                icon={<PlusIcon size={20} />}
+                onClick={session.restart}
+              >
+                Nueva partida
+              </Button>
+            )}
+
             {/* The rules are one tap away, not in the way. Someone who already
                 knows the game should not have to read past them every time. */}
             <Button
               size="lg"
+              block
               icon={<HintIcon size={20} />}
               onClick={() => {
                 setRulesOpen(true);

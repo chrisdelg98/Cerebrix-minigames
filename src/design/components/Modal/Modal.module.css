@@ -7,7 +7,9 @@
      * reset, so the centring is visible where the modal is defined.
      */
     margin: auto;
-    max-inline-size: min(100% - (2 * var(--sp-4)), 420px);
+
+    /* Wide enough that a rule is one or two lines, not five. */
+    max-inline-size: min(100% - (2 * var(--sp-3)), 560px);
     padding: 0;
     background-color: var(--c-surface);
     border: var(--bw-base) solid var(--c-border-strong);
@@ -27,8 +29,8 @@
   .panel {
     display: flex;
     flex-direction: column;
-    gap: var(--sp-3);
-    padding: var(--sp-5);
+    gap: var(--sp-4);
+    padding: var(--sp-6) var(--sp-5);
   }
 
   .title {
@@ -36,8 +38,9 @@
   }
 
   .body {
-    color: var(--c-text-muted);
-    font-size: var(--fs-sm);
+    color: var(--c-text);
+    font-size: var(--fs-md);
+    line-height: var(--lh-body);
   }
 
   .actions {

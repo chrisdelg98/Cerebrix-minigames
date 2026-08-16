@@ -35,10 +35,11 @@ function write(key: string, value: string): void {
 }
 
 export function useTheme(): [Theme, (next: Theme) => void] {
-  // The pre-paint script already resolved stored preference vs. OS setting and
-  // stamped <html>. Reading it back keeps React and the DOM in agreement.
+  // The pre-paint script already stamped <html> with the stored choice, or
+  // light when there is none. Reading it back keeps React and the DOM in
+  // agreement. The OS setting is not consulted — see index.html.
   const [theme, setThemeState] = useState<Theme>(
-    () => (document.documentElement.dataset['theme'] as Theme | undefined) ?? 'dark'
+    () => (document.documentElement.dataset['theme'] as Theme | undefined) ?? 'light'
   );
 
   useEffect(() => {

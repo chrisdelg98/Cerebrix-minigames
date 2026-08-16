@@ -1,4 +1,5 @@
 import { memo, type ReactNode, type Ref } from 'react';
+import type React from 'react';
 
 import { type CSSVars } from '../../types';
 
@@ -9,6 +10,8 @@ export type CellState =
   | 'filled'
   | 'fixed'
   | 'selected'
+  /** Face down: the value exists but the player has not earned it yet. */
+  | 'covered'
   /** Shares a row, column or box with the selected cell. */
   | 'peer'
   /** Holds the same digit as the selected cell, anywhere on the board. */
@@ -36,13 +39,21 @@ export interface CellProps {
    */
   authored?: 'clue' | 'player' | undefined;
   /** Distance from the origin of a reveal, for wave cascades. */
-  distance?: number;
+  distance?: number | undefined;
   animate?: 'pop-in' | 'reveal-wave' | 'none';
   /**
    * React 19 passes ref as an ordinary prop — no forwardRef needed. A board
    * that owns keyboard navigation needs this to move focus with the selection.
    */
   ref?: Ref<HTMLButtonElement>;
+  /**
+   * Secondary interaction — the flag in Minesweeper, and whatever the next
+   * game calls it. A board with only one gesture was a Sudoku assumption.
+   */
+  onContextMenu?: (event: React.MouseEvent) => void;
+  onPointerDown?: (event: React.PointerEvent) => void;
+  onPointerUp?: (event: React.PointerEvent) => void;
+  onPointerLeave?: (event: React.PointerEvent) => void;
 }
 
 /**
@@ -67,6 +78,10 @@ export const Cell = memo(function Cell({
   distance,
   animate = 'none',
   ref,
+  onContextMenu,
+  onPointerDown,
+  onPointerUp,
+  onPointerLeave,
 }: CellProps) {
   const animationClass =
     animate === 'pop-in' ? 'anim-pop-in' : animate === 'reveal-wave' ? 'anim-reveal-wave' : '';
@@ -87,6 +102,10 @@ export const Cell = memo(function Cell({
       aria-label={label}
       disabled={disabled}
       onClick={onActivate}
+      onContextMenu={onContextMenu}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerLeave}
     >
       {value}
     </button>

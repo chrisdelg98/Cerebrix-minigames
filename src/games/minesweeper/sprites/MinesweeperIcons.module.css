@@ -1,0 +1,22 @@
+@layer game {
+  .mine {
+    color: var(--c-text);
+  }
+
+  /* The one that ended the game is the only red thing on the board. */
+  .mine[data-state='exploded'] {
+    color: var(--c-danger);
+  }
+
+  .mine[data-state='exploded'] .core {
+    transform-origin: center;
+  }
+
+  .flag {
+    color: var(--c-danger);
+  }
+
+  .cloth {
+    transform-origin: 7px 7px;
+  }
+}

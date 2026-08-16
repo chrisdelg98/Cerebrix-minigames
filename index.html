@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" data-theme="dark">
+<html lang="es" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -20,17 +20,17 @@
     <script>
       (function () {
         try {
-          var stored = localStorage.getItem('cerebrix:theme');
-          var theme =
-            stored ||
-            (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-          document.documentElement.dataset.theme = theme;
+          // Light is the default, always. The OS setting is deliberately NOT
+          // consulted: this is a bright, playful surface by design, and only an
+          // explicit choice by the player switches it.
+          document.documentElement.dataset.theme =
+            localStorage.getItem('cerebrix:theme') || 'light';
 
           if (localStorage.getItem('cerebrix:motion') === 'reduced') {
             document.documentElement.dataset.motion = 'reduced';
           }
         } catch (e) {
-          document.documentElement.dataset.theme = 'dark';
+          document.documentElement.dataset.theme = 'light';
         }
       })();
     </script>

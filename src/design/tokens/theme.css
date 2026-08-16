@@ -5,6 +5,65 @@
  */
 
 :root,
+[data-theme='light'] {
+  --c-bg: var(--raw-slate-50);
+  --c-surface: var(--raw-white);
+  --c-surface-raised: var(--raw-white);
+  --c-surface-sunken: var(--raw-slate-100);
+
+  --c-text: var(--raw-slate-900);
+  --c-text-muted: var(--raw-slate-500);
+  --c-text-subtle: var(--raw-slate-400);
+  --c-text-on-accent: var(--raw-white);
+
+  --c-border: var(--raw-slate-300);
+  --c-border-strong: var(--raw-slate-400);
+  --c-border-hairline: var(--raw-slate-200);
+
+  /* Light inverts the trick: on a white page the accent has to go DARK to be
+     legible, and then white type on it works (5.47:1). Same two tokens, both
+     directions covered, and the components never learn which theme they are in. */
+  --c-accent: var(--raw-teal-700);
+  --c-accent-hover: var(--raw-teal-600);
+  --c-accent-surface: var(--raw-teal-700);
+  --c-accent-surface-hover: var(--raw-teal-800);
+  --c-accent-press: var(--raw-teal-800);
+  --c-accent-soft: color-mix(in oklab, var(--raw-teal-600) 14%, transparent);
+  --c-accent-ring: color-mix(in oklab, var(--raw-teal-700) 45%, transparent);
+
+  --c-gold: var(--raw-amber-600);
+  --c-gold-soft: color-mix(in oklab, var(--raw-amber-500) 20%, transparent);
+
+  --c-success: var(--raw-green-600);
+  --c-success-soft: color-mix(in oklab, var(--raw-green-600) 14%, transparent);
+  --c-danger: var(--raw-red-600);
+  --c-danger-soft: color-mix(in oklab, var(--raw-red-600) 12%, transparent);
+  --c-info: var(--raw-indigo-600);
+  --c-info-soft: color-mix(in oklab, var(--raw-indigo-600) 12%, transparent);
+
+  --c-cell: var(--raw-white);
+  --c-cell-hover: var(--raw-slate-100);
+  --c-cell-active: var(--c-accent-soft);
+  --c-cell-fixed: var(--raw-slate-100);
+  --c-cell-peer: color-mix(in oklab, var(--raw-teal-700) 9%, transparent);
+
+  /*
+   * Face down vs. done. What the player can still act on stays bright and
+   * raised; what is already resolved recedes into grey. The other way round —
+   * grey lids on a white board — made the finished half look like the live one.
+   */
+  --c-cell-covered: var(--raw-white);
+  --c-cell-done: var(--raw-slate-100);
+
+  --c-cell-error: var(--c-danger-soft);
+  --c-cell-hint: var(--c-info-soft);
+  --c-board-line: var(--raw-slate-500);
+
+  --c-shadow: var(--raw-slate-900);
+
+  color-scheme: light;
+}
+
 [data-theme='dark'] {
   /* Surfaces */
   --c-bg: var(--raw-slate-950);
@@ -22,7 +81,10 @@
 
   /* Borders */
   --c-border: var(--raw-slate-700);
-  --c-border-strong: var(--raw-slate-600);
+
+  /* One step up from slate-600: at that value a strong border landed on the
+     same colour as a raised cell's fill and vanished into it. */
+  --c-border-strong: var(--raw-slate-500);
   --c-border-hairline: var(--raw-slate-800);
 
   /*
@@ -84,6 +146,19 @@
   --c-cell-active: var(--c-accent-soft);
   --c-cell-fixed: var(--raw-slate-900);
   --c-cell-peer: color-mix(in oklab, var(--raw-teal-400) 10%, transparent);
+
+  /*
+   * Measured, not guessed. --c-cell-done used to be slate-900, which IS the
+   * board frame: a cleared cell scored 1.00 against it — the same colour — so
+   * the solved half of the board simply disappeared.
+   *
+   * Now the three states separate on fill alone, which is what has to carry it
+   * here: the solid shadow is black, and black on near-black draws nothing.
+   *   covered  slate-600  → 2.29 against the frame, reads as a lid
+   *   done     slate-1000 → punched out below it
+   */
+  --c-cell-covered: var(--raw-slate-500);
+  --c-cell-done: var(--raw-slate-1000);
   --c-cell-error: var(--c-danger-soft);
   --c-cell-hint: var(--c-info-soft);
 
@@ -98,54 +173,4 @@
   --c-shadow: var(--raw-black);
 
   color-scheme: dark;
-}
-
-[data-theme='light'] {
-  --c-bg: var(--raw-slate-50);
-  --c-surface: var(--raw-white);
-  --c-surface-raised: var(--raw-white);
-  --c-surface-sunken: var(--raw-slate-100);
-
-  --c-text: var(--raw-slate-900);
-  --c-text-muted: var(--raw-slate-500);
-  --c-text-subtle: var(--raw-slate-400);
-  --c-text-on-accent: var(--raw-white);
-
-  --c-border: var(--raw-slate-300);
-  --c-border-strong: var(--raw-slate-400);
-  --c-border-hairline: var(--raw-slate-200);
-
-  /* Light inverts the trick: on a white page the accent has to go DARK to be
-     legible, and then white type on it works (5.47:1). Same two tokens, both
-     directions covered, and the components never learn which theme they are in. */
-  --c-accent: var(--raw-teal-700);
-  --c-accent-hover: var(--raw-teal-600);
-  --c-accent-surface: var(--raw-teal-700);
-  --c-accent-surface-hover: var(--raw-teal-800);
-  --c-accent-press: var(--raw-teal-800);
-  --c-accent-soft: color-mix(in oklab, var(--raw-teal-600) 14%, transparent);
-  --c-accent-ring: color-mix(in oklab, var(--raw-teal-700) 45%, transparent);
-
-  --c-gold: var(--raw-amber-600);
-  --c-gold-soft: color-mix(in oklab, var(--raw-amber-500) 20%, transparent);
-
-  --c-success: var(--raw-green-600);
-  --c-success-soft: color-mix(in oklab, var(--raw-green-600) 14%, transparent);
-  --c-danger: var(--raw-red-600);
-  --c-danger-soft: color-mix(in oklab, var(--raw-red-600) 12%, transparent);
-  --c-info: var(--raw-indigo-600);
-  --c-info-soft: color-mix(in oklab, var(--raw-indigo-600) 12%, transparent);
-
-  --c-cell: var(--raw-white);
-  --c-cell-hover: var(--raw-slate-100);
-  --c-cell-active: var(--c-accent-soft);
-  --c-cell-fixed: var(--raw-slate-100);
-  --c-cell-peer: color-mix(in oklab, var(--raw-teal-700) 9%, transparent);
-  --c-cell-error: var(--c-danger-soft);
-  --c-cell-hint: var(--c-info-soft);
-  --c-board-line: var(--raw-slate-500);
-
-  --c-shadow: var(--raw-slate-900);
-
-  color-scheme: light;
 }

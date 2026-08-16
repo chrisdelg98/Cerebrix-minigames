@@ -6,6 +6,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 // import(), and by an icon small enough to ride in the initial bundle. The lint
 // exemption for this exact path lives in eslint.config.js.
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
+import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
 
 /**
@@ -35,6 +36,19 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: SudokuIcon,
     load: () => import('@games/sudoku'),
+  },
+  {
+    id: 'minesweeper',
+    preview: {
+      id: 'minesweeper',
+      name: 'Buscaminas',
+      tagline: 'Despejá el campo sin pisar una mina.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      estimatedMinutes: [2, 15],
+    },
+    icon: MinesweeperIcon,
+    load: () => import('@games/minesweeper'),
   },
   {
     id: '_dummy',

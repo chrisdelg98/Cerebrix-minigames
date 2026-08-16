@@ -87,7 +87,8 @@ describe('accent contrast', () => {
    * docs/DESIGN_SYSTEM.md §2.3
    */
   const theme = read('theme.css');
-  const [dark = '', light = ''] = theme.split(/\[data-theme='light'\]/);
+  // :root carries the LIGHT theme — it is the default when nothing is stored.
+  const [light = '', dark = ''] = theme.split(/\[data-theme='dark'\]/);
 
   it.each([
     ['dark', dark],

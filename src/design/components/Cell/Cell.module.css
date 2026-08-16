@@ -18,10 +18,14 @@
 
     /* Block dividers, composed from four knobs so a corner cell keeps BOTH of
        its lines — four separate box-shadow rules would override each other. */
-    --edge-top: 0 0;
-    --edge-right: 0 0;
-    --edge-bottom: 0 0;
-    --edge-left: 0 0;
+
+    /* ONE length each: the template supplies the other slots. Two tokens here
+       made the shorthand six values long, which is invalid — so the whole
+       declaration was dropped and no board ever drew a block line. */
+    --edge-top: 0;
+    --edge-right: 0;
+    --edge-bottom: 0;
+    --edge-left: 0;
 
     box-shadow:
       inset 0 var(--edge-top) 0 0 var(--c-board-line),
@@ -74,6 +78,24 @@
 
     /* Colour is never the only carrier: fixed cells are also bolder. */
     font-weight: var(--fw-black);
+  }
+
+  /* Raised while face down, flush once revealed: the board should read as a
+     field of lids, not as a grid of empty squares. */
+  .cell[data-state='covered'] {
+    background-color: var(--c-cell-covered);
+    border-color: var(--c-border-strong);
+
+    /* Raised while face down, flush once revealed. The shadow replaces the
+       block-edge composition here on purpose: a game with hidden state and a
+       game with 3×3 boxes are not the same game. */
+    box-shadow: var(--sh-sm);
+  }
+
+  /* And it presses in when touched, like a lid giving way. */
+  .cell[data-state='covered']:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: var(--sh-none);
   }
 
   .cell[data-state='peer'] {

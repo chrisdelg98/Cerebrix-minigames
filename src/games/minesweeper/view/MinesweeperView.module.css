@@ -1,0 +1,104 @@
+@layer game {
+  .minesweeper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+    inline-size: 100%;
+  }
+
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    inline-size: min(100%, 420px);
+  }
+
+  .counter {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-1) var(--sp-3);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-hair) solid var(--c-border);
+    border-radius: var(--r-full);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+  }
+
+  .hintText {
+    color: var(--c-text-subtle);
+    font-size: var(--fs-xs);
+  }
+
+  /*
+   * A resolved cell recedes: flat, grey, hairline border. Only Minesweeper has
+   * a "done" half of the board, so this lives in @layer game rather than in the
+   * shared Cell — docs/STYLING.md §7, mechanism 3.
+   */
+
+  /*
+   * A cell that ended up holding a NUMBER keeps the app's chunky edge: it is
+   * still something the player reads, and still chordable.
+   */
+
+  /*
+   * A gutter of board between the lids. In the light theme the solid black
+   * shadow is what carves one tile from the next; in the dark it draws nothing,
+   * so the gap has to do that work or the covered half becomes one grey slab.
+   */
+  .minesweeper [data-state='filled'] {
+    background-color: var(--c-cell-done);
+    border-color: var(--c-border-strong);
+    box-shadow: var(--sh-sm);
+  }
+
+  /*
+   * A cleared cell with nothing in it is finished furniture. It keeps the grid
+   * line so the board still reads as a grid, and drops the shadow: dozens of
+   * blank tiles all raised was the loudest thing on screen and the least
+   * informative.
+   */
+  .minesweeper [data-state='empty'] {
+    background-color: var(--c-cell-done);
+    border-color: var(--c-border);
+    box-shadow: var(--sh-none);
+  }
+
+  /*
+   * The classic colour per neighbour count. It is not decoration: at a glance
+   * the number's colour is what lets you read a whole region without counting
+   * digits one by one.
+   */
+  .count {
+    font-weight: var(--fw-black);
+  }
+
+  .count[style*='--count: 1'] {
+    color: var(--c-info);
+  }
+
+  .count[style*='--count: 2'] {
+    color: var(--c-success);
+  }
+
+  .count[style*='--count: 3'] {
+    color: var(--c-danger);
+  }
+
+  .count[style*='--count: 4'] {
+    color: var(--c-accent);
+  }
+
+  .count[style*='--count: 5'] {
+    color: var(--c-gold);
+  }
+
+  .count[style*='--count: 6'],
+  .count[style*='--count: 7'],
+  .count[style*='--count: 8'] {
+    color: var(--c-text-muted);
+  }
+}

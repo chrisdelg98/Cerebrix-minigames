@@ -1,0 +1,42 @@
+@layer game {
+  .queens {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    inline-size: 100%;
+    max-inline-size: 100%;
+
+    /* Esquinas rectas: las regiones son formas, y una forma con las esquinas
+       comidas deja de leerse como una sola pieza. */
+    --cell-radius: 0;
+
+    /* El borde de región baja de 3px a 2: con nueve columnas en un celular, la
+       línea gruesa del Sudoku pesa más que la casilla que separa. */
+    --bw-thick: 2px;
+  }
+
+  /* No ocupa lugar: existe solo para heredarle el color de región a la celda. */
+  .region {
+    display: contents;
+  }
+
+  .mark {
+    color: var(--c-text-subtle);
+    font-weight: var(--fw-bold);
+  }
+
+  /* La corona se lee sobre cualquiera de los tintes. */
+  .queens [data-state='filled'] {
+    color: var(--c-text);
+  }
+
+  /* Proporción de la casilla, sea la casilla del tamaño que sea. */
+  .queens svg {
+    inline-size: var(--crown, 70%);
+    block-size: var(--crown, 70%);
+  }
+
+  .queens .mark {
+    font-size: clamp(0.7rem, calc(var(--cell-size, 2rem) * 0.5), 2rem);
+  }
+}

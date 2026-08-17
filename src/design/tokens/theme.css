@@ -76,6 +76,23 @@
    */
   --c-backdrop: rgb(255 255 255 / 42%);
 
+  /*
+   * Regiones de Queens: tintes, no colores plenos.
+   *
+   * Encima de cada uno van una corona o una cruz, así que el tinte tiene que
+   * ceder el contraste al símbolo. Nueve matices bien separados en el círculo
+   * cromático, para que dos regiones vecinas nunca se confundan.
+   */
+  --c-region-1: color-mix(in oklab, var(--raw-teal-500) 26%, transparent);
+  --c-region-2: color-mix(in oklab, var(--raw-amber-500) 30%, transparent);
+  --c-region-3: color-mix(in oklab, var(--raw-indigo-500) 22%, transparent);
+  --c-region-4: color-mix(in oklab, var(--raw-red-500) 22%, transparent);
+  --c-region-5: color-mix(in oklab, var(--raw-green-500) 26%, transparent);
+  --c-region-6: color-mix(in oklab, var(--raw-violet-500) 24%, transparent);
+  --c-region-7: color-mix(in oklab, var(--raw-orange-500) 26%, transparent);
+  --c-region-8: color-mix(in oklab, var(--raw-sky-500) 26%, transparent);
+  --c-region-9: color-mix(in oklab, var(--raw-pink-500) 24%, transparent);
+
   --c-shadow: var(--raw-slate-900);
 
   color-scheme: light;
@@ -166,6 +183,17 @@
 
   /* Inverted, like every other ink on a dark surface. */
   --c-backdrop: rgb(9 9 11 / 46%);
+
+  /* Sobre superficie oscura hace falta algo más de tinte para que se lea. */
+  --c-region-1: color-mix(in oklab, var(--raw-teal-500) 34%, transparent);
+  --c-region-2: color-mix(in oklab, var(--raw-amber-500) 36%, transparent);
+  --c-region-3: color-mix(in oklab, var(--raw-indigo-500) 30%, transparent);
+  --c-region-4: color-mix(in oklab, var(--raw-red-500) 30%, transparent);
+  --c-region-5: color-mix(in oklab, var(--raw-green-500) 34%, transparent);
+  --c-region-6: color-mix(in oklab, var(--raw-violet-500) 32%, transparent);
+  --c-region-7: color-mix(in oklab, var(--raw-orange-500) 34%, transparent);
+  --c-region-8: color-mix(in oklab, var(--raw-sky-500) 34%, transparent);
+  --c-region-9: color-mix(in oklab, var(--raw-pink-500) 32%, transparent);
 
   --c-cell-ink: var(--raw-slate-50);
   --c-cell-ink-hover: var(--raw-slate-300);

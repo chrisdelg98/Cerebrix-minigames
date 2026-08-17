@@ -44,6 +44,13 @@
   --raw-indigo-500: #6366f1;
   --raw-indigo-600: #4f46e5;
 
+  /* Cuatro familias más, solo para las regiones de Queens: nueve regiones
+     necesitan nueve matices que se distingan entre sí de un vistazo. */
+  --raw-violet-500: #a855f7;
+  --raw-orange-500: #fb7d3c;
+  --raw-sky-500: #38a8f0;
+  --raw-pink-500: #ec5f9e;
+
   --raw-white: #fff;
   --raw-black: #000;
 }

@@ -1,0 +1,46 @@
+@layer game {
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(var(--n), 1.5rem);
+    gap: 1px;
+  }
+
+  .cell {
+    display: grid;
+    place-items: center;
+    block-size: 1.5rem;
+    background-color: var(--c-cell);
+    border: var(--bw-hair) solid var(--c-border-strong);
+    color: var(--c-text);
+  }
+
+  .cell svg {
+    inline-size: 72%;
+    block-size: 72%;
+  }
+
+  .verdict {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-black);
+  }
+
+  .verdict[data-verdict='ok'] {
+    color: var(--c-success);
+  }
+
+  .verdict[data-verdict='no'] {
+    color: var(--c-danger);
+  }
+}

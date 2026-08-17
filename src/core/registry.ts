@@ -8,6 +8,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
+import { QueensIcon } from '@games/queens/sprites/QueensIcons';
 import { TangoIcon } from '@games/tango/sprites/TangoIcons';
 import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
 
@@ -77,6 +78,19 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: TangoIcon,
     load: () => import('@games/tango'),
+  },
+  {
+    id: 'queens',
+    preview: {
+      id: 'queens',
+      name: 'Queens',
+      tagline: 'Una corona por fila, por columna y por región.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      estimatedMinutes: [2, 12],
+    },
+    icon: QueensIcon,
+    load: () => import('@games/queens'),
   },
   {
     id: '_dummy',

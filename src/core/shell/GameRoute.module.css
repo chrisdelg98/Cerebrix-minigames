@@ -182,7 +182,15 @@
     gap: var(--sp-4);
   }
 
-  @media (width < 380px) {
+  /*
+   * En un celular van uno debajo del otro.
+   *
+   * El corte estaba en 380px, así que en cualquier teléfono los dos ejemplos
+   * compartían el ancho del modal y cada tablerito quedaba del tamaño de una
+   * uña — que es justo lo contrario de para qué está dibujado. Dos filas cuestan
+   * scroll; dos columnas cuestan poder verlo.
+   */
+  @media (width < 560px) {
     .examplesGrid {
       grid-template-columns: minmax(0, 1fr);
     }

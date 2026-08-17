@@ -19,10 +19,12 @@
   }
 
   .modal::backdrop {
-    background-color: rgb(0 0 0 / 55%);
+    backdrop-filter: blur(6px);
+    background-color: var(--c-backdrop);
   }
 
   .panel {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
@@ -43,6 +45,32 @@
 
   .panel[data-centered='true'] .actions {
     justify-content: center;
+  }
+
+  /* Discreto pero alcanzable: cerrar tiene que ser posible sin renunciar a
+     volver a mirar el tablero, y el clic afuera ya no cierra. */
+  .close {
+    position: absolute;
+    inset-block-start: var(--sp-3);
+    inset-inline-end: var(--sp-3);
+    display: grid;
+    place-items: center;
+    inline-size: var(--sp-6);
+    block-size: var(--sp-6);
+    border-radius: var(--r-full);
+    color: var(--c-text-subtle);
+    font-size: var(--fs-lg);
+    line-height: 1;
+    transition-property: background-color, color;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .close:hover {
+      background-color: var(--c-cell-hover);
+      color: var(--c-text);
+    }
   }
 
   .body {

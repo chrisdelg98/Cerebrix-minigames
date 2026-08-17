@@ -67,6 +67,15 @@
   --c-cell-hint: var(--c-info-soft);
   --c-board-line: var(--raw-slate-500);
 
+  /*
+   * El velo del modal: claro y translúcido, no un telón negro.
+   *
+   * Se apoya en el desenfoque para separar el modal de lo que hay atrás, en vez
+   * de en la oscuridad. Un telón opaco apaga todo lo que pasa detrás — y en la
+   * pantalla de victoria detrás pasa el confeti.
+   */
+  --c-backdrop: rgb(255 255 255 / 42%);
+
   --c-shadow: var(--raw-slate-900);
 
   color-scheme: light;
@@ -156,6 +165,8 @@
   --c-cell-peer: color-mix(in oklab, var(--raw-teal-400) 10%, transparent);
 
   /* Inverted, like every other ink on a dark surface. */
+  --c-backdrop: rgb(9 9 11 / 46%);
+
   --c-cell-ink: var(--raw-slate-50);
   --c-cell-ink-hover: var(--raw-slate-300);
 

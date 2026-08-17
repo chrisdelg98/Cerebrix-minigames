@@ -1,11 +1,24 @@
 @layer components {
-  /* Above the board, below the modal, and never in the way of a tap. */
+  /*
+   * Va en la capa superior, arriba del modal de victoria.
+   *
+   * Un z-index no alcanza: el modal es un <dialog> nativo y vive en el top
+   * layer, que está por encima de cualquier z-index del documento. La única
+   * forma de pasarlo es entrar al mismo top layer, y para eso está `popover`.
+   * Los estilos de aquí abajo deshacen los que el navegador le pone solo a un
+   * popover — borde, fondo y márgenes centrados.
+   */
   .confetti {
     position: fixed;
     inset: 0;
     z-index: 40;
     inline-size: 100%;
     block-size: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    overflow: clip;
     pointer-events: none;
   }
 }

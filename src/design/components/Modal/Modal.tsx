@@ -15,6 +15,14 @@ export interface ModalProps {
    * un "¡Ganaste!".
    */
   centered?: boolean;
+  /**
+   * Si un clic afuera cierra. Por defecto sí.
+   *
+   * La pantalla de victoria lo apaga: un clic distraído en cualquier parte
+   * borraba el resultado antes de poder leerlo, y ganar merece durar lo que el
+   * jugador quiera. La cruz y Esc siguen estando.
+   */
+  dismissOnBackdrop?: boolean;
 }
 
 /**
@@ -23,7 +31,15 @@ export interface ModalProps {
  * gets at least one of those wrong.
  * Reference: docs/DESIGN_SYSTEM.md §9.
  */
-export function Modal({ open, onClose, title, children, actions, centered }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  actions,
+  centered,
+  dismissOnBackdrop = true,
+}: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -57,10 +73,13 @@ export function Modal({ open, onClose, title, children, actions, centered }: Mod
       // The backdrop is part of the dialog box, so a click landing on the
       // element itself (not on its content) is a click outside.
       onClick={(event) => {
-        if (event.target === ref.current) onClose();
+        if (dismissOnBackdrop && event.target === ref.current) onClose();
       }}
     >
       <div className={s.panel} data-centered={centered === true}>
+        <button type="button" className={s.close} aria-label="Cerrar ventana" onClick={onClose}>
+          ✕
+        </button>
         <h2 id="modal-title" className={s.title}>
           {title}
         </h2>

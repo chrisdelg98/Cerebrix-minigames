@@ -151,7 +151,14 @@ export function Confetti({ active, pieces = 180 }: ConfettiProps) {
        * velocidad se despeja. Estaba puesta a mano y daba 84 px por milisegundo:
        * las chispas se iban de la pantalla en el primer fotograma.
        */
-      const reach = (Math.min(width, height) * 0.24) / 500;
+      /*
+       * En vertical el lado corto ES el ancho, así que la misma proporción da
+       * una nube mucho más chica en el celular que en escritorio: 24% de 390
+       * son 94 px, contra 192 en una pantalla de 800 de alto. La parte sube en
+       * pantalla angosta para que el estallido ocupe lo mismo a la vista.
+       */
+      const share = width < 700 ? 0.42 : 0.24;
+      const reach = (Math.min(width, height) * share) / 500;
 
       for (let i = 0; i < SPARKS_PER_BURST; i += 1) {
         /*
@@ -174,7 +181,7 @@ export function Confetti({ active, pieces = 180 }: ConfettiProps) {
           // Cada chispa se apaga cuando le toca: si todas duran lo mismo, el
           // estallido desaparece de golpe y ahí es donde se siente forzado.
           life: SPARK_LIFE_MS * (0.55 + Math.random() * 0.65),
-          radius: 1.6 + Math.random() * 1.6,
+          radius: (width < 700 ? 1.9 : 1.6) + Math.random() * 1.6,
           color: spec.color,
         });
       }
@@ -183,8 +190,20 @@ export function Confetti({ active, pieces = 180 }: ConfettiProps) {
     let frame = 0;
     let previous = performance.now();
     const startedAt = previous;
+    let promoted = false;
 
     const draw = (now: number) => {
+      /*
+       * En el primer fotograma, no en el efecto: dentro del top layer manda el
+       * orden en que entró cada uno, y el <dialog> de victoria se abre en su
+       * propio efecto. Promoviendo acá el confeti siempre entra último, que es
+       * lo mismo que decir "más arriba".
+       */
+      if (!promoted) {
+        promoted = true;
+        canvas.showPopover?.();
+      }
+
       const delta = Math.min(now - previous, 32);
       previous = now;
       const elapsed = now - startedAt;
@@ -264,5 +283,5 @@ export function Confetti({ active, pieces = 180 }: ConfettiProps) {
 
   if (!active) return null;
 
-  return <canvas ref={canvasRef} className={s.confetti} aria-hidden="true" />;
+  return <canvas ref={canvasRef} className={s.confetti} popover="manual" aria-hidden="true" />;
 }

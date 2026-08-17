@@ -356,6 +356,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
         }}
         title={won ? '¡Ganaste!' : 'Se terminó'}
         centered={won}
+        dismissOnBackdrop={false}
         actions={
           <>
             <Button

@@ -133,7 +133,11 @@ export function History() {
 
                 <span className={s.tags}>
                   <Badge tone={result.outcome === 'won' ? 'success' : 'danger'}>
-                    {result.outcome === 'won' ? 'Completado' : 'Sin terminar'}
+                    {/* «Sin terminar» decía otra cosa: que la dejaste a medias.
+                        Un registro solo se escribe cuando el motor declaró un
+                        final, así que esto es una derrota, no un abandono —
+                        una partida abandonada no llega nunca hasta acá. */}
+                    {result.outcome === 'won' ? 'Completado' : 'Perdida'}
                   </Badge>
                   <Badge tone="accent">
                     {DIFFICULTY_LABELS[result.difficulty as Difficulty] ?? '—'}

@@ -8,6 +8,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
+import { TangoIcon } from '@games/tango/sprites/TangoIcons';
 import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
 
 /**
@@ -63,6 +64,19 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: NonogramIcon,
     load: () => import('@games/nonogram'),
+  },
+  {
+    id: 'tango',
+    preview: {
+      id: 'tango',
+      name: 'Tango',
+      tagline: 'Soles y lunas, tres de cada uno en cada línea.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      estimatedMinutes: [2, 10],
+    },
+    icon: TangoIcon,
+    load: () => import('@games/tango'),
   },
   {
     id: '_dummy',

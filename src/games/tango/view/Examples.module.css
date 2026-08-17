@@ -1,0 +1,69 @@
+@layer game {
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+  }
+
+  .cells {
+    display: flex;
+    gap: 2px;
+  }
+
+  .cell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    background-color: var(--c-cell);
+    border: var(--bw-hair) solid var(--c-border-strong);
+    border-radius: var(--r-xs);
+  }
+
+  .cell[data-value='s'] {
+    color: var(--c-gold);
+  }
+
+  .cell[data-value='m'] {
+    color: var(--c-info);
+  }
+
+  .sign {
+    position: absolute;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+    inset-block-start: 50%;
+    inset-inline-end: 0;
+    background-color: var(--c-surface);
+    border: var(--bw-hair) solid var(--c-border-strong);
+    border-radius: var(--r-full);
+    color: var(--c-text);
+    font-size: var(--fs-2xs);
+    font-weight: var(--fw-black);
+    line-height: 1;
+    translate: 60% -50%;
+  }
+
+  .verdict {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-black);
+  }
+
+  .verdict[data-verdict='ok'] {
+    color: var(--c-success);
+  }
+
+  .verdict[data-verdict='no'] {
+    color: var(--c-danger);
+  }
+}

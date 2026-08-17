@@ -1,0 +1,61 @@
+@layer game {
+  .tango {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  /* Two colours, not two shapes only: the sun is warm and solid, the moon cool
+     and hollowed out, so they stay apart at a glance and in greyscale too. */
+  .symbol {
+    display: grid;
+    place-items: center;
+  }
+
+  .symbol[data-value='1'] {
+    color: var(--c-gold);
+  }
+
+  .symbol[data-value='2'] {
+    color: var(--c-info);
+  }
+
+  /*
+   * The sign sits on the seam between two cells: half of it over each.
+   *
+   * Parked on the cell's own border rather than in a layer above the board, so
+   * it follows the cell wherever the responsive sizing puts it. The disc is
+   * opaque and above the grid line, which is what makes it read as belonging to
+   * the gap rather than to either square.
+   */
+  .sign {
+    position: absolute;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    inline-size: 1.05em;
+    block-size: 1.05em;
+    background-color: var(--c-surface);
+    border: var(--bw-hair) solid var(--c-border-strong);
+    border-radius: var(--r-full);
+    color: var(--c-text);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-black);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .sign[data-where='right'] {
+    inset-block-start: 50%;
+    inset-inline-end: 0;
+    translate: 50% -50%;
+  }
+
+  .sign[data-where='below'] {
+    inset-block-end: 0;
+    inset-inline-start: 50%;
+    translate: -50% 50%;
+  }
+}

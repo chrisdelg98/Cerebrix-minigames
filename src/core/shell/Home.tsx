@@ -11,6 +11,7 @@ import { LogoCerebrix } from '@design/sprites/LogoCerebrix';
 import { Streak } from '@design/sprites/Streak';
 import { Trophy } from '@design/sprites/Trophy';
 
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { usePrefetch } from '../hooks/usePrefetch';
 import { useGlobalStats, useSavedSessions } from '../hooks/useStoredData';
 import { REGISTRY, type RegistryEntry } from '../registry';
@@ -48,6 +49,11 @@ function claimIntro(): boolean {
 export function Home({ entries = REGISTRY }: HomeProps) {
   // Lo oculto sigue teniendo ruta y registro; solo no se ofrece acá.
   const visible = entries.filter((entry) => entry.hidden !== true);
+
+  useDocumentMeta(
+    'Cerebrix',
+    'Minijuegos de lógica para entrenar la concentración: Sudoku, Buscaminas, Nonograma, Tango, Queens, Memoria y más. Gratis, sin cuenta, y funcionan sin conexión.'
+  );
   const prefetch = usePrefetch();
   const [intro] = useState(claimIntro);
   const { sessions, refresh: refreshSessions } = useSavedSessions();

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://cerebrix-minigames.chrisdelg98.workers.dev/</loc><priority>1.0</priority></url>
+  <url><loc>https://cerebrix-minigames.chrisdelg98.workers.dev/game/sudoku</loc><priority>0.8</priority></url>
+  <url><loc>https://cerebrix-minigames.chrisdelg98.workers.dev/game/minesweeper</loc><priority>0.8</priority></url>
+  <url><loc>https://cerebrix-minigames.chrisdelg98.workers.dev/game/nonogram</loc><priority>0.8</priority></url>
+  <url><loc>https://cerebrix-minigames.chrisdelg98.workers.dev/game/tango</loc><priority>0.8</priority></url>
+  <url><loc>https://cerebrix-minigames.chrisdelg98.workers.dev/game/queens</loc><priority>0.8</priority></url>
+  <url><loc>https://cerebrix-minigames.chrisdelg98.workers.dev/game/memory</loc><priority>0.8</priority></url>
+</urlset>

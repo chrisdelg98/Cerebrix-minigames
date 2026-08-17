@@ -6,11 +6,64 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0"
     />
-    <meta name="description" content="Minijuegos de concentración: Sudoku, Buscaminas y más." />
+    <title>Cerebrix — Minijuegos de lógica para concentrarse</title>
+    <meta
+      name="description"
+      content="Minijuegos de lógica para entrenar la concentración: Sudoku, Buscaminas, Nonograma, Tango, Queens, Memoria y más. Gratis, sin cuenta, y funcionan sin conexión."
+    />
+    <!--
+      Dominio provisorio de Cloudflare. Cuando haya uno propio hay que cambiarlo
+      acá, en robots.txt y en sitemap.xml: una URL canónica que apunta al host
+      viejo le dice al buscador que la versión buena es la que ya no existe.
+    -->
+    <link rel="canonical" href="https://cerebrix-minigames.chrisdelg98.workers.dev/" />
     <meta name="theme-color" content="#0d9488" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>Cerebrix</title>
+
+    <!--
+      Los juegos se nombran como ejemplos y con un "y más", nunca contados ni
+      en lista cerrada: un número acá caduca con el próximo juego, y una
+      descripción vieja en el <head> es de las que nadie vuelve a mirar.
+
+      Open Graph y Twitter: sin esto, un enlace compartido en WhatsApp o en un
+      chat se ve como una URL pelada. Es la primera impresión del proyecto en
+      todos lados menos en el navegador.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Cerebrix" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:url" content="https://cerebrix-minigames.chrisdelg98.workers.dev/" />
+    <meta property="og:title" content="Cerebrix — Minijuegos de lógica para concentrarse" />
+    <meta
+      property="og:description"
+      content="Sudoku, Buscaminas, Nonograma, Tango, Queens, Memoria y más. Gratis, sin cuenta, y funcionan sin conexión."
+    />
+    <meta property="og:image" content="https://cerebrix-minigames.chrisdelg98.workers.dev/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!--
+      Datos estructurados. Le dicen a un buscador QUÉ es esto — una aplicación
+      de juegos, gratis, que corre en el navegador — en vez de dejarlo deducirlo
+      de un HTML que llega casi vacío porque la app se dibuja con JavaScript.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Cerebrix",
+        "url": "https://cerebrix-minigames.chrisdelg98.workers.dev/",
+        "description": "Minijuegos de lógica para entrenar la concentración: Sudoku, Buscaminas, Nonograma, Tango, Queens, Memoria y más.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requiere JavaScript",
+        "inLanguage": "es",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
 
     <!--
       Anti-FOUC: the theme must be on <html> before the first paint, otherwise

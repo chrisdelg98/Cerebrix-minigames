@@ -20,6 +20,7 @@ import { Trophy } from '@design/sprites/Trophy';
 
 import { type Difficulty } from '../contract';
 import { DIFFICULTY_LABELS, defaultDifficultyFor, difficultyOptions } from '../difficulty';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useGameSession } from '../hooks/useGameSession';
 import { findEntry, type RegistryEntry } from '../registry';
 import { AppShell } from './AppShell';
@@ -45,6 +46,11 @@ export function GameRoute() {
 
 function GameSession({ entry }: { entry: RegistryEntry }) {
   const session = useGameSession(entry.load, defaultDifficultyFor(entry.preview.difficulties));
+
+  useDocumentMeta(
+    entry.preview.name,
+    `${entry.preview.tagline} Jugá gratis en el navegador, sin cuenta y sin conexión.`
+  );
   const navigate = useNavigate();
   const toast = useToast();
 

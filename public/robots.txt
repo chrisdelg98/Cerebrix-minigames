@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cerebrix-minigames.chrisdelg98.workers.dev/sitemap.xml

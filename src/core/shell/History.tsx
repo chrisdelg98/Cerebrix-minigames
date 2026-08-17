@@ -10,6 +10,8 @@ import { ArrowLeftIcon } from '@design/sprites/SettingsIcons';
 import { Trophy } from '@design/sprites/Trophy';
 import { computeStats, type GameResult } from '@storage/index';
 
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
+
 import { type Difficulty } from '../contract';
 import { DIFFICULTY_LABELS, DIFFICULTIES } from '../difficulty';
 import { findEntry, REGISTRY } from '../registry';
@@ -23,6 +25,8 @@ const PAGE = 20;
 const ALL = '__all__';
 
 export function History() {
+  useDocumentMeta('Mi historial', 'Tus partidas, tus mejores tiempos y tu racha en Cerebrix.');
+
   const storage = useStorage();
   const [results, setResults] = useState<GameResult[] | null>(null);
   const [game, setGame] = useState<string>(ALL);

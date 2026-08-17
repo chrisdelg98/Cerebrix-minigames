@@ -1,0 +1,25 @@
+@layer game {
+  .card {
+    display: contents;
+  }
+
+  /* La figura ocupa la carta y toma el tinte que le tocó. La silueta es la que
+     distingue; el color solo ayuda a recordar. */
+  .card svg {
+    inline-size: 62%;
+    block-size: 62%;
+    color: var(--c-text);
+  }
+
+  .card [data-state='filled'] {
+    --cell-bg: var(--shape);
+  }
+
+  /* El par encontrado se apaga: ya no hay nada que decidir sobre él, y dejarlo
+     tan vivo como el resto hace que el tablero parezca no avanzar. */
+  .card [data-state='fixed'] {
+    --cell-bg: var(--shape);
+
+    opacity: 0.55;
+  }
+}

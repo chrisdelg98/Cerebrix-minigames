@@ -230,22 +230,26 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
       <Button aria-label="Nueva partida" icon={<PlusIcon />} onClick={session.restart}>
         Nueva partida
       </Button>
-      <Button
-        aria-label="Deshacer"
-        icon={<UndoIcon />}
-        onClick={session.undo}
-        disabled={!session.canUndo}
-      >
-        Deshacer
-      </Button>
-      <Button
-        aria-label="Rehacer"
-        icon={<RedoIcon />}
-        onClick={session.redo}
-        disabled={!session.canRedo}
-      >
-        Rehacer
-      </Button>
+      {session.module.meta.supportsUndo !== false && (
+        <>
+          <Button
+            aria-label="Deshacer"
+            icon={<UndoIcon />}
+            onClick={session.undo}
+            disabled={!session.canUndo}
+          >
+            Deshacer
+          </Button>
+          <Button
+            aria-label="Rehacer"
+            icon={<RedoIcon />}
+            onClick={session.redo}
+            disabled={!session.canRedo}
+          >
+            Rehacer
+          </Button>
+        </>
+      )}
       {session.canHint && (
         <Button aria-label="Pista" icon={<HintIcon />} onClick={session.requestHint}>
           Pista

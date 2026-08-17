@@ -56,6 +56,16 @@ export interface GameMeta {
    * easier to recognise than to read should draw it here.
    */
   examples?: GameExample[];
+  /**
+   * Si el shell ofrece deshacer y rehacer. Por defecto sí.
+   *
+   * Existe por Memoria: deshacer devolvería la carta a su lugar pero no te
+   * haría olvidar lo que viste, así que sería un botón para hacer trampa. El
+   * juego no puede apagarlo por su cuenta — deshacer es del shell — y parchear
+   * el shell para que conozca a Memoria sería exactamente lo que el contrato
+   * existe para evitar. Así que lo declara la metadata, como todo lo demás.
+   */
+  supportsUndo?: boolean;
   /** Shape version of TState. Bump it whenever the saved shape changes. */
   stateVersion: number;
 }

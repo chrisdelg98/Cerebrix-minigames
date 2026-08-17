@@ -8,6 +8,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
+import { MemoryIcon } from '@games/memory/sprites/MemoryIcons';
 import { QueensIcon } from '@games/queens/sprites/QueensIcons';
 import { TangoIcon } from '@games/tango/sprites/TangoIcons';
 import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
@@ -91,6 +92,19 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: QueensIcon,
     load: () => import('@games/queens'),
+  },
+  {
+    id: 'memory',
+    preview: {
+      id: 'memory',
+      name: 'Memoria',
+      tagline: 'Cada figura está dos veces. Encontrá los pares.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['memoria'],
+      estimatedMinutes: [1, 6],
+    },
+    icon: MemoryIcon,
+    load: () => import('@games/memory'),
   },
   {
     id: '_dummy',

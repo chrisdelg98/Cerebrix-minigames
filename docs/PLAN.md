@@ -468,11 +468,16 @@ así que los bordes de región salen de preguntar si el vecino es de otra regió
 reinas que no se toquen ni en diagonal, hacer crecer N regiones desde ellas, y
 verificar que la solución sea única.
 
-**Memoria.** Barato, pero fuerza una decisión: **deshacer te deja des-ver una
-carta**, y no se puede des-saber. Deshacer es del shell y `GameMeta` no tiene
-cómo apagarlo, así que hace falta un `supportsUndo?: boolean` — un hueco del
-contrato, no del juego. Lo otro, que el par no acertado se dé vuelta solo, se
-resuelve sin tocar nada: la vista despacha el movimiento con un `setTimeout`.
+**Memoria.** Hecho, y las dos decisiones que anticipaba salieron como estaban
+previstas. `GameMeta` ganó `supportsUndo`: deshacer devolvería la carta pero no
+te haría olvidar lo que viste. Y el par que no coincide se tapa solo con un
+`setTimeout` en la vista, que despacha un movimiento común — el motor sigue sin
+saber que existe el tiempo.
+
+**El estado guarda qué cartas vio el jugador.** Es lo que permite que la pista
+sea honesta: un juego de memoria tiene una pista tramposa («el par está allá»,
+con información que el jugador no tiene) y una honesta, que es recordarle algo
+que ya pasó por sus ojos. Sin registrar lo visto, solo se podía hacer trampa.
 
 **Zip y Flow.** Desde el punto de vista de lo que hay que construir son el mismo
 juego: arrastrar el dedo y dibujar un camino grueso por el centro de las

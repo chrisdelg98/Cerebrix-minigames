@@ -1,0 +1,41 @@
+@layer game {
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--sp-1);
+    align-items: center;
+  }
+
+  .card {
+    display: grid;
+    place-items: center;
+    inline-size: 1.6rem;
+    block-size: 1.6rem;
+    background-color: var(--c-cell);
+    border: var(--bw-hair) solid var(--c-border-strong);
+    border-radius: var(--r-xs);
+    color: var(--c-text);
+  }
+
+  .card[data-face='down'] {
+    background-color: var(--c-cell-covered);
+    border-color: var(--c-border-strong);
+    box-shadow: var(--sh-sm);
+  }
+
+  .card svg {
+    inline-size: 66%;
+    block-size: 66%;
+  }
+
+  .note {
+    margin-inline-start: var(--sp-1);
+    color: var(--c-text-muted);
+    font-size: var(--fs-2xs);
+  }
+}

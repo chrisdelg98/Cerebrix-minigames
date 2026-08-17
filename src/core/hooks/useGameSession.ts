@@ -251,10 +251,19 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     setStartedRound(round);
   }, [round]);
 
-  /** Wall-clock elapsed right now, which is what a save has to record. */
+  /**
+   * Wall-clock elapsed right now, which is what a save has to record.
+   *
+   * Deliberately NOT conditional on `playing`. `elapsedMs` is only ever the
+   * baseline restored from a save; everything since the round began lives in
+   * the running segment. Descartar ese segmento cuando la partida deja de estar
+   * en juego significaba que el registro del resultado — que se escribe justo
+   * en ese instante, con `playing` ya en falso — guardaba el baseline solo, o
+   * sea 00:00 para cualquiera que no hubiera reanudado una partida.
+   */
   const currentElapsed = useCallback(
-    () => elapsedMs + (started && playing ? performance.now() - startedAtRef.current : 0),
-    [elapsedMs, playing, started]
+    () => elapsedMs + (started ? performance.now() - startedAtRef.current : 0),
+    [elapsedMs, started]
   );
 
   useAutosave({

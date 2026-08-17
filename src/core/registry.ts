@@ -25,6 +25,15 @@ export interface RegistryEntry {
   icon: ComponentType<{ size?: number }>;
   /** The whole game, lazily. Never part of the initial bundle. */
   load: () => Promise<{ default: AnyGameModule }>;
+  /**
+   * Se registra pero no se ofrece en Home.
+   *
+   * `_dummy` no es un juego, es la implementación mínima del contrato completo,
+   * y su valor está en que el shell tenga que cargar un módulo que no conoce.
+   * Tiene que seguir teniendo ruta y registro para que los tests lo ejerzan; lo
+   * único que sobra es la tarjeta en la portada.
+   */
+  hidden?: boolean;
 }
 
 export const REGISTRY: readonly RegistryEntry[] = [
@@ -118,6 +127,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: DummyIcon,
     load: () => import('@games/_dummy'),
+    hidden: true,
   },
 ];
 

@@ -30,10 +30,14 @@ describe('the shell runs a game it does not know', () => {
   it('navigates from a Home card into the game', async () => {
     const { user } = renderAt('/');
 
-    await user.click(screen.getByRole('link', { name: /Prueba de contrato/ }));
+    // Cualquier tarjeta real sirve: lo que se prueba es que el shell llegue a
+    // un módulo que no conoce, no cuál. `_dummy` ya no tiene tarjeta — está
+    // registrado como oculto — pero sigue teniendo ruta, y el resto del archivo
+    // lo sigue ejerciendo por ahí.
+    await user.click(screen.getByRole('link', { name: /Memoria/ }));
     await startGame(user);
 
-    expect(await screen.findByRole('group', { name: 'Casillas' })).toBeInTheDocument();
+    expect(await screen.findByRole('grid')).toBeInTheDocument();
   });
 
   it('plays a move, and the shell reflects it in the progress bar', async () => {

@@ -75,7 +75,10 @@ describe('Home', () => {
       </Shell>
     );
 
-    expect(screen.getAllByRole('listitem')).toHaveLength(REGISTRY.length);
+    // `_dummy` está registrado pero oculto: tiene ruta, no tarjeta.
+    expect(screen.getAllByRole('listitem')).toHaveLength(
+      REGISTRY.filter((entry) => entry.hidden !== true).length
+    );
   });
 
   it('shows a newly registered game without any other file changing', () => {

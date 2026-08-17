@@ -164,12 +164,14 @@ describe('Home reflects what is stored', () => {
     const cards = await screen.findAllByRole('listitem');
     expect(within(cards[0]!).queryByText('Continuar')).not.toBeInTheDocument();
 
-    await storage.saveSession('_dummy', {
+    // Un juego con tarjeta: `_dummy` está registrado como oculto y no aparece
+    // en Home, así que su guardado no puede probar nada acá.
+    await storage.saveSession('sudoku', {
       schemaVersion: SCHEMA_VERSION,
-      gameId: '_dummy',
+      gameId: 'sudoku',
       stateVersion: 1,
       difficulty: 3,
-      state: '{"v":1,"tiles":[true,false,false,false,false,false]}',
+      state: '{}',
       elapsedMs: 1_000,
       savedAt: Date.now(),
     });

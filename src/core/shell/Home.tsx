@@ -46,6 +46,8 @@ function claimIntro(): boolean {
  * means adding a registry entry — this file never changes.
  */
 export function Home({ entries = REGISTRY }: HomeProps) {
+  // Lo oculto sigue teniendo ruta y registro; solo no se ofrece acá.
+  const visible = entries.filter((entry) => entry.hidden !== true);
   const prefetch = usePrefetch();
   const [intro] = useState(claimIntro);
   const { sessions, refresh: refreshSessions } = useSavedSessions();
@@ -99,14 +101,14 @@ export function Home({ entries = REGISTRY }: HomeProps) {
         </section>
       )}
 
-      {entries.length === 0 ? (
+      {visible.length === 0 ? (
         <EmptyState
           title="Todavía no hay juegos"
           description="El registro está vacío. Agregá una entrada en src/core/registry.ts."
         />
       ) : (
         <ul className={s.grid}>
-          {entries.map((entry, i) => (
+          {visible.map((entry, i) => (
             <GameCard
               key={entry.id}
               entry={entry}

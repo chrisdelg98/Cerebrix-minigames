@@ -14,7 +14,7 @@ export interface ConfettiProps {
 /* Siete estallidos, el último puede salir a los 2600 ms, y sus chispas duran
    hasta 1560 ms más: la animación tiene que llegar hasta ahí o se corta
    encendida. Los últimos dos alargan la secuencia, no la apuran. */
-const DURATION_MS = 4400;
+const DURATION_MS = 4000;
 
 /**
  * How long the confetti takes to reach the top of its arc, and how high that
@@ -31,7 +31,7 @@ const RISE_SHARE = 0.62;
 
 const BURSTS = 7;
 const SPARKS_PER_BURST = 70;
-const SPARK_LIFE_MS = 1300;
+const SPARK_LIFE_MS = 1500;
 
 interface Piece {
   x: number;

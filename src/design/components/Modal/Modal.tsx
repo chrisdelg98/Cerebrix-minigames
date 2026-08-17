@@ -9,6 +9,12 @@ export interface ModalProps {
   children: ReactNode;
   /** Buttons for the bottom row. */
   actions?: ReactNode;
+  /**
+   * Centra el encabezado. Para los momentos que se celebran y no se leen: el
+   * título alineado a la izquierda es correcto para un formulario y frío para
+   * un "¡Ganaste!".
+   */
+  centered?: boolean;
 }
 
 /**
@@ -17,7 +23,7 @@ export interface ModalProps {
  * gets at least one of those wrong.
  * Reference: docs/DESIGN_SYSTEM.md §9.
  */
-export function Modal({ open, onClose, title, children, actions }: ModalProps) {
+export function Modal({ open, onClose, title, children, actions, centered }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -46,7 +52,7 @@ export function Modal({ open, onClose, title, children, actions }: ModalProps) {
   return (
     <dialog
       ref={ref}
-      className={`${s.modal} ${open ? 'anim-slide-up' : ''}`}
+      className={`${s.modal} ${open ? (centered === true ? 'anim-bounce-in' : 'anim-slide-up') : ''}`}
       aria-labelledby="modal-title"
       // The backdrop is part of the dialog box, so a click landing on the
       // element itself (not on its content) is a click outside.
@@ -54,7 +60,7 @@ export function Modal({ open, onClose, title, children, actions }: ModalProps) {
         if (event.target === ref.current) onClose();
       }}
     >
-      <div className={s.panel}>
+      <div className={s.panel} data-centered={centered === true}>
         <h2 id="modal-title" className={s.title}>
           {title}
         </h2>

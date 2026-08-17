@@ -226,6 +226,20 @@
     align-items: center;
     gap: var(--sp-3);
   }
+
+  .victory {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    align-items: center;
+    padding-block: var(--sp-2);
+  }
+
+  .victoryLine {
+    color: var(--c-text-muted);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+  }
 }
 
 /* On phones the difficulty picker drops to its own line so the timer and the

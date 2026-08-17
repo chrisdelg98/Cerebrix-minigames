@@ -164,10 +164,60 @@
   }
 }
 
+/* Emerge con rebote, pero apenas.
+   Un sobrepaso grande y corto se siente de goma; el mismo gesto con un tercio
+   del recorrido y más tiempo se siente suave. El sobrepaso aterriza en scale(1)
+   y translate(0), así el estado final es correcto aunque no llegue a correr. */
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.965);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.012);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* La copa: entra chica y algo torcida, se pasa apenas y se acomoda. Un premio
+   que aparece del tamaño exacto no se siente como un premio, pero uno que
+   rebota tres veces se siente de juguete. */
+@keyframes trophy-win {
+  0% {
+    transform: scale(0.62) rotate(-8deg);
+  }
+
+  50% {
+    transform: scale(1.09) rotate(4deg);
+  }
+
+  75% {
+    transform: scale(0.985) rotate(-1.5deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
 /* ─────────── Utility classes ─────────── */
 
 .anim-pop-in {
   animation: pop-in var(--d-fast) var(--e-spring) backwards;
+}
+
+.anim-bounce-in {
+  animation: bounce-in 420ms var(--e-out) backwards;
+}
+
+.anim-trophy-win {
+  animation: trophy-win 680ms var(--e-out) backwards;
 }
 
 .anim-slide-up {

@@ -355,6 +355,7 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
           setDismissedRound(session.roundId);
         }}
         title={won ? '¡Ganaste!' : 'Se terminó'}
+        centered={won}
         actions={
           <>
             <Button
@@ -370,12 +371,20 @@ function GameSession({ entry }: { entry: RegistryEntry }) {
           </>
         }
       >
-        <span className={s.outcome}>
-          {won && <Trophy size={32} state="unlocked" />}
-          {won
-            ? `Completado en ${DIFFICULTY_LABELS[session.difficulty]}.`
-            : (session.status.kind === 'lost' && session.status.reason) || 'Probá de nuevo.'}
-        </span>
+        {won ? (
+          <div className={s.victory}>
+            {/* Grande y arriba del texto: el trofeo es el premio, no una viñeta
+                al costado de una frase. La animación es la que ya trae. */}
+            <Trophy size={96} state="unlocked" />
+            <span className={s.victoryLine}>
+              Completado en {DIFFICULTY_LABELS[session.difficulty]}
+            </span>
+          </div>
+        ) : (
+          <span className={s.outcome}>
+            {(session.status.kind === 'lost' && session.status.reason) || 'Probá de nuevo.'}
+          </span>
+        )}
       </Modal>
     </AppShell>
   );

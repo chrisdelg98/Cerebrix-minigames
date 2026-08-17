@@ -8,7 +8,10 @@ export interface TrophyProps {
 
 export function Trophy({ size = 24, state = 'idle' }: TrophyProps) {
   return (
-    <span className={`${s.wrap} ${state === 'unlocked' ? 'anim-pop-in' : ''}`} data-state={state}>
+    <span
+      className={`${s.wrap} ${state === 'unlocked' ? 'anim-trophy-win' : ''}`}
+      data-state={state}
+    >
       <svg
         width={size}
         height={size}

@@ -33,6 +33,18 @@
     font-size: var(--fs-xl);
   }
 
+  .panel[data-centered='true'] {
+    text-align: center;
+  }
+
+  .panel[data-centered='true'] .title {
+    font-size: var(--fs-2xl);
+  }
+
+  .panel[data-centered='true'] .actions {
+    justify-content: center;
+  }
+
   .body {
     color: var(--c-text);
     font-size: var(--fs-md);

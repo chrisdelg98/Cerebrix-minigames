@@ -25,7 +25,8 @@
 
   /* Wins over any colour or animation the sprite sets for itself: as a backdrop
      it is one flat tint, and a pulsing one would pull the eye off the number. */
-  .icon svg {
+  .icon,
+  .icon * {
     color: var(--c-accent);
     animation: none;
   }

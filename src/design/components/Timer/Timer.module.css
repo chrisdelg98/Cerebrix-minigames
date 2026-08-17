@@ -6,8 +6,23 @@
 
     /* Wide enough for mm:ss so the header does not reflow on the first tick. */
     min-inline-size: 5ch;
-    color: var(--c-text-muted);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
+
+    /*
+     * Contraste pleno, no gris apagado.
+     *
+     * El reloj es el dato que el jugador mira de reojo mientras juega, y en el
+     * gris de "esto se puede saltear" no se leía. En el móvil además crece: el
+     * encabezado ahí tiene menos cosas compitiendo, y es donde peor se veía.
+     */
+    color: var(--c-text);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-black);
+    letter-spacing: var(--ls-tight);
+  }
+
+  @media (width < 480px) {
+    .timer {
+      font-size: var(--fs-lg);
+    }
   }
 }

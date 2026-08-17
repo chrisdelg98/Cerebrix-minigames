@@ -2,16 +2,21 @@ interface SpriteProps {
   size?: number;
 }
 
-/** The card icon: the two symbols, side by side, which is the whole game. */
+/**
+ * The card icon: sun up in one corner, moon down in the other.
+ *
+ * Grandes y casi tocándose en la diagonal: separados de más el icono se veía
+ * vacío al lado de los otros, y superpuestos eran una mancha. Que los dos
+ * símbolos nunca se confundan es de lo que trata el juego, así que se tocan sin
+ * pisarse.
+ */
 export function TangoIcon({ size = 24 }: SpriteProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="8" cy="8" r="4.2" fill="currentColor" />
-      <path
-        d="M20 15.6a5 5 0 0 1-6.8-6.8 5.6 5.6 0 1 0 6.8 6.8z"
-        fill="currentColor"
-        opacity="0.55"
-      />
+      <circle cx="7.6" cy="7.6" r="5.3" fill="currentColor" />
+      <g transform="translate(7.4 7.4) scale(0.73)" opacity="0.7">
+        <path d="M20.5 15.2A8.6 8.6 0 0 1 9.3 4a8.6 8.6 0 1 0 11.2 11.2z" fill="currentColor" />
+      </g>
     </svg>
   );
 }

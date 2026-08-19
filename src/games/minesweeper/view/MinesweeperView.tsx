@@ -85,9 +85,24 @@ export function MinesweeperView({
               }}
               onContextMenu={(event) => {
                 event.preventDefault();
+                /*
+                 * Si la pulsación larga ya puso la bandera, esto no hace nada.
+                 *
+                 * Un teléfono dispara su propio `contextmenu` al mantener
+                 * apretado, unas décimas después de nuestros 400 ms. Como
+                 * `flag` alterna, la segunda llamada sacaba la bandera que
+                 * acababa de aparecer: quien soltaba rápido la conservaba y
+                 * quien mantenía —que es lo natural— la perdía.
+                 */
+                if (flagged.current) return;
                 play({ kind: 'flag', index });
               }}
-              onPointerDown={() => {
+              onPointerDown={(event) => {
+                // Solo el botón principal y el dedo. Con el botón derecho el
+                // temporizador arrancaba igual y a los 400 ms sacaba la bandera
+                // que el propio clic derecho había puesto.
+                if (event.button !== 0) return;
+
                 flagged.current = false;
                 longPress.current = setTimeout(() => {
                   flagged.current = true;

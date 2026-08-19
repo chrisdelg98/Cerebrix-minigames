@@ -111,7 +111,36 @@ export const Cell = memo(function Cell({
       disabled={disabled}
       onClick={onActivate}
       onContextMenu={onContextMenu}
-      onPointerDown={onPointerDown}
+      onPointerDown={(event) => {
+        /*
+         * Un toque captura el puntero en el elemento donde empezó, así que sin
+         * soltarlo el arrastre sigue reportando esa misma casilla y `onPointerEnter`
+         * no llega nunca a las de al lado: pintar una hilera o trazar un camino
+         * en un teléfono se vuelve imposible.
+         *
+         * Lo hacía cada tablero por su cuenta, y los dos que lo hacían lo
+         * soltaban desde `currentTarget` — el botón —, que es justamente el que
+         * NO la tiene cuando el dedo cae sobre el dibujo de la casilla. Vive
+         * acá, que es donde está el botón, y se suelta desde el elemento que la
+         * tiene de verdad.
+         *
+         * Solo para tableros que se dibujan arrastrando: si nadie escucha
+         * `onPointerEnter`, la captura no molesta a nadie y soltarla sería
+         * cambiarle el comportamiento a un tablero que no lo pidió.
+         */
+        if (onPointerEnter) {
+          const holder = event.target;
+          // La captura del puntero no está en todos lados, y una excepción acá
+          // adentro se lleva puesto el tablero entero: soltarla es un arreglo,
+          // no la jugada.
+          if (holder instanceof Element && typeof holder.hasPointerCapture === 'function') {
+            if (holder.hasPointerCapture(event.pointerId)) {
+              holder.releasePointerCapture(event.pointerId);
+            }
+          }
+        }
+        onPointerDown?.(event);
+      }}
       onPointerEnter={onPointerEnter}
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerLeave}

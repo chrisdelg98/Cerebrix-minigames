@@ -3,6 +3,22 @@
    * Public knobs a board may set on an ancestor (docs/STYLING.md §7):
    *   --cell-bg · --cell-radius · --cell-size
    */
+
+  /*
+   * Lo que va adentro de una casilla es DIBUJO, y no recibe el puntero.
+   *
+   * El botón es lo interactivo; el dígito, la cruz, el trazo o el disco con el
+   * número son lo que la casilla muestra. Si además fueran blanco de toque, un
+   * toque sobre el dibujo apuntaría al dibujo: la captura implícita del puntero
+   * queda en él y no en el botón, y el arrastre se traba en la casilla donde
+   * empezó. Es lo que pasaba en Trazo — el disco tapa el 62% de la casilla, así
+   * que empezar el trazo desde el número no funcionaba nunca — y lo mismo en
+   * Nonograma al arrastrar desde una casilla ya marcada con ✕.
+   */
+  .cell > * {
+    pointer-events: none;
+  }
+
   .cell {
     position: relative;
     display: grid;

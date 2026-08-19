@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type PointerEvent, type ReactNode } from 'react';
+import { useCallback, useRef, useState, type ReactNode } from 'react';
 
 import { type GameViewProps } from '@core/contract';
 import { Cell, type BlockEdge, type CellState } from '@design/components/Cell';
@@ -61,16 +61,8 @@ export function NonogramView({
   }, []);
 
   const begin = useCallback(
-    (index: number, wanted: Mode, event: PointerEvent) => {
+    (index: number, wanted: Mode) => {
       if (!interactive) return;
-
-      /*
-       * A touch implicitly captures the pointer on the element it started on,
-       * so without this every drag would keep reporting that same cell and
-       * painting a run would be impossible on a phone.
-       */
-      const target = event.currentTarget;
-      if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId);
 
       // Pressing on a square that already holds the mark erases instead, and
       // the whole stroke follows that decision — same as every picross.
@@ -194,8 +186,8 @@ export function NonogramView({
               mark: (marks[index] ?? UNKNOWN) === other ? UNKNOWN : other,
             });
           }}
-          onPointerDown={(event) => {
-            begin(index, mode, event);
+          onPointerDown={() => {
+            begin(index, mode);
           }}
           onPointerEnter={() => {
             extend(index);

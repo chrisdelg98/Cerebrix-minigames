@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type PointerEvent } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { type GameViewProps } from '@core/contract';
 import { Cell, type CellState } from '@design/components/Cell';
@@ -31,11 +31,8 @@ export function TrazoView({
   }, []);
 
   const begin = useCallback(
-    (index: number, event: PointerEvent) => {
+    (index: number) => {
       if (!interactive) return;
-
-      const target = event.currentTarget;
-      if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId);
 
       const at = state.path.indexOf(index);
       // Empezar sobre el trazo lo recorta hasta ahí: es la forma natural de
@@ -121,8 +118,8 @@ export function TrazoView({
                   {number > 0 && <span className={s.number}>{number}</span>}
                 </>
               }
-              onPointerDown={(event) => {
-                begin(index, event);
+              onPointerDown={() => {
+                begin(index);
               }}
               onPointerEnter={() => {
                 extend(index);

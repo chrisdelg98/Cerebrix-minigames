@@ -1,0 +1,139 @@
+@layer game {
+  .game {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    align-items: center;
+    inline-size: 100%;
+  }
+
+  .hud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-2) var(--sp-4);
+    inline-size: 100%;
+  }
+
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .statLabel,
+  .of {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .of {
+    letter-spacing: normal;
+  }
+
+  .statValue {
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+
+  /*
+   * La misma rampa y la misma forma que una ficha del tablero, en chico.
+   *
+   * Es lo que separa las dos magnitudes: los puntos son un número suelto y la
+   * meta es una ficha, porque la meta se cuenta en fichas. Sin esta diferencia
+   * los dos 256 se leían como el mismo 256.
+   */
+  .chip {
+    display: grid;
+    place-items: center;
+    min-inline-size: 2.2rem;
+    block-size: 1.6rem;
+    padding-inline: var(--sp-1);
+    background-color: color-mix(
+      in oklab,
+      var(--c-accent) calc(var(--level) * 9%),
+      var(--c-surface-sunken)
+    );
+    border-radius: var(--r-sm);
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-black);
+    line-height: 1;
+  }
+
+  .chip[data-strong='true'] {
+    color: var(--c-text-on-accent);
+  }
+
+  .chip[data-digits='4'] {
+    font-size: var(--fs-2xs);
+  }
+
+  /* El área que escucha el deslizamiento es la del tablero, no la página: un
+     arrastre que empieza afuera no debería mover fichas. */
+  .board {
+    inline-size: 100%;
+    display: flex;
+    justify-content: center;
+    touch-action: none;
+  }
+
+  /*
+   * El valor se lee por INTENSIDAD, sobre el acento y nada más.
+   *
+   * El 2048 clásico le da un color propio a cada ficha, que acá serían once
+   * tonos saturados a la vez contra el tope de dos de docs/DESIGN_SYSTEM.md §1.
+   * Una rampa sobre un solo tono dice lo mismo — cuánto vale esta ficha
+   * comparada con las de al lado — sin convertir el tablero en un arcoíris, y
+   * además ordena: más oscura es más grande, siempre.
+   */
+  .tile {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    background-color: color-mix(
+      in oklab,
+      var(--c-accent) calc(var(--level) * 9%),
+      var(--c-surface-sunken)
+    );
+    border-radius: var(--r-md);
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-black);
+    line-height: 1;
+    transition-property: background-color, transform;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .tile[data-empty='true'] {
+    background-color: var(--c-cell);
+  }
+
+  /* Pasado el 64 el fondo ya es acento pleno y el texto normal se hunde. */
+  .tile[data-strong='true'] {
+    color: var(--c-text-on-accent);
+  }
+
+  /* Cuatro dígitos no entran al mismo cuerpo que uno. Se achica el número,
+     nunca la ficha: un tablero de casillas desparejas no se lee. */
+  .tile[data-digits='3'] {
+    font-size: var(--fs-md);
+  }
+
+  .tile[data-digits='4'] {
+    font-size: var(--fs-sm);
+  }
+
+  .help {
+    color: var(--c-text-subtle);
+    font-size: var(--fs-sm);
+  }
+}

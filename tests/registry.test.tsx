@@ -114,6 +114,12 @@ describe('Home — filtro por categoría', () => {
 
   const names = () => screen.getAllByRole('listitem').map((li) => li.textContent ?? '');
 
+  /* Las cuentas salen del registro, no escritas acá: registrar un juego nuevo
+     no debería romper estos tests, que es justo lo que prueban. */
+  const offered = REGISTRY.filter((entry) => entry.hidden !== true);
+  const inShelf = (category: string) =>
+    offered.filter((entry) => entry.preview.category === category).length;
+
   it('ofrece un estante por categoría presente, más "Todos"', () => {
     render(
       <Shell>
@@ -124,9 +130,9 @@ describe('Home — filtro por categoría', () => {
     const chips = screen.getAllByRole('radio');
     expect(chips.map((chip) => chip.textContent)).toEqual([
       // El número es la cuenta de juegos que quedan al elegirlo.
-      'Todos8',
-      'Lógica6',
-      'Arcade2',
+      `Todos${String(offered.length)}`,
+      `Lógica${String(inShelf('lógica'))}`,
+      `Arcade${String(inShelf('arcade'))}`,
     ]);
     // Se abre sin filtrar: la portada sigue mostrando todo.
     expect(screen.getByRole('radio', { name: /Todos/ })).toBeChecked();
@@ -140,23 +146,23 @@ describe('Home — filtro por categoría', () => {
       </Shell>
     );
 
-    expect(names()).toHaveLength(8);
+    expect(names()).toHaveLength(offered.length);
 
     await user.click(screen.getByRole('radio', { name: /Arcade/ }));
 
     const arcade = names();
-    expect(arcade).toHaveLength(2);
+    expect(arcade).toHaveLength(inShelf('arcade'));
     expect(arcade.join(' ')).toContain('Memoria');
     expect(arcade.join(' ')).toContain('Simón');
     expect(arcade.join(' ')).not.toContain('Sudoku');
 
     await user.click(screen.getByRole('radio', { name: /Lógica/ }));
-    expect(names()).toHaveLength(6);
+    expect(names()).toHaveLength(inShelf('lógica'));
     expect(names().join(' ')).toContain('Sudoku');
     expect(names().join(' ')).not.toContain('Simón');
 
     await user.click(screen.getByRole('radio', { name: /Todos/ }));
-    expect(names()).toHaveLength(8);
+    expect(names()).toHaveLength(offered.length);
   });
 
   it('recuerda el estante al volver de un juego', async () => {
@@ -177,7 +183,7 @@ describe('Home — filtro por categoría', () => {
     );
 
     expect(screen.getByRole('radio', { name: /Arcade/ })).toBeChecked();
-    expect(names()).toHaveLength(2);
+    expect(names()).toHaveLength(inShelf('arcade'));
   });
 
   it('descubre una categoría nueva sin que Home cambie', () => {
@@ -188,7 +194,9 @@ describe('Home — filtro por categoría', () => {
     );
 
     // fakeEntry es 'arcade': el estante crece solo, sin tocar este archivo.
-    expect(screen.getByRole('radio', { name: /Arcade/ })).toHaveTextContent('3');
+    expect(screen.getByRole('radio', { name: /Arcade/ })).toHaveTextContent(
+      String(inShelf('arcade') + 1)
+    );
   });
 
   it('no dibuja el filtro cuando hay un solo estante', () => {

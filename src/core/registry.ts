@@ -5,6 +5,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 // The ONLY file in /core allowed to name a game — and only by string, by lazy
 // import(), and by an icon small enough to ride in the initial bundle. The lint
 // exemption for this exact path lives in eslint.config.js.
+import { Game2048Icon } from '@games/2048/sprites/Game2048Icons';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
@@ -153,6 +154,20 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: SimonIcon,
     load: () => import('@games/simon'),
+  },
+  {
+    id: '2048',
+    preview: {
+      id: '2048',
+      name: '2048',
+      tagline: 'Juntá fichas iguales y hacelas crecer.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['cálculo'],
+      category: 'arcade',
+      estimatedMinutes: [2, 12],
+    },
+    icon: Game2048Icon,
+    load: () => import('@games/2048'),
   },
   {
     id: '_dummy',

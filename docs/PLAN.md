@@ -509,8 +509,8 @@ están marcadas: encajan en el contrato tal como está hoy.
 
 | Juego                      | Mecánica                                               | Categoría          | Partida  | Dev       |
 | -------------------------- | ------------------------------------------------------ | ------------------ | -------- | --------- |
-| **Simon** ✅               | Repetir la secuencia de luces que va creciendo         | REFLEJOS MEMORIA   | 1–5 min  | Muy fácil |
-| **2048** ✅                | Deslizar números iguales para sumarlos                 | CASUAL DESLIZAR    | 3–15 min | Fácil     |
+| **Simon** ✅ _(hecho)_     | Repetir la secuencia de luces que va creciendo         | REFLEJOS MEMORIA   | 1–5 min  | Muy fácil |
+| **2048** ✅ _(hecho)_      | Deslizar números iguales para sumarlos                 | CASUAL DESLIZAR    | 3–15 min | Fácil     |
 | **4 en línea** ✅          | Dejar caer fichas para alinear cuatro, contra la IA    | MESA RÁPIDO        | 2–5 min  | Fácil     |
 | Snake                      | Moverse, comer y crecer sin chocar                     | ARCADE REFLEJOS    | 1–5 min  | Muy fácil |
 | Golpea al topo             | Tocar rápido las casillas que se encienden             | REFLEJOS VELOCIDAD | 1–3 min  | Muy fácil |
@@ -525,13 +525,36 @@ están marcadas: encajan en el contrato tal como está hoy.
 | Cruzar la calle            | Avanzar paso a paso esquivando el tráfico              | HABILIDAD TIEMPO   | 2–6 min  | Media     |
 | Pac-Man                    | Juntar puntos esquivando uno o dos enemigos            | ARCADE ACCIÓN      | 2–8 min  | Media     |
 
+**2048. Hecho, y las tres decisiones que anticipaba salieron como estaban
+previstas.** El azar vive **adentro del estado** — semilla más contador de
+apariciones — porque `applyMove` tiene que ser pura: con `Math.random()` la
+misma jugada deshecha y rehecha daría otro tablero y el guardado describiría una
+partida distinta de la que se estaba jugando. La **dificultad mueve la meta**
+(128 → 2048) y no el tamaño del tablero, que agrandado sería más fácil y diría
+lo contrario de lo que promete. La escala arranca en 128 para que el primer
+nivel se gane de entrada y termina en 2048, que es la partida clásica: el nivel
+más alto es el juego que le da nombre, no uno inventado más allá. Y **no tiene pista**: `getHint` no está
+declarado, su ausencia apaga el botón, y la única pista posible acá sería la
+mejor dirección, o sea jugar en lugar del jugador.
+
+**El color lo lleva la intensidad, no el tono.** El 2048 clásico le da un color
+propio a cada ficha, que serían once tonos saturados a la vez contra el tope de
+dos del §1 del sistema de diseño. Una rampa sobre el acento dice lo mismo —
+cuánto vale esta ficha comparada con las de al lado — y además ordena: más
+oscura es siempre más grande. Chunk: **3.4 kB gzip**, contra un presupuesto de 60.
+
+**Una jugada que no mueve nada se rechaza, no se ignora.** Aceptarla llenaría la
+pila de deshacer de pasos idénticos — habría que tocar deshacer cuatro veces
+para volver una jugada — y de paso el shell puede decir por qué, que es
+información real: ese lado está trabado.
+
 ✅ = **entra sin tocar el contrato.** Una jugada produce un estado, el shell
 apila el anterior y deshacer sigue significando algo. En Simon la secuencia se
 reproduce con un temporizador en la vista, que es exactamente lo que ya hace
 Memoria para volver a tapar un par: el motor sigue sin saber que existe el
 tiempo.
 
-**Lo que NO entra en el contrato actual:** Snake, Tetris, Simon, N-back, Stroop.
+**Lo que NO entra en el contrato actual:** Snake, Tetris, N-back, Stroop.
 Todos los juegos de hoy son por turnos — una jugada produce un estado y el shell
 apila el anterior. Un juego en tiempo real invierte eso: el reloj genera estados
 sin que el jugador haga nada, y deshacer deja de significar algo. Es una fase,
@@ -542,7 +565,8 @@ no un juego más.
 ## 🔮 Backlog (post-v1, no distraerse)
 
 - ~~Nonograma~~ (hecho: primer juego post-Fase 7)
-- Solitario, 2048, Sopa de letras, Kakuro, Hashi
+- ~~2048~~ (hecho: segundo del estante arcade)
+- Solitario, Sopa de letras, Kakuro, Hashi
 - Puzzle diario con semilla compartida
 - Sincronización en la nube (la interfaz de `/storage` ya lo permite)
 - Logros y niveles de perfil

@@ -1,0 +1,54 @@
+@layer game {
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--sp-1);
+    align-items: center;
+  }
+
+  /* La misma rampa del tablero, en chico: el ejemplo tiene que parecerse a lo
+     que se va a ver jugando. */
+  .tile {
+    display: grid;
+    place-items: center;
+    inline-size: 1.7rem;
+    block-size: 1.7rem;
+    background-color: color-mix(
+      in oklab,
+      var(--c-accent) calc(var(--level) * 9%),
+      var(--c-surface-sunken)
+    );
+    border-radius: var(--r-sm);
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: var(--fs-2xs);
+    font-weight: var(--fw-black);
+  }
+
+  .tile[data-empty='true'] {
+    background-color: var(--c-cell);
+  }
+
+  .tile[data-strong='true'] {
+    color: var(--c-text-on-accent);
+  }
+
+  .arrow {
+    color: var(--c-text-subtle);
+    rotate: 90deg;
+    inline-size: 1.7rem;
+    display: grid;
+    place-items: center;
+  }
+
+  .note {
+    margin-inline-start: var(--sp-2);
+    color: var(--c-text-muted);
+    font-size: var(--fs-2xs);
+  }
+}

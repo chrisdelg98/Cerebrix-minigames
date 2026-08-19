@@ -29,6 +29,16 @@ export default defineConfig({
         // Any route falls back to the shell: this is a client-side router, so a
         // deep link opened offline still has to boot the app.
         navigateFallback: 'index.html',
+        /*
+         * ...pero nunca para un archivo de /assets/.
+         *
+         * Un chunk que no está devolvería el index.html con content-type
+         * text/html, y el import() muere con "'text/html' is not a valid
+         * JavaScript MIME type" en vez de fallar como lo que es: un archivo que
+         * no está. Que falle limpio es lo que deja al router recuperarse
+         * recargando (ver freshChunk en src/core/router.tsx).
+         */
+        navigateFallbackDenylist: [/^\/assets\//],
       },
       manifest: {
         name: 'Cerebrix',

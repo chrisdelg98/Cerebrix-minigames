@@ -6,6 +6,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 // import(), and by an icon small enough to ride in the initial bundle. The lint
 // exemption for this exact path lives in eslint.config.js.
 import { Game2048Icon } from '@games/2048/sprites/Game2048Icons';
+import { ApagonIcon } from '@games/apagon/sprites/ApagonIcons';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
@@ -112,6 +113,20 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: QueensIcon,
     load: () => import('@games/queens'),
+  },
+  {
+    id: 'apagon',
+    preview: {
+      id: 'apagon',
+      name: 'Apagón',
+      tagline: 'Apagá todas las luces. Cada toque prende y apaga de a cinco.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      category: 'lógica',
+      estimatedMinutes: [1, 8],
+    },
+    icon: ApagonIcon,
+    load: () => import('@games/apagon'),
   },
   {
     id: 'memory',

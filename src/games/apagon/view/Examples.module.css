@@ -1,0 +1,44 @@
+@layer game {
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+  }
+
+  .mini {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .cell {
+    inline-size: 1.1rem;
+    block-size: 1.1rem;
+    background-color: var(--c-cell);
+    border: var(--bw-hair) solid var(--c-border-hairline);
+    border-radius: var(--r-xs);
+  }
+
+  .cell[data-lit='true'] {
+    background-color: var(--c-accent);
+    border-color: var(--c-accent);
+  }
+
+  /* El dedo: un anillo, para que se vea cuál se toca sin confundirlo con una
+     casilla encendida. */
+  .cell[data-touch='true'] {
+    border-color: var(--c-text);
+    border-width: var(--bw-base);
+  }
+
+  .note {
+    color: var(--c-text-muted);
+    font-size: var(--fs-2xs);
+  }
+}

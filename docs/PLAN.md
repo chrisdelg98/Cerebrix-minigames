@@ -445,18 +445,40 @@ Estos seis los eligió Chris, en agosto de 2026, después de probarlos en otras
 plataformas. El orden es de costo, no de gusto: los primeros no piden nada que
 no exista ya.
 
-| Juego          | Reusa tal cual                          | Lo único nuevo                          |
-| -------------- | --------------------------------------- | --------------------------------------- |
-| **Lights Out** | todo                                    | nada                                    |
-| **Tango**      | grid, celda de 3 estados, deshacer      | los signos `=` y `×` **entre** casillas |
-| **Queens**     | grid, `blockEdges`, `--cell-bg`         | tokens de color de región               |
-| **Memoria**    | grid, el estado `covered` de Buscaminas | volteo de carta                         |
-| **Zip**        | grid                                    | trazar un camino arrastrando            |
-| **Flow**       | grid                                    | el mismo trazado que Zip                |
+| Juego         | Reusa tal cual                          | Lo único nuevo                          |
+| ------------- | --------------------------------------- | --------------------------------------- |
+| **Apagón** ✅ | todo                                    | nada                                    |
+| **Tango**     | grid, celda de 3 estados, deshacer      | los signos `=` y `×` **entre** casillas |
+| **Queens**    | grid, `blockEdges`, `--cell-bg`         | tokens de color de región               |
+| **Memoria**   | grid, el estado `covered` de Buscaminas | volteo de carta                         |
+| **Zip**       | grid                                    | trazar un camino arrastrando            |
+| **Flow**      | grid                                    | el mismo trazado que Zip                |
 
-**Lights Out.** Sin riesgo técnico: el generador parte de un tablero apagado y
-aplica K clics al azar, así que tiene solución por construcción, y la pista es
-álgebra lineal en GF(2) que dice el clic exacto siguiente.
+**Apagón (era «Lights Out»). Hecho, y salió tan barato como decía la tabla:
+nada nuevo.** Nombre en español, como Trazo, y describe la victoria en vez de
+la mecánica.
+
+**El tablero se genera al revés, y ahí está todo.** Encender luces al azar daría
+tableros que a veces no se pueden apagar, y descartarlos obligaría a resolver
+cada candidato: la maquinaria cara que necesitan Sudoku, Queens y Trazo.
+Partiendo de un tablero apagado y aplicando K toques distintos, la solución son
+esos mismos toques — existe por construcción y no hay nada que verificar. Es la
+única vez que un generador de esta casa no tuvo que contar soluciones.
+
+**La pista es álgebra lineal en GF(2)**, como estaba previsto. Apagar luces es
+un sistema de ecuaciones sobre el cuerpo de dos elementos: tocar dos veces la
+misma casilla la deja igual (cada incógnita es 0 o 1) y el orden no cambia el
+resultado (es un sistema, no una búsqueda). Eliminación gaussiana con XOR en
+lugar de resta. Es honesta porque el tablero ya contiene todo lo necesario para
+deducirla.
+
+**No hay estado perdido.** Cualquier tablero se puede seguir tocando y la
+solución nunca se pierde, así que `checkStatus` no devuelve `lost` nunca. Un
+contador de intentos habría sido un castigo inventado.
+
+**El estado no lo lleva solo el color.** La casilla se rellena Y el foquito se
+enciende: con el color como único portador, un juego de apagar luces queda
+injugable para quien no lo distingue — y acá esa diferencia ES el juego.
 
 **Tango.** 6×6 fijo, así que resolverlo por fuerza bruta es instantáneo y generar
 no tiene riesgo. Lo nuevo es que los signos no viven en una casilla sino en el

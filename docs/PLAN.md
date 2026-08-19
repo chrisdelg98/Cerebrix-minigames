@@ -499,6 +499,38 @@ contar soluciones, cortar en dos, reintentar. Nonograma y Sudoku ya lo hacen cad
 uno por su lado. Conviene extraerlo antes del segundo de estos tres, no después
 del tercero.
 
+---
+
+## 🕹️ Candidatos arcade
+
+Lista de trabajo. **Casi todos son en tiempo real**, así que antes del primero
+hay que decidir lo del modo _tick_ que se explica abajo. Las tres excepciones
+están marcadas: encajan en el contrato tal como está hoy.
+
+| Juego                      | Mecánica                                               | Categoría          | Partida  | Dev       |
+| -------------------------- | ------------------------------------------------------ | ------------------ | -------- | --------- |
+| **Simon** ✅               | Repetir la secuencia de luces que va creciendo         | REFLEJOS MEMORIA   | 1–5 min  | Muy fácil |
+| **2048** ✅                | Deslizar números iguales para sumarlos                 | CASUAL DESLIZAR    | 3–15 min | Fácil     |
+| **4 en línea** ✅          | Dejar caer fichas para alinear cuatro, contra la IA    | MESA RÁPIDO        | 2–5 min  | Fácil     |
+| Snake                      | Moverse, comer y crecer sin chocar                     | ARCADE REFLEJOS    | 1–5 min  | Muy fácil |
+| Golpea al topo             | Tocar rápido las casillas que se encienden             | REFLEJOS VELOCIDAD | 1–3 min  | Muy fácil |
+| Torre de bloques           | Frenar el bloque justo encima del anterior             | PRECISIÓN CASUAL   | 1–3 min  | Muy fácil |
+| Pong                       | Hacer rebotar la bola contra una IA                    | ARCADE DEPORTE     | 2–5 min  | Muy fácil |
+| Rompebloques               | Rebotar la pelota con una barra para romper bloques    | ARCADE ACCIÓN      | 2–8 min  | Fácil     |
+| Flappy                     | Tocar para mantenerse volando entre obstáculos         | AGILIDAD ACCIÓN    | 1–3 min  | Fácil     |
+| Piano Tiles                | Tocar los bloques que caen antes de que lleguen abajo  | RITMO AGILIDAD     | 1–5 min  | Fácil     |
+| Salto infinito             | Saltar sobre plataformas que aparecen más y más arriba | ARCADE HABILIDAD   | 2–6 min  | Media     |
+| Asteroids / Space Invaders | Nave que dispara a figuras que caen                    | ACCIÓN DISPAROS    | 2–7 min  | Media     |
+| Cambio de color            | Cruzar la pelota solo por los obstáculos de su color   | AGILIDAD PRECISIÓN | 1–4 min  | Media     |
+| Cruzar la calle            | Avanzar paso a paso esquivando el tráfico              | HABILIDAD TIEMPO   | 2–6 min  | Media     |
+| Pac-Man                    | Juntar puntos esquivando uno o dos enemigos            | ARCADE ACCIÓN      | 2–8 min  | Media     |
+
+✅ = **entra sin tocar el contrato.** Una jugada produce un estado, el shell
+apila el anterior y deshacer sigue significando algo. En Simon la secuencia se
+reproduce con un temporizador en la vista, que es exactamente lo que ya hace
+Memoria para volver a tapar un par: el motor sigue sin saber que existe el
+tiempo.
+
 **Lo que NO entra en el contrato actual:** Snake, Tetris, Simon, N-back, Stroop.
 Todos los juegos de hoy son por turnos — una jugada produce un estado y el shell
 apila el anterior. Un juego en tiempo real invierte eso: el reloj genera estados

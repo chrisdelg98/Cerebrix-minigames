@@ -10,6 +10,7 @@ import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
 import { MemoryIcon } from '@games/memory/sprites/MemoryIcons';
 import { QueensIcon } from '@games/queens/sprites/QueensIcons';
+import { SimonIcon } from '@games/simon/sprites/SimonIcons';
 import { TangoIcon } from '@games/tango/sprites/TangoIcons';
 import { TrazoIcon } from '@games/trazo/sprites/TrazoIcons';
 import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
@@ -128,6 +129,19 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: TrazoIcon,
     load: () => import('@games/trazo'),
+  },
+  {
+    id: 'simon',
+    preview: {
+      id: 'simon',
+      name: 'Simón',
+      tagline: 'Repetí la secuencia. Cada ronda suma un paso.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['memoria', 'velocidad'],
+      estimatedMinutes: [1, 5],
+    },
+    icon: SimonIcon,
+    load: () => import('@games/simon'),
   },
   {
     id: '_dummy',

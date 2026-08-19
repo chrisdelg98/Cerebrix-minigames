@@ -1,0 +1,38 @@
+@layer game {
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--sp-1);
+    align-items: center;
+  }
+
+  .pad {
+    inline-size: 1.4rem;
+    block-size: 1.4rem;
+    border: var(--bw-hair) solid var(--c-border-strong);
+    border-radius: var(--r-sm);
+  }
+
+  .pad[data-pad='1'] {
+    background-color: var(--c-trace-1);
+  }
+
+  .pad[data-pad='2'] {
+    background-color: var(--c-trace-3);
+  }
+
+  .pad[data-pad='3'] {
+    background-color: var(--c-trace-5);
+  }
+
+  .note {
+    margin-inline-start: var(--sp-2);
+    color: var(--c-text-muted);
+    font-size: var(--fs-2xs);
+  }
+}

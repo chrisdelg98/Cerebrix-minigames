@@ -1,0 +1,69 @@
+@layer game {
+  .simon {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    align-items: center;
+    inline-size: 100%;
+  }
+
+  .status {
+    color: var(--c-text-muted);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-bold);
+  }
+
+  .pads {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-3);
+
+    /* Cuadrado y atado al alto disponible, como cualquier tablero de la casa. */
+    inline-size: min(calc(100dvh - 260px), 100vw - var(--sp-6), 420px);
+  }
+
+  .pads[data-pads='6'] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .pad {
+    aspect-ratio: 1;
+    background-color: var(--pad);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+
+    /* Apagada la pastilla es su color a media asta; encendida es el color
+       pleno y crece un poco. Solo se animan opacidad y transform. */
+    opacity: 0.42;
+    transition-property: opacity, transform;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  .pad[data-lit='true'] {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  .pad[data-hinted='true'] {
+    border-color: var(--c-info);
+    opacity: 0.8;
+  }
+
+  .pad:disabled {
+    cursor: default;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pad:hover:not(:disabled) {
+      opacity: 0.7;
+    }
+  }
+
+  .round {
+    color: var(--c-text-subtle);
+    font-family: var(--font-num);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+}

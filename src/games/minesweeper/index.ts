@@ -17,6 +17,7 @@ export default defineGame({
     icon: MinesweeperIcon,
     difficulties: [1, 2, 3, 4, 5],
     tags: ['lógica'],
+    category: 'lógica',
     estimatedMinutes: [2, 15],
     howToPlay: [
       'Tocá una casilla para descubrirla. La primera nunca es una mina.',

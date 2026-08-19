@@ -150,6 +150,7 @@ describe('the contract, not the game', () => {
         icon: () => <svg aria-hidden="true" />,
         difficulties: [1],
         tags: ['memoria'],
+        category: 'arcade',
         estimatedMinutes: [1, 1],
         howToPlay: ['Escribí tres letras.'],
         stateVersion: 1,

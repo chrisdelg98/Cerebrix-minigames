@@ -19,6 +19,7 @@ export default defineGame({
     icon: DummyIcon,
     difficulties: [1, 3, 5],
     tags: ['lógica'],
+    category: 'lógica',
     estimatedMinutes: [1, 2],
     howToPlay: [
       'Tocá cada casilla para marcarla.',

@@ -106,6 +106,15 @@
     }
   }
 
+  /*
+   * Los estantes van pegados a la grilla que gobiernan, no al encabezado: lo
+   * que se filtra queda inmediatamente debajo del control que lo filtra.
+   */
+  .filters {
+    display: flex;
+    margin-block-end: var(--sp-4);
+  }
+
   /* Taller cards need more room each, so the track grows with them. */
   .grid {
     display: grid;

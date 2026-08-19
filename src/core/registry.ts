@@ -22,7 +22,10 @@ import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
 export interface RegistryEntry {
   id: string;
   /** Light metadata, so Home can paint a card without downloading the game. */
-  preview: Pick<GameMeta, 'id' | 'name' | 'tagline' | 'difficulties' | 'tags' | 'estimatedMinutes'>;
+  preview: Pick<
+    GameMeta,
+    'id' | 'name' | 'tagline' | 'difficulties' | 'tags' | 'category' | 'estimatedMinutes'
+  >;
   /** The icon IS a static import: ~1 kB, and Home needs it immediately. */
   icon: ComponentType<{ size?: number }>;
   /** The whole game, lazily. Never part of the initial bundle. */
@@ -47,6 +50,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
       tagline: 'El clásico 9×9, con anotaciones y pistas.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['lógica'],
+      category: 'lógica',
       estimatedMinutes: [5, 25],
     },
     icon: SudokuIcon,
@@ -60,6 +64,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
       tagline: 'Despejá el campo sin pisar una mina.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['lógica'],
+      category: 'lógica',
       estimatedMinutes: [2, 15],
     },
     icon: MinesweeperIcon,
@@ -73,6 +78,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
       tagline: 'Los números dicen qué pintar. Sale una figura.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['lógica'],
+      category: 'lógica',
       estimatedMinutes: [3, 20],
     },
     icon: NonogramIcon,
@@ -86,6 +92,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
       tagline: 'Soles y lunas, tres de cada uno en cada línea.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['lógica'],
+      category: 'lógica',
       estimatedMinutes: [2, 10],
     },
     icon: TangoIcon,
@@ -99,6 +106,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
       tagline: 'Una corona por fila, por columna y por región.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['lógica'],
+      category: 'lógica',
       estimatedMinutes: [2, 12],
     },
     icon: QueensIcon,
@@ -112,6 +120,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
       tagline: 'Cada figura está dos veces. Encontrá los pares.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['memoria'],
+      category: 'arcade',
       estimatedMinutes: [1, 6],
     },
     icon: MemoryIcon,
@@ -125,6 +134,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
       tagline: 'Un solo trazo que pase por los números en orden.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['lógica'],
+      category: 'lógica',
       estimatedMinutes: [2, 10],
     },
     icon: TrazoIcon,
@@ -138,6 +148,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
       tagline: 'Repetí la secuencia. Cada ronda suma un paso.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['memoria', 'velocidad'],
+      category: 'arcade',
       estimatedMinutes: [1, 5],
     },
     icon: SimonIcon,
@@ -151,6 +162,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
       tagline: 'El juego mínimo que implementa el contrato entero.',
       difficulties: [1, 3, 5],
       tags: ['lógica'],
+      category: 'lógica',
       estimatedMinutes: [1, 2],
     },
     icon: DummyIcon,

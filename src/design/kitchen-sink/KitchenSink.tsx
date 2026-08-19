@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { Cell, type CellState } from '../components/Cell';
 import { DifficultyPicker } from '../components/DifficultyPicker';
 import { EmptyState } from '../components/EmptyState';
+import { FilterChips } from '../components/FilterChips';
 import { Grid } from '../components/Grid';
 import { IconButton } from '../components/IconButton';
 import { Modal } from '../components/Modal';
@@ -16,6 +17,7 @@ import { Timer } from '../components/Timer';
 import { useToast } from '../components/Toast';
 import { Clock } from '../sprites/Clock';
 import { LogoCerebrix } from '../sprites/LogoCerebrix';
+import { AllGamesIcon, ArcadeIcon, LogicIcon } from '../sprites/CategoryIcons';
 import { MotionIcon, SunIcon } from '../sprites/SettingsIcons';
 import { Streak } from '../sprites/Streak';
 import { Trophy } from '../sprites/Trophy';
@@ -44,6 +46,7 @@ const CELL_STATES: CellState[] = [
 
 export function KitchenSink() {
   const [difficulty, setDifficulty] = useState<1 | 2 | 3 | 4 | 5>(3);
+  const [shelf, setShelf] = useState('todas');
   const [modalOpen, setModalOpen] = useState(false);
   const toast = useToast();
 
@@ -145,6 +148,21 @@ export function KitchenSink() {
             { value: 5, label: 'Experto', color: 'var(--c-difficulty-5)' },
           ]}
           onChange={setDifficulty}
+        />
+      </Section>
+
+      <Section title="FilterChips">
+        {/* Con icono y conteo, que es como los usa la portada. El componente no
+            sabe qué son estos estantes: los recibe como opciones. */}
+        <FilterChips
+          value={shelf}
+          options={[
+            { value: 'todas', label: 'Todos', count: 8, icon: AllGamesIcon },
+            { value: 'lógica', label: 'Lógica', count: 6, icon: LogicIcon },
+            { value: 'arcade', label: 'Arcade', count: 2, icon: ArcadeIcon },
+          ]}
+          onChange={setShelf}
+          label="Categoría"
         />
       </Section>
 

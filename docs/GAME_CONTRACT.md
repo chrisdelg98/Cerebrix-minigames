@@ -63,6 +63,8 @@ export interface GameMeta {
   difficulties: Difficulty[];
   /** Para filtrar y agrupar en Home. */
   tags: ('lógica' | 'memoria' | 'cálculo' | 'azar' | 'velocidad')[];
+  /** El estante de la portada. Uno solo, y no se deriva de `tags`. */
+  category: 'lógica' | 'arcade';
   /** Minutos estimados por partida. Se muestra en la tarjeta. */
   estimatedMinutes: [min: number, max: number];
   /**
@@ -190,7 +192,10 @@ El único punto de `/core` que nombra juegos — y solo por string y función pe
 export interface RegistryEntry {
   id: string;
   /** Metadata liviana para pintar Home sin cargar el juego. */
-  preview: Pick<GameMeta, 'id' | 'name' | 'tagline' | 'difficulties' | 'tags' | 'estimatedMinutes'>;
+  preview: Pick<
+    GameMeta,
+    'id' | 'name' | 'tagline' | 'difficulties' | 'tags' | 'category' | 'estimatedMinutes'
+  >;
   /** El ícono sí se importa estático: son ~1 kB y Home los necesita ya. */
   icon: ComponentType<{ size?: number }>;
   /** El juego entero, perezoso. Nunca en el bundle inicial. */

@@ -1,0 +1,161 @@
+@layer components {
+  /*
+   * Una fila de botones, no un riel segmentado.
+   *
+   * El riel hundido de `<DifficultyPicker>` sirve para una escala — cinco pasos
+   * de lo mismo, que se leen juntos. Acá son estantes independientes, y con la
+   * forma y la sombra de `<Button>` quedan del mismo material que el resto de
+   * los controles de la portada.
+   */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+
+    /* WCAG 2.5.5 — el pulgar es el cursor (docs/DESIGN_SYSTEM.md §7). */
+    min-block-size: var(--touch-min);
+    padding-inline: var(--sp-4);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-md);
+    color: var(--c-text);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    line-height: 1;
+    white-space: nowrap;
+    touch-action: manipulation;
+    transition-property: transform, box-shadow, background-color, border-color, color;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  /* Relleno acentuado: el mismo `primary` de `<Button>`, que trae su propio
+     color de texto y por eso se puede llenar sin quedar ilegible. */
+  .chip[data-selected='true'] {
+    background-color: var(--c-accent-surface);
+    border-color: var(--c-accent-press);
+    color: var(--c-text-on-accent);
+  }
+
+  /*
+   * El hover levanta la pastilla; no le cambia el color al texto.
+   *
+   * Antes teñía el fondo con --c-accent-surface y dejaba el texto en --c-text:
+   * oscuro sobre oscuro, ilegible justo mientras el dedo apuntaba. El estado se
+   * lee por la elevación, que es lo que hacen los botones del resto de la app.
+   */
+  @media (hover: hover) and (pointer: fine) {
+    .chip:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--sh-lg);
+      background-color: var(--c-cell-hover);
+    }
+
+    .chip[data-selected='true']:hover {
+      background-color: var(--c-accent-surface-hover);
+    }
+  }
+
+  .chip:active {
+    transform: translate(3px, 3px);
+    box-shadow: var(--sh-none);
+  }
+
+  /*
+   * Acompaña la palabra sin disputarle el turno.
+   *
+   * 0.85 y no menos: los glifos son siluetas llenas, y bajarles mucho la
+   * opacidad las devuelve al problema que el relleno vino a resolver.
+   */
+  .icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+  /*
+   * El conteo, en su propia pastilla.
+   *
+   * Suelto y a 0.6 de opacidad era un número gris flotando contra el borde de
+   * la palabra: a --fs-2xs no le sobra contraste como para encima difuminarlo.
+   * Con fondo propio se lee como un dato aparte de la etiqueta, que es lo que
+   * es, y ya no necesita la opacidad para quedar en segundo plano.
+   *
+   * Redondo con un dígito, cápsula con dos: el mínimo cuadrado más --r-full lo
+   * resuelve solo, sin que el número deforme la pastilla que lo contiene.
+   */
+  .count {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: var(--sp-4);
+    min-block-size: var(--sp-4);
+    padding-inline: var(--sp-1);
+    background-color: var(--c-surface-sunken);
+    border-radius: var(--r-full);
+    color: var(--c-text);
+    font-size: var(--fs-2xs);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * Sobre el relleno acentuado la pastillita usa la superficie base, no una
+   * mezcla del acento.
+   *
+   * Aclarar el acento con un velo del propio color de texto daba 3.43:1 en
+   * claro: el velo empuja el fondo HACIA el texto de encima, así que cuanto más
+   * se nota la pastilla, menos se lee el número. Y la dirección correcta se
+   * invierte entre temas — en claro el texto es blanco y habría que oscurecer,
+   * en oscuro es casi negro y habría que aclarar — así que ninguna mezcla sola
+   * sirve para los dos. Con --c-surface-raised y --c-text es el par de siempre,
+   * que ya está validado en ambos temas y contrasta contra el acento.
+   */
+  .chip[data-selected='true'] .count {
+    background-color: var(--c-surface-raised);
+    color: var(--c-text);
+  }
+
+  /*
+   * --bp-sm — donde tres estantes dejan de entrar en una línea.
+   *
+   * Se aprieta a lo ancho y nada más: el alto sigue en --touch-min, porque una
+   * fila más corta no necesita pastillas más bajas y 44px es el mínimo de toque
+   * (docs/DESIGN_SYSTEM.md §7).
+   *
+   * El hueco ENTRE pastillas no se toca. --sh-md es una sombra sólida de 4px
+   * sin difuminado, así que un gap de 4px la apoya exactamente sobre el borde
+   * de la de al lado y las tres se leen como un bloque pegoteado. El gap tiene
+   * que despejar la sombra, no solo separar las cajas: --sp-2 deja 4px de aire.
+   * Lo que se recorta es lo de adentro.
+   */
+  @media (width < 480px) {
+    .chip {
+      gap: var(--sp-1);
+      padding-inline: var(--sp-2);
+      font-size: var(--fs-xs);
+    }
+
+    .icon svg {
+      inline-size: 14px;
+      block-size: 14px;
+    }
+
+    /*
+     * El conteo no entra en un teléfono. A --fs-2xs dentro de una pastilla ya
+     * comprimida no se distingue, y ocupa el ancho que la fila necesita para
+     * entrar en una línea. La cifra es una ayuda, no información que falte:
+     * la grilla de abajo ya muestra cuántos juegos quedaron.
+     */
+    .count {
+      display: none;
+    }
+  }
+}

@@ -13,6 +13,7 @@ export default defineGame({
     icon: TrazoIcon,
     difficulties: [1, 2, 3, 4, 5],
     tags: ['lógica'],
+    category: 'lógica',
     estimatedMinutes: [2, 10],
 
     howToPlay: [

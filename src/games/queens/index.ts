@@ -13,6 +13,7 @@ export default defineGame({
     icon: QueensIcon,
     difficulties: [1, 2, 3, 4, 5],
     tags: ['lógica'],
+    category: 'lógica',
     estimatedMinutes: [2, 12],
 
     howToPlay: [

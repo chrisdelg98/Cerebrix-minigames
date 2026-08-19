@@ -13,6 +13,7 @@ export default defineGame({
     icon: SimonIcon,
     difficulties: [1, 2, 3, 4, 5],
     tags: ['memoria', 'velocidad'],
+    category: 'arcade',
     estimatedMinutes: [1, 5],
 
     howToPlay: [

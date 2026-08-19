@@ -13,6 +13,7 @@ export default defineGame({
     icon: NonogramIcon,
     difficulties: [1, 2, 3, 4, 5],
     tags: ['lógica'],
+    category: 'lógica',
     estimatedMinutes: [3, 20],
 
     /*

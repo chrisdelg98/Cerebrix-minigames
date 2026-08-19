@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -27,6 +28,7 @@ const fakeEntry: RegistryEntry = {
     tagline: 'No existe en ningún lado salvo en este test.',
     difficulties: [2, 4],
     tags: ['memoria'],
+    category: 'arcade',
     estimatedMinutes: [3, 7],
   },
   icon: FakeIcon,
@@ -46,6 +48,7 @@ describe('registry', () => {
         tagline: meta.tagline,
         difficulties: meta.difficulties,
         tags: meta.tags,
+        category: meta.category,
         estimatedMinutes: meta.estimatedMinutes,
       });
     }
@@ -66,6 +69,7 @@ function Shell({ children }: { children: ReactNode }) {
 describe('Home', () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
   });
 
   it('renders one card per registry entry', () => {
@@ -95,5 +99,108 @@ describe('Home', () => {
       'href',
       '/game/__fake__'
     );
+  });
+});
+
+/**
+ * El filtro por categoría. Como la grilla, sale del registro: las pastillas son
+ * las categorías que los juegos declaran, no una lista escrita en Home.
+ */
+describe('Home — filtro por categoría', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+
+  const names = () => screen.getAllByRole('listitem').map((li) => li.textContent ?? '');
+
+  it('ofrece un estante por categoría presente, más "Todos"', () => {
+    render(
+      <Shell>
+        <Home />
+      </Shell>
+    );
+
+    const chips = screen.getAllByRole('radio');
+    expect(chips.map((chip) => chip.textContent)).toEqual([
+      // El número es la cuenta de juegos que quedan al elegirlo.
+      'Todos8',
+      'Lógica6',
+      'Arcade2',
+    ]);
+    // Se abre sin filtrar: la portada sigue mostrando todo.
+    expect(screen.getByRole('radio', { name: /Todos/ })).toBeChecked();
+  });
+
+  it('acorta la grilla al estante elegido', async () => {
+    const user = userEvent.setup();
+    render(
+      <Shell>
+        <Home />
+      </Shell>
+    );
+
+    expect(names()).toHaveLength(8);
+
+    await user.click(screen.getByRole('radio', { name: /Arcade/ }));
+
+    const arcade = names();
+    expect(arcade).toHaveLength(2);
+    expect(arcade.join(' ')).toContain('Memoria');
+    expect(arcade.join(' ')).toContain('Simón');
+    expect(arcade.join(' ')).not.toContain('Sudoku');
+
+    await user.click(screen.getByRole('radio', { name: /Lógica/ }));
+    expect(names()).toHaveLength(6);
+    expect(names().join(' ')).toContain('Sudoku');
+    expect(names().join(' ')).not.toContain('Simón');
+
+    await user.click(screen.getByRole('radio', { name: /Todos/ }));
+    expect(names()).toHaveLength(8);
+  });
+
+  it('recuerda el estante al volver de un juego', async () => {
+    const user = userEvent.setup();
+    const view = render(
+      <Shell>
+        <Home />
+      </Shell>
+    );
+
+    await user.click(screen.getByRole('radio', { name: /Arcade/ }));
+    view.unmount();
+
+    render(
+      <Shell>
+        <Home />
+      </Shell>
+    );
+
+    expect(screen.getByRole('radio', { name: /Arcade/ })).toBeChecked();
+    expect(names()).toHaveLength(2);
+  });
+
+  it('descubre una categoría nueva sin que Home cambie', () => {
+    render(
+      <Shell>
+        <Home entries={[...REGISTRY, fakeEntry]} />
+      </Shell>
+    );
+
+    // fakeEntry es 'arcade': el estante crece solo, sin tocar este archivo.
+    expect(screen.getByRole('radio', { name: /Arcade/ })).toHaveTextContent('3');
+  });
+
+  it('no dibuja el filtro cuando hay un solo estante', () => {
+    const soloLogica = REGISTRY.filter((entry) => entry.preview.category === 'lógica');
+
+    render(
+      <Shell>
+        <Home entries={soloLogica} />
+      </Shell>
+    );
+
+    // Un control con una sola opción real es ruido, no un filtro.
+    expect(screen.queryByRole('radiogroup', { name: 'Categoría' })).not.toBeInTheDocument();
   });
 });

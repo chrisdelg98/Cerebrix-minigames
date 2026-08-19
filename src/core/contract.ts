@@ -16,6 +16,21 @@ export type Difficulty = 1 | 2 | 3 | 4 | 5;
 export type GameTag = 'lógica' | 'memoria' | 'cálculo' | 'azar' | 'velocidad';
 
 /**
+ * El estante donde vive el juego en la portada: se piensa, o se juega.
+ *
+ * Existe separado de `tags` porque responde otra pregunta. `tags` describen de
+ * qué va un juego y son varios; esto es uno solo, y es la única división que la
+ * portada ofrece como filtro.
+ *
+ * No se deriva de los tags a propósito. Simón es 'memoria' y 'velocidad',
+ * Memoria es 'memoria' a secas, y Trazo es 'lógica' aunque se juegue con el
+ * dedo: leer el estante desde esa lista sería el shell suponiendo cosas sobre
+ * juegos que no conoce, que es exactamente lo que el contrato existe para
+ * evitar. Lo declara la metadata, como `supportsUndo`.
+ */
+export type GameCategory = 'lógica' | 'arcade';
+
+/**
  * A rule drawn instead of described.
  *
  * `howToPlay` says what to do; an example shows what "correcto" looks like next
@@ -44,6 +59,8 @@ export interface GameMeta {
   difficulties: Difficulty[];
   /** For filtering and grouping on Home. */
   tags: GameTag[];
+  /** El estante de la portada. Uno solo, a diferencia de `tags`. */
+  category: GameCategory;
   estimatedMinutes: [min: number, max: number];
   /**
    * Two or three lines of "how this is played", shown before the board.

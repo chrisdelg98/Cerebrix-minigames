@@ -486,6 +486,7 @@ Se construyen **una sola vez** y todos los juegos los consumen. Ninguno conoce r
 | `<Timer>`            | `running`, `elapsedMs`, `onTick?`                                        | Tabular-nums. El tick vive fuera de React (`rAF`), no re-renderiza el árbol |
 | `<Badge>`            | `tone: neutral\|accent\|gold\|success\|danger`                           |                                                                             |
 | `<DifficultyPicker>` | `value: 1..5`, `onChange`, `available: number[]`                         | Idéntico en todos los juegos                                                |
+| `<FilterChips>`      | `value`, `options: {value,label,count?,icon?}[]`, `onChange`, `label`    | Fila de botones para partir una lista. Genérico: no sabe qué filtra         |
 | `<Modal>`            | `open`, `onClose`, `title`                                               | Focus trap, `Esc`, click fuera, `slide-up`                                  |
 | `<Toast>`            | `tone`, `duration`                                                       | Anclado arriba en móvil, abajo-derecha en desktop                           |
 | `<Skeleton>`         | `w`, `h`, `radius`                                                       | Shimmer, sin spinners                                                       |

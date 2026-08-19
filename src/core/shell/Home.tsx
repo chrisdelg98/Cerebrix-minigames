@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { EmptyState } from '@design/components/EmptyState';
+import { FilterChips } from '@design/components/FilterChips';
 import { InstallButton } from '@design/components/InstallButton';
 import { SettingsToggles } from '@design/components/SettingsToggles';
 import { StatTile } from '@design/components/StatTile';
@@ -11,6 +12,13 @@ import { LogoCerebrix } from '@design/sprites/LogoCerebrix';
 import { Streak } from '@design/sprites/Streak';
 import { Trophy } from '@design/sprites/Trophy';
 
+import {
+  ALL_CATEGORIES,
+  asCategoryFilter,
+  categoryOptions,
+  matchesCategory,
+  type CategoryFilter,
+} from '../category';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { usePrefetch } from '../hooks/usePrefetch';
 import { useGlobalStats, useSavedSessions } from '../hooks/useStoredData';
@@ -26,6 +34,7 @@ export interface HomeProps {
 }
 
 const INTRO_KEY = 'cerebrix:intro';
+const CATEGORY_KEY = 'cerebrix:categoria';
 
 /**
  * The full entrance sequence runs ONCE per session (docs/DESIGN_SYSTEM.md §5.4).
@@ -43,6 +52,30 @@ function claimIntro(): boolean {
 }
 
 /**
+ * El estante elegido sobrevive a entrar a un juego y volver.
+ *
+ * Home se vuelve a montar en cada vuelta, así que sin esto el filtro se
+ * reinicia justo cuando alguien está recorriendo un estante — que es cuando más
+ * lo está usando. Es la misma sessionStorage que `claimIntro`, y por el mismo
+ * motivo: dura lo que dura la visita, no queda pegado para siempre.
+ */
+function readCategory(): CategoryFilter {
+  try {
+    return asCategoryFilter(sessionStorage.getItem(CATEGORY_KEY)) ?? ALL_CATEGORIES;
+  } catch {
+    return ALL_CATEGORIES;
+  }
+}
+
+function rememberCategory(value: CategoryFilter): void {
+  try {
+    sessionStorage.setItem(CATEGORY_KEY, value);
+  } catch {
+    /* Sin sessionStorage el filtro sigue funcionando; solo no se recuerda. */
+  }
+}
+
+/**
  * The card grid is read from the registry and from nowhere else. Adding a game
  * means adding a registry entry — this file never changes.
  */
@@ -56,8 +89,22 @@ export function Home({ entries = REGISTRY }: HomeProps) {
   );
   const prefetch = usePrefetch();
   const [intro] = useState(claimIntro);
+  const [category, setCategory] = useState(readCategory);
   const { sessions, refresh: refreshSessions } = useSavedSessions();
   const { stats, refresh: refreshStats } = useGlobalStats();
+
+  /*
+   * Las pastillas salen de los juegos que hay, no de una lista escrita acá: un
+   * estante nuevo aparece solo con registrar un juego que lo declare, y uno que
+   * se queda sin juegos deja de ofrecerse.
+   */
+  const options = categoryOptions(visible.map((entry) => entry.preview.category));
+  const shown = visible.filter((entry) => matchesCategory(category, entry.preview.category));
+
+  const chooseCategory = (value: CategoryFilter) => {
+    setCategory(value);
+    rememberCategory(value);
+  };
 
   const refreshAll = () => {
     refreshSessions();
@@ -107,6 +154,18 @@ export function Home({ entries = REGISTRY }: HomeProps) {
         </section>
       )}
 
+      {/* Con un solo estante el filtro no filtra nada: es ruido con aspecto de control. */}
+      {options.length > 2 && (
+        <div className={`${s.filters} ${intro ? 'anim-slide-up' : ''}`}>
+          <FilterChips
+            value={category}
+            options={options}
+            onChange={chooseCategory}
+            label="Categoría"
+          />
+        </div>
+      )}
+
       {visible.length === 0 ? (
         <EmptyState
           title="Todavía no hay juegos"
@@ -114,7 +173,7 @@ export function Home({ entries = REGISTRY }: HomeProps) {
         />
       ) : (
         <ul className={s.grid}>
-          {visible.map((entry, i) => (
+          {shown.map((entry, i) => (
             <GameCard
               key={entry.id}
               entry={entry}

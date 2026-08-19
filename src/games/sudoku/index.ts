@@ -17,6 +17,7 @@ export default defineGame({
     icon: SudokuIcon,
     difficulties: [1, 2, 3, 4, 5],
     tags: ['lógica'],
+    category: 'lógica',
     estimatedMinutes: [5, 25],
     howToPlay: [
       'Completá la grilla para que del 1 al 9 aparezca una sola vez en cada fila, cada columna y cada caja de 3×3.',

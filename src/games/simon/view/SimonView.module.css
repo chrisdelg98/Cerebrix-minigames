@@ -32,6 +32,11 @@
     border: var(--bw-base) solid var(--c-border-strong);
     border-radius: var(--r-lg);
 
+    /* docs/DESIGN_SYSTEM.md §7: sin esto el navegador móvil reserva el toque
+       por si viene un segundo y llega tarde, además de permitir zoom al
+       doble toque justo encima del tablero. */
+    touch-action: manipulation;
+
     /* Apagada la pastilla es su color a media asta; encendida es el color
        pleno y crece un poco. Solo se animan opacidad y transform. */
     opacity: 0.42;

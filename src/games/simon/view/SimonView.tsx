@@ -17,6 +17,9 @@ import s from './SimonView.module.css';
  */
 const LEAD_IN_MS = 900;
 
+/** Cuánto queda encendida la pastilla que tocó el jugador. */
+const TAP_FLASH_MS = 180;
+
 export function SimonView({
   state,
   dispatch,
@@ -24,6 +27,18 @@ export function SimonView({
   hint,
 }: GameViewProps<SimonState, SimonMove>) {
   const [lit, setLit] = useState(-1);
+  /*
+   * El acuse de recibo del dedo, aparte del destello de la secuencia.
+   *
+   * Compartían `lit` y un mismo cajón de temporizadores, y eso se comía
+   * justo el toque que cierra la ronda: completarla cambia `round`, el efecto
+   * de abajo se reprograma, y su limpieza borraba el temporizador del acuse
+   * de recibo un instante después de encenderlo. El toque más importante de la
+   * ronda era el único que no se veía.
+   *
+   * Separados, la secuencia no puede apagar lo que encendió la mano.
+   */
+  const [tapped, setTapped] = useState(-1);
   /*
    * Qué ronda ya terminó de mostrarse, en vez de un "estoy mostrando".
    *
@@ -34,6 +49,15 @@ export function SimonView({
    */
   const [shownRound, setShownRound] = useState(-1);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const tapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // El del dedo se cancela solo al desmontar: no lo toca el efecto de abajo.
+  useEffect(
+    () => () => {
+      if (tapTimer.current !== null) clearTimeout(tapTimer.current);
+    },
+    []
+  );
 
   const { pads, sequence, round, tempoMs } = state;
   const hinted = hint === null ? -1 : (hint.cells[0]?.col ?? -1);
@@ -111,7 +135,7 @@ export function SimonView({
             type="button"
             className={s.pad}
             style={{ '--pad': `var(--c-trace-${String(pad + 1)})` } as CSSVars}
-            data-lit={lit === pad}
+            data-lit={lit === pad || tapped === pad}
             data-hinted={hinted === pad}
             disabled={busy}
             aria-label={`Pastilla ${String(pad + 1)}`}
@@ -119,12 +143,11 @@ export function SimonView({
               if (busy) return;
               // El destello sale de la vista y no del estado: es acuse de
               // recibo del dedo, no una jugada distinta.
-              setLit(pad);
-              timers.current.push(
-                setTimeout(() => {
-                  setLit(-1);
-                }, 180)
-              );
+              setTapped(pad);
+              if (tapTimer.current !== null) clearTimeout(tapTimer.current);
+              tapTimer.current = setTimeout(() => {
+                setTapped(-1);
+              }, TAP_FLASH_MS);
               dispatch({ pad });
             }}
           />

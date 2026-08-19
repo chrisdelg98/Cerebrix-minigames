@@ -94,6 +94,26 @@ export default defineConfig({
   },
 
   test: {
+    /*
+     * Solo la suite de jsdom. Los `.spec.ts` de /e2e son de Playwright — usan
+     * su propio `test` y necesitan un navegador — y sin acotar esto Vitest los
+     * levantaba y fallaba al recolectarlos.
+     */
+    include: ['tests/**/*.test.{ts,tsx}'],
+    /*
+     * El default de 5 s está pensado para tests que esperan, no para los que
+     * calculan.
+     *
+     * Acá hay varios que hacen trabajo de verdad: verificar que cada puzzle de
+     * Sudoku tenga una sola solución tarda 2 s solo, y generar doscientos
+     * tableros de Apagón otro tanto. Con la suite entera repartida entre los
+     * núcleos, esos mismos tests pasan de 5 s y fallaban de a ratos — no
+     * siempre, y no los mismos, que es lo peor que puede pasarle a una suite:
+     * romper algo de verdad se veía igual que no romper nada.
+     *
+     * Sigue siendo un techo, no una espera: un test colgado corta a los 20 s.
+     */
+    testTimeout: 20_000,
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],

@@ -369,13 +369,37 @@ Buscaminas antes que Solitario a propósito: comparte el modelo de grid (reusa `
 **Objetivo:** que sirva de verdad en el subte, sin señal y con una mano.
 
 - [x] PWA: manifest, íconos, service worker (Workbox), instalable
-- [ ] Offline completo — no hay backend, no hay excusa
+- [x] Offline completo — verificado en `e2e/offline.spec.ts`: la portada abre sin
+      red, un juego que nunca se visitó se juega desde el precache, y la partida
+      se guarda y vuelve
 - [ ] Vista de estadísticas y logros (lazy)
-- [ ] Presupuestos verificados en CI: bundle inicial ≤ 120 kB gzip, cada juego ≤ 60 kB
+- [x] Presupuestos verificados en CI: `scripts/check-budget.mjs`, sobre el build
+      real y con los ids leídos del registro, así que un juego nuevo se mide solo
 - [ ] Lighthouse móvil ≥ 90 en Performance y Accessibility
 - [ ] Profiling real con throttling 4×: sin frames largos al navegar el tablero
 - [ ] Auditoría de teclado y lector de pantalla
-- [ ] E2E con Playwright: jugar y ganar cada juego, recargar y resumir
+- [x] E2E con Playwright: los diez juegos abren, se juega y se resume tras
+      recargar, y los gestos con dedo real — la franja que jsdom no puede cubrir
+
+### Lo que esta ronda dejó montado
+
+**La suite volvió a servir de alarma.** Fallaban entre cuatro y ocho tests por
+corrida, y no los mismos: `findBy` se rendía al segundo mientras una ruta
+resolvía dos `import()` encadenados, y los tests que calculan de verdad —la
+unicidad de los puzzles de Sudoku, los doscientos tableros de Apagón— chocaban
+con el `testTimeout` de 5 s bajo carga. Eran dos problemas distintos, no uno.
+El costo no era la molestia: con fallos que cambiaban de nombre, romper algo se
+veía igual que no romper nada. Arreglado en `tests/setup.ts` y `vite.config.ts`.
+
+**Playwright cubre lo que jsdom no puede, y solo eso.** Los dos bugs que
+llegaron a usuarios —la captura implícita del puntero en Trazo, el chunk viejo
+en iOS— eran invisibles ahí por construcción: jsdom no tiene captura de puntero
+ni pide módulos por HTTP. La suite corre contra el **build de producción** y en
+un perfil de teléfono con pantalla táctil, porque los dos aparecieron en móvil.
+
+**Un tope de 360px para todo lo que venga.** `e2e/movil.spec.ts` recorre las
+diez pantallas de reglas y los diez tableros y falla si algo se pasa de ancho.
+El §1 decía "se diseña a 360px" y nadie lo verificaba.
 
 ---
 

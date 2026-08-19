@@ -66,9 +66,7 @@ async function advance(ms: number): Promise<void> {
  */
 async function renderAndStart(): Promise<void> {
   renderSimon();
-  // Margen amplio a propósito: la ruta y el módulo llegan por import(), y con
-  // la suite entera en paralelo el default de 1s se queda corto.
-  const start = await screen.findByRole('button', { name: /Empezar partida/ }, { timeout: 5000 });
+  const start = await screen.findByRole('button', { name: /Empezar partida/ });
   vi.useFakeTimers();
   act(() => {
     fireEvent.click(start);

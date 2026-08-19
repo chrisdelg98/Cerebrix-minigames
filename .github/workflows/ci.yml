@@ -51,3 +51,40 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # El presupuesto de la Fase 7, verificado sobre el build real. Existe para
+      # que una dependencia que se cuela en el bundle inicial rompa acá y no en
+      # el teléfono de alguien seis meses después.
+      - name: Budget
+        run: npm run budget
+
+  # Separado del resto a propósito: necesita descargar un navegador, así que
+  # correrlo dentro de `verify` le sumaría minutos a cada push aunque el cambio
+  # no toque la app.
+  e2e:
+    runs-on: ubuntu-latest
+    needs: verify
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci --ignore-scripts
+
+      - name: Install browser
+        run: npx playwright install --with-deps chrome
+
+      - name: E2E
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

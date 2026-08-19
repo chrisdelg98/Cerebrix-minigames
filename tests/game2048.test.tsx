@@ -27,11 +27,7 @@ function renderGame() {
 
 async function startGame(user: ReturnType<typeof userEvent.setup>): Promise<HTMLElement> {
   await user.click(
-    await screen.findByRole(
-      'button',
-      { name: /Empezar partida|Continuar partida/ },
-      { timeout: 5000 }
-    )
+    await screen.findByRole('button', { name: /Empezar partida|Continuar partida/ })
   );
   return screen.getByRole('grid', { name: 'Tablero de 2048' });
 }

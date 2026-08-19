@@ -43,7 +43,14 @@
 
   --c-cell: var(--raw-white);
   --c-cell-hover: var(--raw-slate-100);
-  --c-cell-active: var(--c-accent-soft);
+
+  /*
+   * Dónde está el cursor. Es más fuerte que `--c-accent-soft` a propósito: ese
+   * tinte al 12% alcanza para un fondo de botón, pero sobre una grilla de 81
+   * casillas con números encima la casilla elegida desaparecía — y saber cuál
+   * tenés elegida es lo primero que necesitás antes de escribir un número.
+   */
+  --c-cell-active: color-mix(in oklab, var(--raw-teal-600) 24%, transparent);
   --c-cell-fixed: var(--raw-slate-100);
   --c-cell-peer: color-mix(in oklab, var(--raw-teal-700) 9%, transparent);
 
@@ -177,7 +184,7 @@
   /* Board cells — shared by every game */
   --c-cell: var(--raw-slate-800);
   --c-cell-hover: var(--raw-slate-700);
-  --c-cell-active: var(--c-accent-soft);
+  --c-cell-active: color-mix(in oklab, var(--raw-teal-400) 28%, transparent);
   --c-cell-fixed: var(--raw-slate-900);
   --c-cell-peer: color-mix(in oklab, var(--raw-teal-400) 10%, transparent);
 

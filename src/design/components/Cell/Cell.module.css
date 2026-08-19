@@ -122,8 +122,12 @@
     background-color: var(--c-accent-soft);
   }
 
+  /* Mismo grosor de borde que la pista: si el shell puede señalar una casilla
+     con un anillo que no deja dudas, el jugador merece lo mismo cuando la
+     señala él. Con la hairline por defecto no se distinguía de sus vecinas. */
   .cell[data-state='selected'] {
     background-color: var(--c-cell-active);
+    border-width: var(--bw-base);
     border-color: var(--c-accent);
   }
 

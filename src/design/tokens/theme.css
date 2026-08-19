@@ -100,6 +100,18 @@
   --c-region-8: color-mix(in oklab, var(--raw-sky-500) 26%, transparent);
   --c-region-9: color-mix(in oklab, var(--raw-pink-500) 24%, transparent);
 
+  /*
+   * El trazo. Seis tonos que rotan por tablero para que no sea siempre lo
+   * mismo, todos del mismo peso y ninguno chillón: la línea es el contenido,
+   * no un adorno, y tiene que verse igual de legible en cualquiera de los seis.
+   */
+  --c-trace-1: var(--raw-teal-600);
+  --c-trace-2: var(--raw-indigo-500);
+  --c-trace-3: var(--raw-green-600);
+  --c-trace-4: var(--raw-violet-500);
+  --c-trace-5: var(--raw-sky-500);
+  --c-trace-6: var(--raw-red-600);
+
   --c-shadow: var(--raw-slate-900);
 
   color-scheme: light;
@@ -201,6 +213,14 @@
   --c-region-7: color-mix(in oklab, var(--raw-orange-500) 34%, transparent);
   --c-region-8: color-mix(in oklab, var(--raw-sky-500) 34%, transparent);
   --c-region-9: color-mix(in oklab, var(--raw-pink-500) 32%, transparent);
+
+  /* Un escalón más claros: sobre superficie oscura los mismos tonos se apagan. */
+  --c-trace-1: var(--raw-teal-400);
+  --c-trace-2: var(--raw-indigo-400);
+  --c-trace-3: var(--raw-green-500);
+  --c-trace-4: var(--raw-violet-500);
+  --c-trace-5: var(--raw-sky-500);
+  --c-trace-6: var(--raw-red-500);
 
   --c-cell-ink: var(--raw-slate-50);
   --c-cell-ink-hover: var(--raw-slate-300);

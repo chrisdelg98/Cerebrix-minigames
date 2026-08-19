@@ -1,0 +1,105 @@
+@layer game {
+  .trazo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    inline-size: 100%;
+    max-inline-size: 100%;
+
+    /* Esquinas rectas: el trazo tiene que cruzar el borde de una casilla a la
+       de al lado sin que quede una muesca en el medio. */
+    --cell-radius: 0;
+  }
+
+  .trazo [role='grid'] {
+    /* Dibujar es arrastrar, y el gesto por defecto de un arrastre es scrollear. */
+    touch-action: none;
+  }
+
+  /*
+   * El trazo se dibuja por casilla, no como una línea encima del tablero.
+   *
+   * Cada casilla saca un brazo hacia el paso anterior y otro hacia el siguiente,
+   * y los brazos se pasan un par de píxeles del borde para encontrarse con los
+   * de al lado. Una línea superpuesta habría que mantenerla sincronizada con la
+   * geometría del tablero, que cambia con la pantalla; esto la sigue solo.
+   */
+  .pipe {
+    position: absolute;
+    inset: 0;
+  }
+
+  .arm,
+  .hub {
+    position: absolute;
+    background-color: var(--trace, var(--c-accent));
+  }
+
+  /*
+   * El nudo es un círculo del mismo ancho que los brazos.
+   *
+   * Es lo único que hace falta para que el trazo doble redondeado y termine en
+   * punta redonda: en una esquina el círculo tapa el ángulo recto que dejan los
+   * dos brazos, y en la punta hace de tapa. Sin él la línea se ve cortada a
+   * escuadra, que es lo que la hacía parecer un dibujo de celdas y no un trazo.
+   */
+  .hub {
+    inset: 32%;
+    border-radius: var(--r-full);
+  }
+
+  .arm[data-dir='up'] {
+    inset-block: -2px 50%;
+    inset-inline: 32%;
+  }
+
+  .arm[data-dir='down'] {
+    inset-block: 50% -2px;
+    inset-inline: 32%;
+  }
+
+  .arm[data-dir='left'] {
+    inset-block: 32%;
+    inset-inline: -2px 50%;
+  }
+
+  .arm[data-dir='right'] {
+    inset-block: 32%;
+    inset-inline: 50% -2px;
+  }
+
+  /* El número va encima del trazo, en su disco, como en el tablero de papel. */
+  .number {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    inline-size: 62%;
+    block-size: 62%;
+    background-color: var(--c-text);
+    border-radius: var(--r-full);
+    color: var(--c-surface);
+    font-family: var(--font-num);
+    font-size: clamp(0.65rem, calc(var(--cell-size, 2rem) * 0.4), 1.4rem);
+    font-weight: var(--fw-black);
+  }
+
+  /*
+   * La casilla tampoco reacciona al dedo ni al mouse.
+   *
+   * <Cell> es un botón, y un botón se ilumina al pasarle por encima y se encoge
+   * al apretarlo. Acá eso aparecía como un recuadro gris debajo del trazo y le
+   * deformaba el contorno al arrastrar: la grilla es una guía y tiene que
+   * quedarse quieta. El anillo de foco se conserva — es cómo se juega con
+   * teclado.
+   */
+  .trazo [role='grid'] button:hover:not(:disabled),
+  .trazo [role='grid'] button:active:not(:disabled) {
+    background-color: var(--cell-bg, var(--c-cell));
+    transform: none;
+  }
+
+  /* La casilla por la que pasa el trazo no cambia de aspecto. La grilla es una
+     guía; lo que se dibuja encima es el juego. Marcar también la casilla partía
+     la línea en cuadrados y le robaba el contorno. */
+}

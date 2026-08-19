@@ -11,6 +11,7 @@ import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
 import { MemoryIcon } from '@games/memory/sprites/MemoryIcons';
 import { QueensIcon } from '@games/queens/sprites/QueensIcons';
 import { TangoIcon } from '@games/tango/sprites/TangoIcons';
+import { TrazoIcon } from '@games/trazo/sprites/TrazoIcons';
 import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
 
 /**
@@ -114,6 +115,19 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: MemoryIcon,
     load: () => import('@games/memory'),
+  },
+  {
+    id: 'trazo',
+    preview: {
+      id: 'trazo',
+      name: 'Trazo',
+      tagline: 'Un solo trazo que pase por los números en orden.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      estimatedMinutes: [2, 10],
+    },
+    icon: TrazoIcon,
+    load: () => import('@games/trazo'),
   },
   {
     id: '_dummy',

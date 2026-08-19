@@ -479,12 +479,20 @@ sea honesta: un juego de memoria tiene una pista tramposa («el par está allá�
 con información que el jugador no tiene) y una honesta, que es recordarle algo
 que ya pasó por sus ojos. Sin registrar lo visto, solo se podía hacer trampa.
 
-**Zip y Flow.** Desde el punto de vista de lo que hay que construir son el mismo
-juego: arrastrar el dedo y dibujar un camino grueso por el centro de las
-casillas. **Se hace una vez.** La diferencia está en el generador — Zip necesita
-un camino hamiltoniano con puntos que lo fuercen; para Flow, generar niveles
-buenos automáticamente es un problema serio, así que van curados como data, que
-es lo que ya hace Sudoku con `game-data`.
+**Trazo (era «Zip»). Hecho, y Flow queda descartado.** Se eligió uno de los dos
+porque son juegos distintos que comparten primitiva, y Trazo es el que sostiene
+el estándar de la casa: su generador garantiza recorrido único y su pista cita
+la regla. Flow, para tener soluciones únicas, obliga a curar niveles a mano —
+trabajo de contenido, no de código — y su pista honesta se parece demasiado a la
+respuesta. Nombre en español porque «zip» acá es un cierre o un archivo.
+
+**La poda que lo hace posible.** Encontrar el primer recorrido siempre fue
+barato; lo caro es demostrar que no hay un segundo, que es lo que exige la
+unicidad. La comprobación de alcance no alcanza: hace falta contar los callejones
+sin salida, porque final hay uno solo y en cuanto aparecen dos la rama está
+muerta aunque todo siga comunicado. Medido con eso: 1 ms en 4×4, 13 ms en 5×5,
+35 ms en 6×6. **Tope en 6×6** — de 7 en adelante el costo crece mucho más rápido
+que la dificultad que aporta.
 
 **Inversión compartida:** Tango, Queens y Zip necesitan lo mismo — generar,
 contar soluciones, cortar en dos, reintentar. Nonograma y Sudoku ya lo hacen cada

@@ -5,9 +5,10 @@ import { type SimonConfig, type SimonMove, type SimonState } from './types';
 /*
  * Más pastillas, más pasos y menos tiempo para mirarlos.
  *
- * El Simón electrónico terminaba a los 8, 14, 20 o 31 destellos. Acá la escala
- * es más corta a propósito: una partida tiene que caber en el viaje, y con el
- * destello acelerándose además, quince pasos a 330 ms ya cuesta.
+ * El Simón electrónico —el juguete que le da origen a este juego— terminaba a
+ * los 8, 14, 20 o 31 destellos. Acá la escala es más corta a propósito: una
+ * partida tiene que caber en el viaje, y con el destello acelerándose además,
+ * quince pasos a 330 ms ya cuesta.
  */
 const CONFIGS: Record<Difficulty, SimonConfig> = {
   1: { pads: 4, target: 5, tempoMs: 620 },

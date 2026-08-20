@@ -48,7 +48,7 @@ interface EntryBase {
  *
  * `kind` es del shell y decide qué maquinaria corre — la pila de deshacer y el
  * autoguardado, o un reloj y una pausa. No confundir con `preview.category`,
- * que es del jugador y decide en qué estante de la portada aparece: Simón y
+ * que es del jugador y decide en qué estante de la portada aparece: Secuencia y
  * 2048 están en el estante «arcade» y son por turnos.
  */
 export interface TurnEntry extends EntryBase {
@@ -145,7 +145,7 @@ export const REGISTRY: readonly RegistryEntry[] = [
     id: 'apagon',
     preview: {
       id: 'apagon',
-      name: 'Apagón',
+      name: 'Lights Out',
       tagline: 'Apagá todas las luces. Cada toque prende y apaga de a cinco.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['lógica'],
@@ -187,8 +187,8 @@ export const REGISTRY: readonly RegistryEntry[] = [
     id: 'simon',
     preview: {
       id: 'simon',
-      name: 'Simón',
-      tagline: 'Repetí la secuencia. Cada ronda suma un paso.',
+      name: 'Secuencia',
+      tagline: 'Mirá y repetí. Cada ronda suma un paso.',
       difficulties: [1, 2, 3, 4, 5],
       tags: ['memoria', 'velocidad'],
       category: 'arcade',

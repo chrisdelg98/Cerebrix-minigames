@@ -13,7 +13,7 @@ test('una partida empezada sobrevive a recargar la página', async ({ page }) =>
   await page.getByRole('button', { name: 'Empezar partida' }).click();
   await expect(page.getByRole('button', { name: 'Nueva partida' })).toBeVisible();
 
-  const board = page.getByRole('grid', { name: 'Tablero de Apagón' });
+  const board = page.getByRole('grid', { name: 'Tablero de Lights Out' });
   await board.getByRole('gridcell').nth(4).click();
 
   const after = await board
@@ -41,7 +41,11 @@ test('una partida empezada sobrevive a recargar la página', async ({ page }) =>
 test('la portada ofrece continuar el juego que quedó a medias', async ({ page }) => {
   await page.goto('/game/apagon');
   await page.getByRole('button', { name: 'Empezar partida' }).click();
-  await page.getByRole('grid', { name: 'Tablero de Apagón' }).getByRole('gridcell').nth(0).click();
+  await page
+    .getByRole('grid', { name: 'Tablero de Lights Out' })
+    .getByRole('gridcell')
+    .nth(0)
+    .click();
   await page.waitForTimeout(500);
 
   await page.goto('/');

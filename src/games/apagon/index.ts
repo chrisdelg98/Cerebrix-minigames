@@ -8,7 +8,7 @@ import { ApagonView } from './view/ApagonView';
 export default defineGame({
   meta: {
     id: 'apagon',
-    name: 'Apagón',
+    name: 'Lights Out',
     tagline: 'Apagá todas las luces. Cada toque prende y apaga de a cinco.',
     icon: ApagonIcon,
     difficulties: [1, 2, 3, 4, 5],

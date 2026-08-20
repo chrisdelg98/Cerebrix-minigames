@@ -48,7 +48,7 @@ test('un juego que nunca se abrió se puede jugar sin conexión', async ({ page,
   await context.setOffline(true);
 
   /*
-   * Apagón, deliberadamente: en esta sesión nunca se visitó, así que su chunk
+   * Lights Out, deliberadamente: en esta sesión nunca se visitó, así que su chunk
    * solo puede venir del precache. Si el precache dejara afuera los juegos, un
    * viaje en subte serviría para mirar la portada y nada más.
    */
@@ -58,7 +58,7 @@ test('un juego que nunca se abrió se puede jugar sin conexión', async ({ page,
   await page.getByRole('button', { name: /Empezar partida|Continuar partida/ }).click();
   await expect(page.getByRole('button', { name: 'Nueva partida' })).toBeVisible();
 
-  const board = page.getByRole('grid', { name: 'Tablero de Apagón' });
+  const board = page.getByRole('grid', { name: 'Tablero de Lights Out' });
   const before = await board
     .getByRole('gridcell')
     .evaluateAll((cells) => cells.map((cell) => cell.getAttribute('aria-label')));

@@ -31,7 +31,7 @@ const SHAPES = [
  * Una carta tapada y otra dada vuelta, con su figura.
  *
  * Dos rectángulos iguales no decían "cartas" ni "pares": eran dos bloques, y en
- * la portada se confundían con los de Simón y los de 2048. Que una esté llena y
+ * la portada se confundían con los de Secuencia y los de 2048. Que una esté llena y
  * la otra abierta con una figura adentro es lo que hace la escena — hay algo
  * escondido y algo revelado, que es el juego.
  */

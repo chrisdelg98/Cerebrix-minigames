@@ -7,7 +7,7 @@ import { routes } from '@core/router';
 import { StorageContext } from '@core/storageContext';
 import { LocalStorageDriver } from '@storage/localStorageDriver';
 
-/** Apagón dentro del shell. El motor se prueba aparte, sin DOM. */
+/** Lights Out dentro del shell. El motor se prueba aparte, sin DOM. */
 
 let storage: LocalStorageDriver;
 
@@ -25,7 +25,7 @@ async function startGame(user: ReturnType<typeof userEvent.setup>): Promise<HTML
   await user.click(
     await screen.findByRole('button', { name: /Empezar partida|Continuar partida/ })
   );
-  return screen.getByRole('grid', { name: 'Tablero de Apagón' });
+  return screen.getByRole('grid', { name: 'Tablero de Lights Out' });
 }
 
 const cells = (board: HTMLElement) => within(board).getAllByRole('gridcell');
@@ -37,7 +37,7 @@ beforeEach(() => {
   storage = new LocalStorageDriver();
 });
 
-describe('Apagón dentro del shell', () => {
+describe('Lights Out dentro del shell', () => {
   it('carga desde el registro con luces prendidas para apagar', async () => {
     const user = renderGame();
     const board = await startGame(user);

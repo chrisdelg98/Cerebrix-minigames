@@ -22,7 +22,7 @@ export type GameTag = 'lógica' | 'memoria' | 'cálculo' | 'azar' | 'velocidad';
  * qué va un juego y son varios; esto es uno solo, y es la única división que la
  * portada ofrece como filtro.
  *
- * No se deriva de los tags a propósito. Simón es 'memoria' y 'velocidad',
+ * No se deriva de los tags a propósito. Secuencia es 'memoria' y 'velocidad',
  * Memoria es 'memoria' a secas, y Trazo es 'lógica' aunque se juegue con el
  * dedo: leer el estante desde esa lista sería el shell suponiendo cosas sobre
  * juegos que no conoce, que es exactamente lo que el contrato existe para

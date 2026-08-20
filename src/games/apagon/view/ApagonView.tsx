@@ -25,7 +25,7 @@ export function ApagonView({
         <span className="tabular">{state.moves}</span>
       </p>
 
-      <Grid cols={size} label="Tablero de Apagón" gap="var(--sp-2)" framed>
+      <Grid cols={size} label="Tablero de Lights Out" gap="var(--sp-2)" framed>
         {lights.map((lit, index) => (
           <Cell
             key={index}

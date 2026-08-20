@@ -154,13 +154,13 @@ describe('Home — filtro por categoría', () => {
     const arcade = names();
     expect(arcade).toHaveLength(inShelf('arcade'));
     expect(arcade.join(' ')).toContain('Memoria');
-    expect(arcade.join(' ')).toContain('Simón');
+    expect(arcade.join(' ')).toContain('Secuencia');
     expect(arcade.join(' ')).not.toContain('Sudoku');
 
     await user.click(screen.getByRole('radio', { name: /Lógica/ }));
     expect(names()).toHaveLength(inShelf('lógica'));
     expect(names().join(' ')).toContain('Sudoku');
-    expect(names().join(' ')).not.toContain('Simón');
+    expect(names().join(' ')).not.toContain('Secuencia');
 
     await user.click(screen.getByRole('radio', { name: /Todos/ }));
     expect(names()).toHaveLength(offered.length);

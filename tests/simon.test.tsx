@@ -7,7 +7,7 @@ import { StorageContext } from '@core/storageContext';
 import { LocalStorageDriver } from '@storage/localStorageDriver';
 
 /**
- * El acuse de recibo del dedo en Simón.
+ * El acuse de recibo del dedo en Secuencia.
  *
  * La secuencia la muestra la vista con temporizadores, así que todo acá corre
  * con relojes falsos: son la única forma de mirar un destello sin esperarlo.
@@ -94,7 +94,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('Simón — el destello del jugador', () => {
+describe('Secuencia — el destello del jugador', () => {
   it('deja ver el toque que completa la ronda, no solo los del medio', async () => {
     await renderAndStart();
 

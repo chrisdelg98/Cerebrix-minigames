@@ -8,8 +8,8 @@ import { SimonView } from './view/SimonView';
 export default defineGame({
   meta: {
     id: 'simon',
-    name: 'Simón',
-    tagline: 'Repetí la secuencia. Cada ronda suma un paso.',
+    name: 'Secuencia',
+    tagline: 'Mirá y repetí. Cada ronda suma un paso.',
     icon: SimonIcon,
     difficulties: [1, 2, 3, 4, 5],
     tags: ['memoria', 'velocidad'],

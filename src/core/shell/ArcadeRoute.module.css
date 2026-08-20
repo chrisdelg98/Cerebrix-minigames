@@ -1,0 +1,88 @@
+@layer components {
+  /* El encabezado es el mismo que el de GameRoute, y comparte sus reglas: las
+     dos rutas tienen que verse como la misma app. */
+  .back {
+    display: grid;
+    place-items: center;
+    min-inline-size: var(--touch-min);
+    min-block-size: var(--touch-min);
+    margin-inline-start: calc(var(--sp-2) * -1);
+    color: var(--c-text);
+    border-radius: var(--r-full);
+  }
+
+  .title {
+    flex: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .headerEnd {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+    inline-size: 100%;
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+    inline-size: min(100%, 460px);
+    margin-inline: auto;
+    padding-block: var(--sp-4);
+  }
+
+  .rules {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    padding-inline-start: var(--sp-4);
+    color: var(--c-text);
+    font-size: var(--fs-reading);
+    line-height: var(--lh-body);
+  }
+
+  .examples {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-4);
+  }
+
+  .example {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+    max-inline-size: 22ch;
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    text-align: center;
+  }
+
+  .loading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    inline-size: 100%;
+  }
+
+  .message {
+    max-inline-size: 34ch;
+    color: var(--c-text-muted);
+    text-align: center;
+  }
+}

@@ -1,0 +1,167 @@
+@layer game {
+  .snake {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    align-items: center;
+    inline-size: 100%;
+  }
+
+  .hud {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+
+  .label {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .label:not(:first-child) {
+    margin-inline-start: var(--sp-3);
+  }
+
+  /*
+   * El mismo cálculo de ancho que <Grid>, y a propósito.
+   *
+   * Snake no usa <Grid> porque su tablero no es una grilla de controles sino un
+   * dibujo: los segmentos van posicionados encima y se mueven con `transform`,
+   * que es lo único que se anima durante la partida (docs/DESIGN_SYSTEM.md §1).
+   * Pero el ancho tiene que salir igual, o el tablero no se parecería al de los
+   * otros diez juegos.
+   */
+  .frame {
+    inline-size: min(
+      calc((100dvh - 215px) * var(--cols) / var(--rows)),
+      calc(100vw - var(--sp-4)),
+      480px
+    );
+    max-inline-size: 100%;
+    margin-inline: auto;
+    padding: var(--sp-2);
+    background-color: var(--c-surface);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+  }
+
+  .field {
+    position: relative;
+    inline-size: 100%;
+    aspect-ratio: var(--cols) / var(--rows);
+    background-color: var(--c-cell);
+    border-radius: var(--r-md);
+    overflow: hidden;
+
+    /* El pulgar dibuja sobre el tablero: el gesto es del juego, no de la página. */
+    touch-action: none;
+  }
+
+  /* Una cuadrícula tenue, para que se pueda contar cuánto falta para la pared
+     sin que compita con la víbora. Dos degradados, cero nodos. */
+  .field::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        to right,
+        var(--c-border-hairline) 0 1px,
+        transparent 1px calc(100% / var(--cols))
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        var(--c-border-hairline) 0 1px,
+        transparent 1px calc(100% / var(--rows))
+      );
+    opacity: 0.5;
+  }
+
+  .segment,
+  .food {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: calc(100% / var(--cols));
+    block-size: calc(100% / var(--rows));
+  }
+
+  .segment {
+    /* Solo transform: es lo único que se puede animar a 60fps en el área de
+       juego, y acá se anima en cada paso. */
+    transform: translate(calc(var(--x) * 100%), calc(var(--y) * 100%));
+    background-color: var(--c-accent);
+    border: 1px solid var(--c-surface);
+    border-radius: var(--r-xs);
+
+    /*
+     * La duración la manda el motor a través de --step, así que el
+     * deslizamiento dura exactamente lo que dura el paso y el movimiento no
+     * tiene costuras. Lineal y no eased: una víbora que acelera y frena dentro
+     * de cada casilla se ve nerviosa.
+     */
+    transition-property: transform;
+    transition-duration: var(--step, 150ms);
+    transition-timing-function: linear;
+  }
+
+  .segment[data-head='true'] {
+    background-color: var(--c-accent-press);
+    border-radius: var(--r-sm);
+    z-index: 1;
+  }
+
+  /*
+   * La fruta se ubica con `translate`, no con `transform`.
+   *
+   * Lleva encima `anim-breathe`, que anima `transform: scale()` — y una
+   * animación no compone con la propiedad, la REEMPLAZA. Con las dos cosas en
+   * `transform` la escala pisaba la posición, y la fruta aparecía siempre en la
+   * esquina de arriba a la izquierda sin importar dónde decía el motor que
+   * estaba. `translate` es una propiedad aparte, así que conviven.
+   */
+  .food {
+    translate: calc(var(--x) * 100%) calc(var(--y) * 100%);
+  }
+
+  /*
+   * El disco lo dibuja un pseudo-elemento y no la casilla.
+   *
+   * Antes era `padding` + `background-clip: content-box` sobre un span vacío, y
+   * no se veía nada: sin contenido no hay caja de contenido a la que recortar
+   * el fondo. Con `inset` el disco tiene medidas propias y no depende de que
+   * adentro haya algo.
+   */
+  .food::after {
+    content: '';
+    position: absolute;
+    inset: 16%;
+    background-color: var(--c-gold);
+    border-radius: var(--r-full);
+  }
+
+  /* Al morir se congela todo: la víbora deja de deslizarse en el aire hacia una
+     casilla a la que ya no va a llegar. */
+  .field[data-dead='true'] .segment {
+    transition-property: none;
+  }
+
+  .field[data-dead='true'] {
+    filter: saturate(0.4);
+  }
+
+  .help {
+    min-block-size: 1.4em;
+    color: var(--c-text-subtle);
+    font-size: var(--fs-sm);
+    text-align: center;
+  }
+}

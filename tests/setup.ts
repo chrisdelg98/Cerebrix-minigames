@@ -20,8 +20,18 @@ import { afterEach, vi } from 'vitest';
  * compilados y precargados; lo lento es el pipeline del test, y esperarlo es lo
  * correcto. Se pone acá una vez en vez de en cada llamada para que el próximo
  * test no tenga que descubrirlo de nuevo.
+ *
+ * Diez segundos y no cinco: con veintiún archivos repartidos entre los
+ * núcleos, cinco alcanzaban en una máquina descansada y no en una que además
+ * está compilando o corriendo navegadores. Sigue siendo un techo — un test
+ * colgado corta — y es preferible a una suite que falla distinto cada vez.
+ *
+ * Tiene que quedar POR DEBAJO del `testTimeout` de vite.config.ts con margen:
+ * una espera de 15 s dentro de un techo de 20 s dejaba cinco para todo lo demás,
+ * y los tests que esperan dos veces se pasaban del techo del test en vez de
+ * fallar por lo que estaban probando.
  */
-configure({ asyncUtilTimeout: 5000 });
+configure({ asyncUtilTimeout: 10_000 });
 
 afterEach(() => {
   cleanup();

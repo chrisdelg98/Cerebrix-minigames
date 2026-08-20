@@ -32,12 +32,24 @@ async function startGame(user: ReturnType<typeof userEvent.setup>): Promise<HTML
   return screen.getByRole('grid', { name: 'Tablero de 2048' });
 }
 
-/** El tablero como texto, para comparar un antes y un después. */
-const snapshot = (board: HTMLElement) =>
-  within(board)
+/**
+ * El tablero como texto, para comparar un antes y un después.
+ *
+ * Vuelve a buscarlo cada vez en vez de recibirlo: una jugada rechazada hace que
+ * el shell remonte el tablero con otra `key` para reproducir el temblor, y una
+ * referencia guardada de antes queda desconectada del documento. Los eventos
+ * siguientes se disparaban contra un nodo que ya no estaba en pantalla.
+ */
+const board = () => screen.getByRole('grid', { name: 'Tablero de 2048' });
+
+const snapshot = () =>
+  within(board())
     .getAllByRole('gridcell')
     .map((cell) => cell.textContent)
     .join('|');
+
+/** El contenedor que escucha el gesto, dos niveles por encima de la grilla. */
+const surface = () => board().parentElement?.parentElement ?? board();
 
 beforeEach(() => {
   localStorage.clear();
@@ -48,11 +60,11 @@ beforeEach(() => {
 describe('2048 dentro del shell', () => {
   it('carga desde el registro sin que /core sepa qué es', async () => {
     const user = renderGame();
-    const board = await startGame(user);
+    await startGame(user);
 
-    expect(within(board).getAllByRole('gridcell')).toHaveLength(16);
+    expect(within(board()).getAllByRole('gridcell')).toHaveLength(16);
     // El original arranca con dos fichas: con una, la primera jugada sería gratis.
-    const filled = within(board)
+    const filled = within(board())
       .getAllByRole('gridcell')
       .filter((cell) => cell.textContent !== '');
     expect(filled).toHaveLength(2);
@@ -82,14 +94,14 @@ describe('2048 dentro del shell', () => {
 
   it('mueve el tablero con las flechas', async () => {
     const user = renderGame();
-    const board = await startGame(user);
-    const before = snapshot(board);
+    await startGame(user);
+    const before = snapshot();
 
     // Con dos fichas al azar hay al menos un lado que mueve algo, pero no se
     // sabe cuál: se prueban los cuatro y alcanza con que uno responda.
     for (const key of ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown']) {
       fireEvent.keyDown(window, { key });
-      if (snapshot(board) !== before) return;
+      if (snapshot() !== before) return;
     }
 
     throw new Error('ninguna flecha movió el tablero');
@@ -97,11 +109,8 @@ describe('2048 dentro del shell', () => {
 
   it('mueve el tablero deslizando el dedo', async () => {
     const user = renderGame();
-    const board = await startGame(user);
-    const before = snapshot(board);
-
-    // El gesto lo escucha el contenedor del tablero, no la página.
-    const surface = board.parentElement?.parentElement ?? board;
+    await startGame(user);
+    const before = snapshot();
 
     const swipes = [
       { x: 200, y: 100 },
@@ -110,9 +119,9 @@ describe('2048 dentro del shell', () => {
       { x: 100, y: 0 },
     ];
     for (const end of swipes) {
-      fireEvent.pointerDown(surface, { clientX: 100, clientY: 100 });
-      fireEvent.pointerUp(surface, { clientX: end.x, clientY: end.y });
-      if (snapshot(board) !== before) return;
+      fireEvent.pointerDown(surface(), { clientX: 100, clientY: 100 });
+      fireEvent.pointerUp(surface(), { clientX: end.x, clientY: end.y });
+      if (snapshot() !== before) return;
     }
 
     throw new Error('ningún deslizamiento movió el tablero');
@@ -120,14 +129,13 @@ describe('2048 dentro del shell', () => {
 
   it('ignora un roce que no llega a ser deslizamiento', async () => {
     const user = renderGame();
-    const board = await startGame(user);
-    const before = snapshot(board);
-    const surface = board.parentElement?.parentElement ?? board;
+    await startGame(user);
+    const before = snapshot();
 
     // Ocho píxeles es un toque tembloroso, no una intención de mover.
-    fireEvent.pointerDown(surface, { clientX: 100, clientY: 100 });
-    fireEvent.pointerUp(surface, { clientX: 108, clientY: 100 });
+    fireEvent.pointerDown(surface(), { clientX: 100, clientY: 100 });
+    fireEvent.pointerUp(surface(), { clientX: 108, clientY: 100 });
 
-    expect(snapshot(board)).toBe(before);
+    expect(snapshot()).toBe(before);
   });
 });

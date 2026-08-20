@@ -1,0 +1,46 @@
+@layer game {
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+  }
+
+  .mini {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    padding: 2px;
+    background-color: var(--c-border-hairline);
+    border-radius: var(--r-xs);
+  }
+
+  .cell {
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+    background-color: var(--c-cell);
+  }
+
+  .cell[data-body='true'] {
+    background-color: var(--c-accent);
+  }
+
+  .cell[data-head='true'] {
+    background-color: var(--c-accent-press);
+  }
+
+  .cell[data-food='true'] {
+    background-color: var(--c-gold);
+    border-radius: var(--r-full);
+  }
+
+  .note {
+    color: var(--c-text-muted);
+    font-size: var(--fs-2xs);
+  }
+}

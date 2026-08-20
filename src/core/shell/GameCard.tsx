@@ -4,7 +4,7 @@ import { Badge } from '@design/components/Badge';
 import { type CSSVars } from '@design/types';
 
 import { DIFFICULTY_LABELS } from '../difficulty';
-import { type RegistryEntry } from '../registry';
+import { pathFor, type RegistryEntry } from '../registry';
 
 import s from './GameCard.module.css';
 
@@ -29,7 +29,7 @@ export function GameCard({ entry, index, continueAt, onPrefetch }: GameCardProps
   return (
     <li className={`${s.card} anim-stagger`} style={{ '--i': index } as CSSVars}>
       <Link
-        to={`/game/${entry.id}`}
+        to={pathFor(entry)}
         className={s.link}
         // The chunk is usually there by the time the finger lifts.
         onPointerEnter={onPrefetch}

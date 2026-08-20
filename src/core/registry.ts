@@ -1,11 +1,13 @@
 import { type ComponentType } from 'react';
 
+import { type AnyArcadeModule } from './arcade';
 import { type AnyGameModule, type GameMeta } from './contract';
 
 // The ONLY file in /core allowed to name a game — and only by string, by lazy
 // import(), and by an icon small enough to ride in the initial bundle. The lint
 // exemption for this exact path lives in eslint.config.js.
 import { Game2048Icon } from '@games/2048/sprites/Game2048Icons';
+import { SnakeIcon } from '@games/snake/sprites/SnakeIcons';
 import { ApagonIcon } from '@games/apagon/sprites/ApagonIcons';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
@@ -21,7 +23,7 @@ import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
  * The manifest. Adding a game is adding an entry here and nothing else in /core.
  * Reference: docs/GAME_CONTRACT.md §4.
  */
-export interface RegistryEntry {
+interface EntryBase {
   id: string;
   /** Light metadata, so Home can paint a card without downloading the game. */
   preview: Pick<
@@ -30,8 +32,6 @@ export interface RegistryEntry {
   >;
   /** The icon IS a static import: ~1 kB, and Home needs it immediately. */
   icon: ComponentType<{ size?: number }>;
-  /** The whole game, lazily. Never part of the initial bundle. */
-  load: () => Promise<{ default: AnyGameModule }>;
   /**
    * Se registra pero no se ofrece en Home.
    *
@@ -41,6 +41,33 @@ export interface RegistryEntry {
    * único que sobra es la tarjeta en la portada.
    */
   hidden?: boolean;
+}
+
+/**
+ * Quién produce el estado: el jugador o el reloj.
+ *
+ * `kind` es del shell y decide qué maquinaria corre — la pila de deshacer y el
+ * autoguardado, o un reloj y una pausa. No confundir con `preview.category`,
+ * que es del jugador y decide en qué estante de la portada aparece: Simón y
+ * 2048 están en el estante «arcade» y son por turnos.
+ */
+export interface TurnEntry extends EntryBase {
+  /** Ausente es por turnos, que es lo que son casi todos. */
+  kind?: 'turnos';
+  /** The whole game, lazily. Never part of the initial bundle. */
+  load: () => Promise<{ default: AnyGameModule }>;
+}
+
+export interface ClockEntry extends EntryBase {
+  kind: 'reloj';
+  load: () => Promise<{ default: AnyArcadeModule }>;
+}
+
+export type RegistryEntry = TurnEntry | ClockEntry;
+
+/** La ruta que le corresponde según quién produce su estado. */
+export function pathFor(entry: RegistryEntry): string {
+  return entry.kind === 'reloj' ? `/arcade/${entry.id}` : `/game/${entry.id}`;
 }
 
 export const REGISTRY: readonly RegistryEntry[] = [
@@ -183,6 +210,21 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: Game2048Icon,
     load: () => import('@games/2048'),
+  },
+  {
+    id: 'snake',
+    kind: 'reloj',
+    preview: {
+      id: 'snake',
+      name: 'Snake',
+      tagline: 'Comé y crecé sin chocarte. No para de moverse.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['velocidad'],
+      category: 'arcade',
+      estimatedMinutes: [1, 4],
+    },
+    icon: SnakeIcon,
+    load: () => import('@games/snake'),
   },
   {
     id: '_dummy',

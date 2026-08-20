@@ -77,6 +77,17 @@ export const routes: RouteObject[] = [
           }),
       },
       {
+        /* Los juegos con reloj tienen su propia maquinaria — sin deshacer, sin
+           partida guardada, con pausa — así que tienen su propia ruta. Ver
+           src/core/arcade.ts. */
+        path: 'arcade/:gameId',
+        lazy: () =>
+          freshChunk(async () => {
+            const { ArcadeRoute } = await import('./shell/ArcadeRoute');
+            return { Component: ArcadeRoute };
+          }),
+      },
+      {
         path: 'historial',
         lazy: () =>
           freshChunk(async () => {

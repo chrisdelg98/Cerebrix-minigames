@@ -111,9 +111,10 @@ export default defineConfig({
      * siempre, y no los mismos, que es lo peor que puede pasarle a una suite:
      * romper algo de verdad se veía igual que no romper nada.
      *
-     * Sigue siendo un techo, no una espera: un test colgado corta a los 20 s.
+     * Sigue siendo un techo, no una espera: un test colgado corta a los 30 s, y el techo
+     * queda holgado sobre los 10 s que espera cada `findBy` (tests/setup.ts).
      */
-    testTimeout: 20_000,
+    testTimeout: 30_000,
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],

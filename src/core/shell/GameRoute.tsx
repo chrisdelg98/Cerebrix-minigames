@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import { Button } from '@design/components/Button';
 import { Confetti } from '@design/components/Confetti';
@@ -22,7 +22,7 @@ import { type Difficulty } from '../contract';
 import { DIFFICULTY_LABELS, defaultDifficultyFor, difficultyOptions } from '../difficulty';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useGameSession } from '../hooks/useGameSession';
-import { findEntry, type RegistryEntry } from '../registry';
+import { findEntry, type TurnEntry } from '../registry';
 import { AppShell } from './AppShell';
 import { NotFound } from './NotFound';
 
@@ -39,12 +39,16 @@ export function GameRoute() {
 
   if (!entry) return <NotFound />;
 
+  // Un juego con reloj tiene otra maquinaria y vive en /arcade. Redirige en vez
+  // de dar 404 para que un enlace viejo siga llevando a algún lado.
+  if (entry.kind === 'reloj') return <Navigate to={`/arcade/${entry.id}`} replace />;
+
   // Keyed by id so switching games remounts the session instead of trying to
   // reconcile one game's state onto another's engine.
   return <GameSession key={entry.id} entry={entry} />;
 }
 
-function GameSession({ entry }: { entry: RegistryEntry }) {
+function GameSession({ entry }: { entry: TurnEntry }) {
   const session = useGameSession(entry.load, defaultDifficultyFor(entry.preview.difficulties));
 
   useDocumentMeta(

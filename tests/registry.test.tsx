@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { type AnyGameModule } from '@core/contract';
 import { REGISTRY, type RegistryEntry } from '@core/registry';
 import { Home } from '@core/shell/Home';
 import { StorageContext } from '@core/storageContext';
@@ -38,7 +37,9 @@ const fakeEntry: RegistryEntry = {
 describe('registry', () => {
   it('keeps every preview in sync with the real module metadata', async () => {
     for (const entry of REGISTRY) {
-      const loaded: { default: AnyGameModule } = await entry.load();
+      // Sin anotar: el registro tiene juegos por turnos y con reloj, y los
+      // campos que la portada pinta son los mismos en las dos metadatas.
+      const loaded = await entry.load();
       const { meta } = loaded.default;
 
       expect(entry.id, 'registry id must equal the module id').toBe(meta.id);

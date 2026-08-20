@@ -93,17 +93,20 @@
    * second row. Four stats only ever read well as 4×1 or 2×2, so the layout
    * names those two shapes and nothing in between can happen.
    */
+
+  /* La grilla la arma <GlobalStatsPanel>; acá solo se lo ubica y se lo hace
+     comportarse como enlace sin que parezca uno. */
   .stats {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--sp-2);
+    display: block;
     margin-block-end: var(--sp-5);
+    border-radius: var(--r-md);
+    color: inherit;
+    text-decoration: none;
   }
 
-  @media (width >= 600px) {
-    .stats {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
+  .stats:focus-visible {
+    outline: var(--bw-base) solid var(--c-accent);
+    outline-offset: var(--sp-1);
   }
 
   /*

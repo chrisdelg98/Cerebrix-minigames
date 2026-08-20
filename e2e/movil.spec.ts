@@ -50,3 +50,59 @@ test('ninguna pantalla se desborda a lo ancho en un teléfono de 360px', async (
   await page.goto('/historial');
   expect(await overflow(page), 'el historial se desborda').toBeLessThanOrEqual(0);
 });
+
+/*
+ * Las cifras de la portada según el ancho.
+ *
+ * Las cuatro fichas se comían casi un tercio de la primera pantalla de un
+ * teléfono, y esa pantalla tiene un trabajo: mostrar juegos. En móvil queda la
+ * racha sola a lo ancho y el bloque entero lleva al historial, que es donde
+ * están las cuatro. En una pantalla ancha no sobra espacio, así que se quedan.
+ *
+ * Es un corte por media query, así que solo se puede comprobar acá.
+ */
+test('la portada muestra una sola cifra en el teléfono y las cuatro en pantalla ancha', async ({
+  page,
+}) => {
+  // Una partida cualquiera, para que el bloque exista.
+  await page.goto('/arcade/snake');
+  await page.getByRole('button', { name: 'Empezar partida' }).click();
+  await expect(page.getByRole('heading', { name: 'Se terminó' })).toBeVisible({ timeout: 15_000 });
+
+  /*
+   * VISIBLES, no presentes. Las cuatro fichas se renderizan siempre y el CSS
+   * decide cuáles se muestran, así que `count()` —que cuenta nodos del DOM—
+   * devolvería cuatro en los dos anchos y el test no probaría nada.
+   */
+  const visibles = async () => {
+    const bloque = page.getByRole('link', { name: 'Ver mi historial completo' });
+    await expect(bloque).toBeVisible();
+    return bloque
+      .getByText(/^(Partidas|Completadas|Éxito|Racha)$/)
+      .evaluateAll((nodes) => nodes.filter((node) => node.checkVisibility()).length);
+  };
+
+  await page.setViewportSize(NARROW);
+  await page.goto('/');
+  expect(await visibles(), 'el teléfono debería mostrar solo la racha').toBe(1);
+  await expect(page.getByRole('link', { name: 'Ver mi historial completo' })).toHaveAttribute(
+    'href',
+    '/historial'
+  );
+
+  await page.setViewportSize({ width: 900, height: 900 });
+  await page.goto('/');
+  expect(await visibles(), 'en pantalla ancha deberían estar las cuatro').toBe(4);
+
+  // Y las cuatro tienen que estar siempre en el historial, en los dos anchos.
+  for (const size of [NARROW, { width: 900, height: 900 }]) {
+    await page.setViewportSize(size);
+    await page.goto('/historial');
+    const totales = page.getByRole('region', { name: 'Tus estadísticas' });
+    await expect(totales).toBeVisible();
+    const cifras = await totales
+      .getByText(/^(Partidas|Completadas|Éxito|Racha)$/)
+      .evaluateAll((nodes) => nodes.filter((node) => node.checkVisibility()).length);
+    expect(cifras).toBe(4);
+  }
+});

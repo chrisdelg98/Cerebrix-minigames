@@ -8,13 +8,14 @@ import { Modal } from '@design/components/Modal';
 import { Skeleton } from '@design/components/Skeleton';
 import { ArrowLeftIcon } from '@design/sprites/SettingsIcons';
 import { Trophy } from '@design/sprites/Trophy';
-import { computeStats, type GameResult } from '@storage/index';
+import { computeGlobalStats, computeStats, type GameResult } from '@storage/index';
 
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 import { type Difficulty } from '../contract';
 import { DIFFICULTY_LABELS, DIFFICULTIES } from '../difficulty';
 import { findEntry, REGISTRY } from '../registry';
+import { GlobalStatsPanel } from './GlobalStatsPanel';
 import { useStorage } from '../storageContext';
 
 import s from './History.module.css';
@@ -101,6 +102,17 @@ export function History() {
 
       {results !== null && results.length > 0 && (
         <>
+          {/*
+            Las cuatro cifras globales, arriba de todo.
+            En un teléfono la portada muestra solo la racha para no comerse la
+            primera pantalla, así que este es el lugar donde están completas.
+            Se calculan de los resultados que esta pantalla ya cargó, sin pedirle
+            nada más al storage.
+          */}
+          <section className={s.totals} aria-label="Tus estadísticas">
+            <GlobalStatsPanel stats={computeGlobalStats(results)} />
+          </section>
+
           <Progress results={results} />
 
           {/* One tab per game that has been played, plus everything. */}

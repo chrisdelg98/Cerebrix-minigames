@@ -103,6 +103,10 @@
 
   /* ── Progreso ── */
 
+  .totals {
+    margin-block-end: var(--sp-5);
+  }
+
   .progress {
     display: flex;
     flex-direction: column;

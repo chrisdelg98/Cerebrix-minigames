@@ -1,0 +1,38 @@
+@layer components {
+  /*
+   * Cuentas fijas y no auto-fit: con `minmax` hay anchos donde entran tres
+   * fichas y la cuarta cae sola a una segunda fila. Cuatro cifras solo se leen
+   * bien como 4×1 o 2×2, así que el layout nombra esas dos formas y nada
+   * intermedio puede pasar.
+   */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-2);
+    inline-size: 100%;
+  }
+
+  @media (width >= 600px) {
+    .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .tile {
+    display: contents;
+  }
+
+  /*
+   * --bp-sm — en un teléfono, y solo cuando quien lo usa lo pide, queda la
+   * racha sola ocupando el ancho entero. Una fila en vez de dos.
+   */
+  @media (width < 480px) {
+    .stats[data-collapse='true'] {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .stats[data-collapse='true'] .tile[data-secondary='true'] {
+      display: none;
+    }
+  }
+}

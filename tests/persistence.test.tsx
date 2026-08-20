@@ -195,8 +195,16 @@ describe('Home reflects what is stored', () => {
 
     renderAt('/');
 
-    const stats = await screen.findByRole('region', { name: 'Tus estadísticas' });
+    /*
+     * En la portada las cifras SON un enlace al historial. En un teléfono la
+     * portada muestra solo la racha —las cuatro se comían un tercio de la
+     * primera pantalla— así que ese enlace es cómo se llega al resto, y no un
+     * adorno. Las cuatro se renderizan siempre; cuáles se ven lo decide el CSS.
+     */
+    const stats = await screen.findByRole('link', { name: 'Ver mi historial completo' });
+    expect(stats).toHaveAttribute('href', '/historial');
     expect(within(stats).getByText('Partidas')).toBeInTheDocument();
     expect(within(stats).getByText('Éxito')).toBeInTheDocument();
+    expect(within(stats).getByText('Racha')).toBeInTheDocument();
   });
 });

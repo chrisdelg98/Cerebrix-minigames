@@ -5,12 +5,9 @@ import { EmptyState } from '@design/components/EmptyState';
 import { FilterChips } from '@design/components/FilterChips';
 import { InstallButton } from '@design/components/InstallButton';
 import { SettingsToggles } from '@design/components/SettingsToggles';
-import { StatTile } from '@design/components/StatTile';
 import { Clock } from '@design/sprites/Clock';
-import { GamepadIcon, InstallIcon, TargetIcon } from '@design/sprites/SettingsIcons';
+import { InstallIcon } from '@design/sprites/SettingsIcons';
 import { LogoCerebrix } from '@design/sprites/LogoCerebrix';
-import { Streak } from '@design/sprites/Streak';
-import { Trophy } from '@design/sprites/Trophy';
 
 import {
   ALL_CATEGORIES,
@@ -25,6 +22,7 @@ import { useGlobalStats, useSavedSessions } from '../hooks/useStoredData';
 import { REGISTRY, type RegistryEntry } from '../registry';
 import { DataControls } from './DataControls';
 import { GameCard } from './GameCard';
+import { GlobalStatsPanel } from './GlobalStatsPanel';
 
 import s from './Home.module.css';
 
@@ -136,22 +134,15 @@ export function Home({ entries = REGISTRY }: HomeProps) {
         </div>
       </header>
 
+      {/*
+        Las cifras llevan al historial, que es donde están enteras y explicadas.
+        En un teléfono la portada muestra solo la racha, así que el enlace deja
+        de ser un adorno: es cómo se llega al resto.
+      */}
       {stats !== null && stats.played > 0 && (
-        <section className={s.stats} aria-label="Tus estadísticas">
-          <StatTile label="Partidas" value={stats.played} icon={<GamepadIcon size={64} />} />
-          <StatTile
-            label="Completadas"
-            value={stats.completed}
-            icon={<Trophy size={64} state="unlocked" />}
-          />
-          <StatTile
-            label="Éxito"
-            value={Math.round(stats.successRate * 100)}
-            format={(value) => `${String(Math.round(value))}%`}
-            icon={<TargetIcon size={64} />}
-          />
-          <StatTile label="Racha" value={stats.currentStreak} icon={<Streak size={64} />} />
-        </section>
+        <Link to="/historial" className={s.stats} aria-label="Ver mi historial completo">
+          <GlobalStatsPanel stats={stats} collapse />
+        </Link>
       )}
 
       {/* Con un solo estante el filtro no filtra nada: es ruido con aspecto de control. */}

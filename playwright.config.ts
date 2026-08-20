@@ -21,6 +21,17 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
 
+  /*
+   * Sesenta segundos, no los treinta que trae Playwright.
+   *
+   * Varios de estos tests recorren flujos largos de verdad — abrir los once
+   * juegos, jugar una partida hasta el final, medir el reloj — y encima varias
+   * suites se reparten los núcleos. Con el default fallaban por la máquina y no
+   * por el código, y siempre distintos: el peor tipo de test, porque enseña a
+   * ignorar el rojo. Sigue siendo un techo: un test colgado corta.
+   */
+  timeout: 60_000,
+
   use: {
     baseURL: 'http://localhost:4173',
     // Solo al fallar: una traza por corrida verde es basura que nadie abre.

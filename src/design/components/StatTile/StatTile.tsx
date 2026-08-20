@@ -11,12 +11,20 @@ export interface StatTileProps {
   /** Formats the animated number. Defaults to the integer itself. */
   format?: (value: number) => string;
   trend?: 'up' | 'down';
+  /**
+   * Algo dibujado dentro de la ficha, detrás del número.
+   *
+   * Va acá adentro y no envuelto por fuera para que lo recorte el
+   * `overflow: hidden` de la ficha y le herede las esquinas: lo que se ponga no
+   * puede desbordarse ni tapar lo de al lado. `<StatTile>` no sabe qué es.
+   */
+  overlay?: ReactNode;
 }
 
 /** docs/DESIGN_SYSTEM.md §5.3 — count-up runs for 700ms on an ease-out curve. */
 const COUNT_UP_MS = 700;
 
-export function StatTile({ label, value, icon, format, trend }: StatTileProps) {
+export function StatTile({ label, value, icon, format, trend, overlay }: StatTileProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const numeric = typeof value === 'number' ? value : null;
 
@@ -52,6 +60,8 @@ export function StatTile({ label, value, icon, format, trend }: StatTileProps) {
 
   return (
     <div className={s.tile}>
+      {overlay}
+
       {/* Behind the numbers, not beside them: it gives the card an identity
           without spending a row on it. */}
       {icon !== undefined && (

@@ -1,8 +1,12 @@
+import { Sparks } from '@design/components/Sparks';
 import { StatTile } from '@design/components/StatTile';
 import { GamepadIcon, TargetIcon } from '@design/sprites/SettingsIcons';
 import { Streak } from '@design/sprites/Streak';
 import { Trophy } from '@design/sprites/Trophy';
+import { type CSSVars } from '@design/types';
 import { type GlobalStats } from '@storage/index';
+
+import { isCrowned, sparkIntensity } from '../streak';
 
 import s from './GlobalStatsPanel.module.css';
 
@@ -28,6 +32,9 @@ export interface GlobalStatsPanelProps {
  * así que vive en uno solo y se usa dos veces.
  */
 export function GlobalStatsPanel({ stats, collapse = false }: GlobalStatsPanelProps) {
+  const glow = sparkIntensity(stats.currentStreak);
+  const crowned = isCrowned(stats.currentStreak);
+
   return (
     <div className={s.stats} data-collapse={collapse}>
       <div className={s.tile} data-secondary="true">
@@ -48,8 +55,45 @@ export function GlobalStatsPanel({ stats, collapse = false }: GlobalStatsPanelPr
           icon={<TargetIcon size={64} />}
         />
       </div>
-      <div className={s.tile}>
-        <StatTile label="Racha" value={stats.currentStreak} icon={<Streak size={64} />} />
+      {/*
+        La llama se enciende con la racha.
+        Sin esto, el icono quedaba en teal pálido detrás de chispas doradas —
+        dos cosas peleando en el mismo rincón. Encendiéndose, el icono y el
+        efecto pasan a ser lo mismo, y la recompensa se lee en la ficha entera y
+        no en un adorno pegado encima.
+      */}
+      <div
+        className={s.tile}
+        style={
+          glow === null
+            ? undefined
+            : ({
+                /*
+                 * El tono NO se interpola: desde la primera chispa la llama ya
+                 * es dorada, y lo que crece es cuánto se la ve.
+                 *
+                 * Mezclar el acento con el dorado parecía lo natural y se veía
+                 * mal: son casi complementarios, así que la mezcla pasa por un
+                 * gris oliva y las rachas del medio quedaban con una llama
+                 * sucia. De tenue a encendida se lee como progresión igual, y
+                 * sin ningún paso feo.
+                 */
+                '--stat-icon': 'var(--c-gold)',
+                '--stat-icon-opacity': String(0.16 + glow * 0.44),
+                // Entra hasta quedar completa: sangrada fuera del borde estaba
+                // bien cuando era fondo, no ahora que es lo que se mira.
+                '--stat-icon-end': `${String(Math.round(glow * 10))}px`,
+              } as CSSVars)
+        }
+      >
+        <StatTile
+          label="Racha"
+          value={stats.currentStreak}
+          icon={<Streak size={64} />}
+          // Solo se pide cuando hay algo que festejar, así que el chunk del
+          // efecto ni se descarga hasta que la racha llega a siete.
+          overlay={glow === null ? undefined : <Sparks intensity={glow} ring={crowned} />}
+        />
       </div>
     </div>
   );

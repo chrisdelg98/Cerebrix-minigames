@@ -1,0 +1,186 @@
+@layer components {
+  .field {
+    position: absolute;
+    inset: 0;
+
+    /*
+     * El centro de la llama, en píxeles desde el borde derecho.
+     *
+     * Sale de las medidas del icono en StatTile.module.css: pegado al borde con
+     * `--stat-icon-end` y 64px de ancho, así que su mitad está 32px más adentro.
+     * Las chispas se cuelgan de acá y no de un porcentaje — un porcentaje se
+     * despega del icono en cuanto cambia el ancho de la ficha.
+     */
+    --flame-center: calc(var(--stat-icon-end, 0px) + 32px);
+
+    pointer-events: none;
+  }
+
+  /*
+   * Fuera de la pantalla o con la pestaña atrás, se congela.
+   *
+   * `animation-play-state` es gratis: el compositor deja de componer y no hay
+   * nada que recalcular. Desmontarlas sería peor — cada vuelta de scroll
+   * costaría montar y desmontar treinta elementos.
+   */
+  .field[data-awake='false'] * {
+    animation-play-state: paused;
+  }
+
+  /*
+   * El calor entra DESDE LA IZQUIERDA y crece hacia la llama.
+   *
+   * Como halo circular se veía un punto pegado en un lugar arbitrario, con un
+   * borde donde empezaba. Un barrido horizontal no tiene borde: nace
+   * imperceptible en el canto izquierdo y se va cargando hacia el rincón de la
+   * llama.
+   *
+   * Se corta ANTES de llegar a ella y baja en el último tramo. Cargado hasta el
+   * final, el barrido le pasaba por encima y le lavaba el color justo donde el
+   * fuego tiene que verse más. El fondo acompaña, no tapa.
+   */
+  .aura {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      color-mix(in oklab, var(--c-gold) 6%, transparent) 44%,
+      color-mix(in oklab, var(--c-gold) 20%, transparent) 74%,
+      color-mix(in oklab, var(--c-gold) 10%, transparent) 100%
+    );
+    opacity: calc(var(--level) * var(--level));
+    animation: aura-breathe 3.6s var(--e-in-out) infinite;
+  }
+
+  .spark {
+    position: absolute;
+
+    /*
+     * De la BASE de la llama, no de su centro.
+     *
+     * El icono mide 64px y está centrado en vertical, así que su mitad inferior
+     * termina 24px por debajo del medio de la ficha: ahí es donde arde. Naciendo
+     * en el centro, las chispas aparecían a media llama y se veían brotando de
+     * la nada; naciendo en la base, la atraviesan al subir, que es lo que hace
+     * el fuego.
+     */
+    inset-inline-end: calc(var(--flame-center) + var(--fx));
+    inset-block-start: calc(50% + 24px + var(--fy));
+    inline-size: var(--size);
+
+    /*
+     * Más alta que ancha: una chispa en movimiento deja un rastro, y un círculo
+     * perfecto se lee como una bolita quieta por más que se desplace. Con
+     * --r-full la cápsula sigue teniendo puntas redondeadas.
+     */
+    block-size: calc(var(--size) * 2.2);
+    background-color: var(--c-gold);
+    border-radius: var(--r-full);
+    opacity: 0;
+    animation: spark-rise var(--dur) ease-out var(--delay) infinite;
+  }
+
+  /* Las brasas son redondas, más grandes y suben sin apuro: son el cuerpo del
+     fuego, no la chispa que salta. */
+  .spark[data-ember='true'] {
+    block-size: var(--size);
+    filter: blur(0.4px);
+  }
+
+  /*
+   * El anillo del nivel máximo.
+   *
+   * Un aro de un píxel y medio recortado del borde: se nota sin engordar la
+   * ficha ni empujar nada. La máscara deja pasar solo el marco — el relleno se
+   * excluye — así que lo de adentro sigue siendo la ficha de siempre.
+   */
+  .ring {
+    position: absolute;
+    inset: 0;
+    padding: 1.5px;
+    border-radius: var(--r-md);
+    overflow: hidden;
+
+    /* `currentcolor` y no un color literal: a la máscara solo le importa el
+       alfa, y así no entra un hex donde stylelint —con razón— no los quiere. */
+    mask-image: linear-gradient(currentcolor 0 0), linear-gradient(currentcolor 0 0);
+    mask-clip: content-box, border-box;
+    mask-composite: exclude;
+  }
+
+  /*
+   * Lo que recorre el aro es un cuadrado que GIRA, no un degradado que cambia.
+   *
+   * Animar el ángulo de un `conic-gradient` obliga al navegador a repintarlo en
+   * cada cuadro. Un elemento con el degradado quieto y `transform: rotate()`
+   * encima lo resuelve el compositor, que es la única forma de animar algo
+   * permanente sin costo (docs/DESIGN_SYSTEM.md §1).
+   */
+  .sweep {
+    position: absolute;
+    inset: -60%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      transparent 232deg,
+      color-mix(in oklab, var(--c-gold) 55%, transparent) 292deg,
+      var(--c-gold) 330deg,
+      transparent 360deg
+    );
+    animation: ring-sweep 3.4s linear infinite;
+  }
+
+  /*
+   * Sube abriéndose y se bambolea en el medio.
+   *
+   * El bamboleo es lo que la saca de la línea recta: sin él las treinta suben
+   * en paralelo y se ve una cortina, no fuego. Y encoge al final en vez de
+   * apagarse de golpe, que es como se consume una chispa de verdad.
+   */
+  @keyframes spark-rise {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale(0.2);
+    }
+
+    12% {
+      opacity: calc(0.55 + var(--level) * 0.45);
+      transform: translate3d(calc(var(--drift) * 0.12), calc(var(--rise) * -0.12), 0) scale(1);
+    }
+
+    48% {
+      opacity: calc(0.5 + var(--level) * 0.4);
+      transform: translate3d(calc(var(--drift) * 0.5 + var(--sway)), calc(var(--rise) * -0.5), 0)
+        scale(1);
+    }
+
+    78% {
+      opacity: calc(0.28 + var(--level) * 0.28);
+    }
+
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--drift), calc(var(--rise) * -1), 0) scale(0.35);
+    }
+  }
+
+  /* Late en opacidad y no en escala: un barrido que ocupa la ficha entera no
+     puede crecer sin desbordarla. */
+  @keyframes aura-breathe {
+    0%,
+    100% {
+      opacity: calc(var(--level) * var(--level) * 0.75);
+    }
+
+    50% {
+      opacity: calc(var(--level) * var(--level));
+    }
+  }
+
+  @keyframes ring-sweep {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+}

@@ -40,6 +40,18 @@ function sizeOf(files) {
   return files.reduce((total, file) => total + gzipped(file), 0);
 }
 
+/*
+ * Cosas que NO pueden viajar en el arranque, por más chicas que sean.
+ *
+ * Cada una está detrás de un import() a propósito, y ese import() se rompe con
+ * una facilidad incómoda: `import { type X } from './Y'` con
+ * verbatimModuleSyntax deja `import './Y'` en la salida, el módulo vuelve al
+ * grafo estático y la separación desaparece sin que nada falle. Pasó con las
+ * chispas de la racha. Se busca una marca del propio código en el paquete
+ * inicial.
+ */
+const FUERA_DEL_ARRANQUE = [{ what: 'chispas de la racha', needle: 'spark-rise' }];
+
 const files = readdirSync(ASSETS);
 // String.raw y no un template normal: en uno normal `\w` no es un escape
 // válido, JS lo colapsa a `w`, y el patrón deja de buscar lo que dice buscar.
@@ -73,6 +85,19 @@ for (const { what, bytes, budget } of rows) {
   console.log(
     `${mark} ${what.padEnd(width)}  ${kb} kB gzip   ${String(share).padStart(3)}% del presupuesto`
   );
+}
+
+const initialSource = belongingTo('index')
+  .map((file) => readFileSync(join(ASSETS, file), 'utf8'))
+  .join('');
+
+for (const { what, needle } of FUERA_DEL_ARRANQUE) {
+  if (initialSource.includes(needle)) {
+    console.error(`✖ ${what}: viaja en el paquete inicial y debería cargarse aparte`);
+    failed = true;
+  } else {
+    console.log(`✓ ${what.padEnd(width)}  fuera del arranque`);
+  }
 }
 
 if (failed) {

@@ -16,18 +16,28 @@
   .icon {
     position: absolute;
     inset-block-start: 50%;
-    inset-inline-end: calc(var(--sp-3) * -1);
-    color: var(--c-accent);
-    opacity: 0.14;
+
+    /* Por defecto se sangra fuera del borde: de fondo, un icono entero compite
+       con el número. `--stat-icon-end` lo trae adentro cuando el icono deja de
+       ser fondo y pasa a ser lo que se mira. */
+    inset-inline-end: var(--stat-icon-end, calc(var(--sp-3) * -1));
+    opacity: var(--stat-icon-opacity, 0.14);
     pointer-events: none;
     translate: 0 -50%;
   }
 
-  /* Wins over any colour or animation the sprite sets for itself: as a backdrop
-     it is one flat tint, and a pulsing one would pull the eye off the number. */
+  /*
+   * Gana sobre el color y la animación que el sprite traiga: de fondo es un
+   * tinte plano, y uno que late le robaría el ojo al número.
+   *
+   * Con DOS perillas públicas, `--stat-icon` y `--stat-icon-opacity`, para el
+   * caso en que el icono deja de ser fondo y pasa a ser el premio: la llama de
+   * la racha se enciende a medida que la racha crece. Los valores por defecto
+   * son los de siempre, así que ninguna otra ficha se entera.
+   */
   .icon,
   .icon * {
-    color: var(--c-accent);
+    color: var(--stat-icon, var(--c-accent));
     animation: none;
   }
 

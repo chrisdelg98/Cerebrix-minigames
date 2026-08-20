@@ -27,11 +27,23 @@ const SHAPES = [
   'M12 4c4 0 7 3 7 6s-3 4-3 6-1 4-4 4-4-2-4-4-3-3-3-6 3-6 7-6z',
 ];
 
+/**
+ * Una carta tapada y otra dada vuelta, con su figura.
+ *
+ * Dos rectángulos iguales no decían "cartas" ni "pares": eran dos bloques, y en
+ * la portada se confundían con los de Simón y los de 2048. Que una esté llena y
+ * la otra abierta con una figura adentro es lo que hace la escena — hay algo
+ * escondido y algo revelado, que es el juego.
+ */
 export function MemoryIcon({ size = 24 }: SpriteProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="2.5" y="4.5" width="9" height="15" rx="1.6" fill="currentColor" opacity="0.55" />
-      <rect x="12.5" y="4.5" width="9" height="15" rx="1.6" fill="currentColor" />
+      {/* Tapada. */}
+      <rect x="2.5" y="4" width="8.6" height="16" rx="2" fill="currentColor" opacity="0.38" />
+
+      {/* Dada vuelta: el contorno es la carta y el disco, su figura. */}
+      <rect x="13.4" y="4" width="8.6" height="16" rx="2" stroke="currentColor" strokeWidth="2" />
+      <circle cx="17.7" cy="12" r="2.4" fill="currentColor" />
     </svg>
   );
 }

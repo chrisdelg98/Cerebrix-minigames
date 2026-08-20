@@ -3,17 +3,19 @@ interface SpriteProps {
 }
 
 /**
- * Dos fichas chicas empujadas contra una grande: la fusión, que es el juego.
+ * Dos fichas iguales de un lado, una del doble de grande del otro.
  *
- * La opacidad hace de escala — cuanto más vale la ficha, más presencia tiene —
- * que es exactamente lo que hace el tablero.
+ * Lo que distingue a este icono de los de Simón y Memoria es que sus cuadrados
+ * NO son todos del mismo tamaño — y ese contraste es justo la mecánica: dos
+ * iguales entran y sale una que vale el doble. Un intento anterior superponía
+ * las chicas a la grande y parecía un carrete con orejas.
  */
 export function Game2048Icon({ size = 24 }: SpriteProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="3" y="3" width="8.4" height="8.4" rx="2" fill="currentColor" opacity="0.3" />
-      <rect x="12.6" y="3" width="8.4" height="8.4" rx="2" fill="currentColor" opacity="0.3" />
-      <rect x="3" y="12.6" width="18" height="8.4" rx="2" fill="currentColor" />
+      <rect x="1.5" y="2.5" width="8" height="8" rx="2.2" fill="currentColor" opacity="0.38" />
+      <rect x="1.5" y="13.5" width="8" height="8" rx="2.2" fill="currentColor" opacity="0.38" />
+      <rect x="12.5" y="6.5" width="11" height="11" rx="3" fill="currentColor" />
     </svg>
   );
 }

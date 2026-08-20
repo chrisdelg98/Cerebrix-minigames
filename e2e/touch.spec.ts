@@ -42,7 +42,7 @@ async function dragFinger(page: Page, from: [number, number], to: [number, numbe
 }
 
 test('Trazo: el trazo empieza tocando el número, no solo el borde', async ({ page }) => {
-  await start(page, 'trazo');
+  await start(page, 'trace');
 
   // La casilla con el 1 es la única desde la que se puede empezar.
   const one = page.getByRole('gridcell', { name: /número 1$/ });
@@ -63,7 +63,7 @@ test('Trazo: el trazo empieza tocando el número, no solo el borde', async ({ pa
 });
 
 test('Trazo: arrastrar desde el número extiende el trazo a la casilla vecina', async ({ page }) => {
-  await start(page, 'trazo');
+  await start(page, 'trace');
 
   const one = page.getByRole('gridcell', { name: /número 1$/ });
   const box = await one.boundingBox();

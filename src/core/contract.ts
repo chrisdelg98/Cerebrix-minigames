@@ -48,7 +48,24 @@ export interface GameExample {
 }
 
 export interface GameMeta {
-  /** Stable identifier. It lives in the URL and in the database: never change it. */
+  /**
+   * La clave del juego: inglés, kebab-case, neutral al idioma.
+   *
+   * NO es una etiqueta y no tiene por qué parecerse a `name`. `name`, `tagline`
+   * y `howToPlay` son texto para el jugador y el día que haya multiidioma se
+   * traducen; el id no puede traducirse porque vive en la URL y en el
+   * almacenamiento del teléfono de cada jugador. Por eso se escribe en inglés,
+   * que es el idioma de las claves de este código: «Lights Out» se llama
+   * `lights-out` acá y se llamará así en cualquier idioma que hablemos después.
+   *
+   * Se elige una vez. Cambiarlo huerfaniza la partida guardada, el historial y
+   * la dificultad recordada de todos los que ya jugaron — y no hay forma de
+   * alcanzar esos datos para migrarlos. Si igual hay que cambiarlo, la limpieza
+   * de useForgetUnknownGames descarta lo viejo en vez de dejarlo pudrirse.
+   *
+   * La carpeta del juego se llama igual que el id: las herramientas emparejan
+   * los chunks del build por ahí (scripts/check-budget.mjs).
+   */
   id: string;
   name: string;
   /** One line for the Home card. */

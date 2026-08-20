@@ -134,6 +134,41 @@ export class LocalStorageDriver implements StorageDriver {
     return preferences;
   }
 
+  retainGames(gameIds: readonly string[]): Promise<string[]> {
+    const keep = new Set(gameIds);
+    const dropped = new Set<string>();
+
+    try {
+      // Se juntan primero y se borran después: remover mientras se recorre
+      // localStorage por índice se saltea claves.
+      const doomed: string[] = [];
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (key === null) continue;
+
+        for (const prefix of [SESSION_PREFIX, DIFFICULTY_PREFIX]) {
+          if (!key.startsWith(prefix)) continue;
+          const gameId = key.slice(prefix.length);
+          if (keep.has(gameId)) continue;
+          doomed.push(key);
+          dropped.add(gameId);
+        }
+      }
+      for (const key of doomed) localStorage.removeItem(key);
+
+      const results = this.#results();
+      const surviving = results.filter((result) => keep.has(result.gameId));
+      if (surviving.length !== results.length) {
+        for (const result of results) if (!keep.has(result.gameId)) dropped.add(result.gameId);
+        this.#write(RESULTS_KEY, surviving);
+      }
+    } catch {
+      // Sin storage no hay nada que limpiar.
+    }
+
+    return Promise.resolve([...dropped]);
+  }
+
   async clearAll(): Promise<void> {
     for (const session of await this.listSessions()) await this.clearSession(session.gameId);
     for (const preference of this.#preferences()) {

@@ -53,6 +53,7 @@ export type Difficulty = 1 | 2 | 3 | 4 | 5;
 
 export interface GameMeta {
   /** Identificador estable. Va en la URL y en la base de datos: no se cambia nunca. */
+  /** Clave en inglés y kebab-case. Ver «El id es una clave, no una etiqueta». */
   id: string;
   name: string;
   /** Una línea para la tarjeta de Home. */
@@ -283,3 +284,37 @@ Cuando el contrato cambie, el dummy es lo primero que se actualiza. Si actualiza
 - [ ] La vista usa componentes de `/design`, no CSS propio salvo lo específico del tablero
 - [ ] Probado a 360px, con teclado, y con `prefers-reduced-motion`
 - [ ] **El diff no toca `/core`.** Si lo toca, justificar en el PR.
+
+---
+
+## El id es una clave, no una etiqueta
+
+Un juego tiene **dos nombres** y hacen trabajos opuestos.
+
+|            | `id`                       | `meta.name`                        |
+| ---------- | -------------------------- | ---------------------------------- |
+| Para quién | la URL y el almacenamiento | el jugador                         |
+| Idioma     | inglés, siempre            | el del jugador                     |
+| ¿Cambia?   | nunca                      | cuando haga falta                  |
+| Ejemplo    | `lights-out`               | «Lights Out», «Apagón», «Éteignez» |
+
+**Por qué en inglés.** El día que haya multiidioma, `name`, `tagline` y
+`howToPlay` se traducen. El id no puede: es la clave con la que están guardadas
+las partidas en el teléfono de cada jugador y la que está en los enlaces que
+alguien compartió. Una clave en el idioma de la primera versión del producto es
+una decisión que se paga para siempre, así que se escribe en el idioma del
+código.
+
+**Por qué no cambia.** Este almacenamiento vive en cada dispositivo y no se
+puede alcanzar desde ningún lado: a una base en un servidor le corrés una
+migración una vez, a esta no. Cambiar un id huerfaniza la partida guardada, el
+historial y la dificultad recordada de todos los que ya jugaron.
+
+**Si igual hay que cambiarlo**, `useForgetUnknownGames` descarta al arrancar los
+datos de cualquier id que el registro ya no conozca. No los migra: los tira. Es
+deliberado — desde el storage, un juego renombrado y uno eliminado son el mismo
+caso, y una regla («quedate con los ids vigentes») cubre los dos sin una tabla
+de renombres históricos que haya que mantener a mano.
+
+**La carpeta se llama como el id.** No es cosmético: `scripts/check-budget.mjs`
+empareja cada chunk del build con su juego por ese nombre.

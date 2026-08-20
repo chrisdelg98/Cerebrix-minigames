@@ -8,20 +8,34 @@ import { type AnyGameModule, type GameMeta } from './contract';
 // exemption for this exact path lives in eslint.config.js.
 import { Game2048Icon } from '@games/2048/sprites/Game2048Icons';
 import { SnakeIcon } from '@games/snake/sprites/SnakeIcons';
-import { ApagonIcon } from '@games/apagon/sprites/ApagonIcons';
+import { LightsOutIcon } from '@games/lights-out/sprites/LightsOutIcons';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
 import { MemoryIcon } from '@games/memory/sprites/MemoryIcons';
 import { QueensIcon } from '@games/queens/sprites/QueensIcons';
-import { SimonIcon } from '@games/simon/sprites/SimonIcons';
+import { SequenceIcon } from '@games/sequence/sprites/SequenceIcons';
 import { TangoIcon } from '@games/tango/sprites/TangoIcons';
-import { TrazoIcon } from '@games/trazo/sprites/TrazoIcons';
+import { TraceIcon } from '@games/trace/sprites/TraceIcons';
 import { SudokuIcon } from '@games/sudoku/sprites/SudokuIcons';
 
 /**
  * The manifest. Adding a game is adding an entry here and nothing else in /core.
  * Reference: docs/GAME_CONTRACT.md §4.
+ *
+ * EL ORDEN DE ESTA LISTA ES EL ORDEN DE LA PORTADA, y es editorial.
+ *
+ * Durante un tiempo fue cronológico —cada juego nuevo se pegaba al final— y se
+ * notaba: la portada abría con los tres más largos. Ahora abre con lo más
+ * reconocible y alterna sabores, porque la app es para cinco minutos en el
+ * transporte y la primera fila decide si alguien entra o se va.
+ *
+ * No hay un campo `order`. Los números se pudren: todos eligen 10, 20, 30 y al
+ * mes hace falta el 15. Un array YA es una lista ordenada; un juego nuevo va
+ * donde corresponde, no al final por inercia.
+ *
+ * Los estantes heredan este orden, así que una sola lista ordena las tres
+ * vistas: Todos, Lógica y Arcade.
  */
 interface EntryBase {
   id: string;
@@ -100,6 +114,35 @@ export const REGISTRY: readonly RegistryEntry[] = [
     load: () => import('@games/minesweeper'),
   },
   {
+    id: '2048',
+    preview: {
+      id: '2048',
+      name: '2048',
+      tagline: 'Juntá fichas iguales y hacelas crecer.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['cálculo'],
+      category: 'arcade',
+      estimatedMinutes: [2, 12],
+    },
+    icon: Game2048Icon,
+    load: () => import('@games/2048'),
+  },
+  {
+    id: 'snake',
+    kind: 'reloj',
+    preview: {
+      id: 'snake',
+      name: 'Snake',
+      tagline: 'Comé y crecé sin chocarte. No para de moverse.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['velocidad'],
+      category: 'arcade',
+      estimatedMinutes: [1, 4],
+    },
+    icon: SnakeIcon,
+    load: () => import('@games/snake'),
+  },
+  {
     id: 'nonogram',
     preview: {
       id: 'nonogram',
@@ -112,6 +155,20 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: NonogramIcon,
     load: () => import('@games/nonogram'),
+  },
+  {
+    id: 'trace',
+    preview: {
+      id: 'trace',
+      name: 'Trazo',
+      tagline: 'Un solo trazo que pase por los números en orden.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      category: 'lógica',
+      estimatedMinutes: [2, 10],
+    },
+    icon: TraceIcon,
+    load: () => import('@games/trace'),
   },
   {
     id: 'tango',
@@ -142,20 +199,6 @@ export const REGISTRY: readonly RegistryEntry[] = [
     load: () => import('@games/queens'),
   },
   {
-    id: 'apagon',
-    preview: {
-      id: 'apagon',
-      name: 'Lights Out',
-      tagline: 'Apagá todas las luces. Cada toque prende y apaga de a cinco.',
-      difficulties: [1, 2, 3, 4, 5],
-      tags: ['lógica'],
-      category: 'lógica',
-      estimatedMinutes: [1, 8],
-    },
-    icon: ApagonIcon,
-    load: () => import('@games/apagon'),
-  },
-  {
     id: 'memory',
     preview: {
       id: 'memory',
@@ -170,23 +213,9 @@ export const REGISTRY: readonly RegistryEntry[] = [
     load: () => import('@games/memory'),
   },
   {
-    id: 'trazo',
+    id: 'sequence',
     preview: {
-      id: 'trazo',
-      name: 'Trazo',
-      tagline: 'Un solo trazo que pase por los números en orden.',
-      difficulties: [1, 2, 3, 4, 5],
-      tags: ['lógica'],
-      category: 'lógica',
-      estimatedMinutes: [2, 10],
-    },
-    icon: TrazoIcon,
-    load: () => import('@games/trazo'),
-  },
-  {
-    id: 'simon',
-    preview: {
-      id: 'simon',
+      id: 'sequence',
       name: 'Secuencia',
       tagline: 'Mirá y repetí. Cada ronda suma un paso.',
       difficulties: [1, 2, 3, 4, 5],
@@ -194,37 +223,22 @@ export const REGISTRY: readonly RegistryEntry[] = [
       category: 'arcade',
       estimatedMinutes: [1, 5],
     },
-    icon: SimonIcon,
-    load: () => import('@games/simon'),
+    icon: SequenceIcon,
+    load: () => import('@games/sequence'),
   },
   {
-    id: '2048',
+    id: 'lights-out',
     preview: {
-      id: '2048',
-      name: '2048',
-      tagline: 'Juntá fichas iguales y hacelas crecer.',
+      id: 'lights-out',
+      name: 'Lights Out',
+      tagline: 'Apagá todas las luces. Cada toque prende y apaga de a cinco.',
       difficulties: [1, 2, 3, 4, 5],
-      tags: ['cálculo'],
-      category: 'arcade',
-      estimatedMinutes: [2, 12],
+      tags: ['lógica'],
+      category: 'lógica',
+      estimatedMinutes: [1, 8],
     },
-    icon: Game2048Icon,
-    load: () => import('@games/2048'),
-  },
-  {
-    id: 'snake',
-    kind: 'reloj',
-    preview: {
-      id: 'snake',
-      name: 'Snake',
-      tagline: 'Comé y crecé sin chocarte. No para de moverse.',
-      difficulties: [1, 2, 3, 4, 5],
-      tags: ['velocidad'],
-      category: 'arcade',
-      estimatedMinutes: [1, 4],
-    },
-    icon: SnakeIcon,
-    load: () => import('@games/snake'),
+    icon: LightsOutIcon,
+    load: () => import('@games/lights-out'),
   },
   {
     id: '_dummy',

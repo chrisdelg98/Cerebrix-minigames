@@ -136,6 +136,35 @@ export class IndexedDbDriver implements StorageDriver {
     return db.getAll('preferences');
   }
 
+  async retainGames(gameIds: readonly string[]): Promise<string[]> {
+    const keep = new Set(gameIds);
+    const dropped = new Set<string>();
+    const db = await this.#open();
+
+    const tx = db.transaction(['sessions', 'results', 'preferences'], 'readwrite');
+
+    for (const store of ['sessions', 'preferences'] as const) {
+      for (const key of await tx.objectStore(store).getAllKeys()) {
+        const gameId = String(key);
+        if (keep.has(gameId)) continue;
+        await tx.objectStore(store).delete(key);
+        dropped.add(gameId);
+      }
+    }
+
+    const results = tx.objectStore('results');
+    for (const record of await results.getAll()) {
+      const gameId = (record as { gameId?: string; id?: number }).gameId ?? '';
+      const id = (record as { id?: number }).id;
+      if (keep.has(gameId) || id === undefined) continue;
+      await results.delete(id);
+      dropped.add(gameId);
+    }
+
+    await tx.done;
+    return [...dropped];
+  }
+
   async clearAll(): Promise<void> {
     const db = await this.#open();
     const tx = db.transaction(['sessions', 'results', 'preferences'], 'readwrite');

@@ -9,7 +9,7 @@ import { expect, test } from '@playwright/test';
  */
 
 test('una partida empezada sobrevive a recargar la página', async ({ page }) => {
-  await page.goto('/game/apagon');
+  await page.goto('/game/lights-out');
   await page.getByRole('button', { name: 'Empezar partida' }).click();
   await expect(page.getByRole('button', { name: 'Nueva partida' })).toBeVisible();
 
@@ -39,7 +39,7 @@ test('una partida empezada sobrevive a recargar la página', async ({ page }) =>
 });
 
 test('la portada ofrece continuar el juego que quedó a medias', async ({ page }) => {
-  await page.goto('/game/apagon');
+  await page.goto('/game/lights-out');
   await page.getByRole('button', { name: 'Empezar partida' }).click();
   await page
     .getByRole('grid', { name: 'Tablero de Lights Out' })
@@ -50,6 +50,6 @@ test('la portada ofrece continuar el juego que quedó a medias', async ({ page }
 
   await page.goto('/');
 
-  const card = page.locator('a[href="/game/apagon"]');
+  const card = page.locator('a[href="/game/lights-out"]');
   await expect(card.getByText('Continuar')).toBeVisible();
 });

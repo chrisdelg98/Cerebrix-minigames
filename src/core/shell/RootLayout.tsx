@@ -4,6 +4,8 @@ import { Outlet } from 'react-router-dom';
 import { Skeleton } from '@design/components/Skeleton';
 import { ToastProvider } from '@design/components/Toast';
 
+import { useForgetUnknownGames } from '../hooks/useForgetUnknownGames';
+
 import s from './RootLayout.module.css';
 
 /**
@@ -12,6 +14,9 @@ import s from './RootLayout.module.css';
  * never a full-screen spinner (docs/DESIGN_SYSTEM.md §5.4).
  */
 export function RootLayout() {
+  // Al arrancar, y una sola vez por visita.
+  useForgetUnknownGames();
+
   return (
     <ToastProvider>
       <a className="skip-link" href="#main">

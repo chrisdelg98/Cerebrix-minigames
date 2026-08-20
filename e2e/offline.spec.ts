@@ -52,7 +52,7 @@ test('un juego que nunca se abrió se puede jugar sin conexión', async ({ page,
    * solo puede venir del precache. Si el precache dejara afuera los juegos, un
    * viaje en subte serviría para mirar la portada y nada más.
    */
-  await page.goto('/game/apagon');
+  await page.goto('/game/lights-out');
   await expect(page.getByText('Hay una versión nueva')).toBeHidden();
 
   await page.getByRole('button', { name: /Empezar partida|Continuar partida/ }).click();

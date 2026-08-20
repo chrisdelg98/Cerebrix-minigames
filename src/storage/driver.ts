@@ -31,6 +31,25 @@ export interface StorageDriver {
   saveDifficulty(gameId: string, difficulty: number): Promise<void>;
   loadDifficulty(gameId: string): Promise<number | null>;
 
+  /**
+   * Se queda SOLO con los juegos de la lista y devuelve los ids que descartó.
+   *
+   * Existe porque este almacenamiento vive en el teléfono de cada jugador y no
+   * se puede alcanzar desde ningún lado: a una base en un servidor le corrés una
+   * migración una vez, a esta no. Cada dispositivo se limpia solo, cuando su
+   * dueño abre la app — o nunca.
+   *
+   * Cubre tres casos con una sola operación, porque desde acá abajo los tres
+   * son el mismo: un juego que se sacó, uno al que le cambiaron el id, y una
+   * clave escrita por un error de tipeo. En los tres el resultado es basura que
+   * nadie puede explicar ni borrar.
+   *
+   * "Quedate con estos" y no "borrá estos": una lista de ids vigentes se saca
+   * del registro y siempre está bien; una lista de ids históricos hay que
+   * mantenerla a mano y crece con cada cambio.
+   */
+  retainGames(gameIds: readonly string[]): Promise<string[]>;
+
   /** Wipes everything: sessions, results and preferences. No way back. */
   clearAll(): Promise<void>;
 

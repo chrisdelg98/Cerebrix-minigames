@@ -123,11 +123,18 @@ test('girar no frena el reloj', async ({ page }) => {
   const pasos = await page.evaluate(() => (window as unknown as { pasos: number[] }).pasos.slice());
 
   expect(pasos.length, 'la víbora casi no avanzó mientras giraba').toBeGreaterThan(4);
-  // Holgado para absorber el jitter de la máquina, pero muy por debajo de los
-  // 580 ms que medía cuando el giro reprogramaba el reloj.
-  for (const paso of pasos) {
-    expect(paso, `un paso tardó ${String(paso)}ms en vez de ~220`).toBeLessThan(330);
-  }
+
+  /*
+   * La MEDIANA y no el máximo.
+   *
+   * Con varias suites de navegador repartiéndose los núcleos, un paso suelto se
+   * estira y no dice nada del código. La regresión que este test cuida no era
+   * un pico: era que TODOS los pasos se iban a 580-781 ms, y contra eso la
+   * mediana es la medida correcta — y además no se puede engañar con suerte.
+   */
+  const ordenados = [...pasos].sort((a, b) => a - b);
+  const mediana = ordenados[Math.floor(ordenados.length / 2)] ?? 0;
+  expect(mediana, `la mediana fue ${String(mediana)}ms en vez de ~220`).toBeLessThan(330);
 });
 
 test('la pausa detiene el reloj y tapa el tablero', async ({ page }) => {

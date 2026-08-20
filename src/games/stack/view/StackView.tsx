@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { type ArcadeViewProps } from '@core/arcade';
 import { type CSSVars } from '@design/types';
 
+import { LEVEL_TARGETS } from '../engine/stackEngine';
 import { type StackMove, type StackState } from '../engine/types';
 
 import s from './StackView.module.css';
@@ -18,6 +19,31 @@ const VISIBLE = 9;
 
 /** Lo más arriba que la cima puede llegar antes de que la cámara empiece a subir. */
 const CEILING_ROW = 2;
+
+/**
+ * Los tonos, en orden CROMÁTICO y no por contraste.
+ *
+ * Caminan alrededor del círculo de color en vez de saltar entre colores
+ * distintos: teal → celeste → índigo → violeta, y recién al final el rojo y el
+ * oro para los tramos que superan la meta del nivel más alto. El violeta
+ * después del azul y no antes — un salto de tono chico entre tramos hace que el
+ * cambio se sienta como una progresión y no como otro juego.
+ *
+ * Son los `--c-trace-*` que ya usa Trazo, reordenados.
+ */
+const TONES = [
+  'var(--c-trace-1)',
+  'var(--c-trace-5)',
+  'var(--c-trace-2)',
+  'var(--c-trace-4)',
+  'var(--c-trace-6)',
+  'var(--c-gold)',
+];
+
+/** Cuántas metas dejó atrás una altura. Es el tramo al que pertenece. */
+function bandOf(floor: number): number {
+  return LEVEL_TARGETS.filter((target) => floor >= target).length;
+}
 
 export function StackView({
   state,
@@ -57,6 +83,28 @@ export function StackView({
    * Cada pieza se identifica por su altura y se ubica por su fila en pantalla,
    * así que un paneo es un transform por pieza y la transición lo hace continuo.
    */
+  /*
+   * TODA la torre lleva el tono del tramo alcanzado, no cada piso el suyo.
+   *
+   * Antes cada piso pintaba su propio tramo y la carga se reiniciaba en cada
+   * frontera: un tramo terminaba saturado y el siguiente arrancaba clarito,
+   * justo pegados. El corte se veía como un error de dibujo, no como un logro.
+   *
+   * Cambiando la torre entera de una, cruzar una meta se nota muchísimo más y
+   * no queda ninguna costura — y como la transición de CSS anima el color, el
+   * cambio se desliza en vez de saltar.
+   */
+  const band = bandOf(Math.max(0, tower.length - 1));
+  const tone = TONES[band] ?? TONES[0];
+
+  /*
+   * La carga corre a lo largo de TODA la torre, del pie a la cima, sin
+   * reiniciarse. Y arranca en 72 y no en 52: por debajo de eso el tono se
+   * lavaba contra el gris y los primeros pisos parecían sin pintar.
+   */
+  const tintOf = (floor: number) =>
+    `${String(Math.round(72 + (floor / Math.max(1, tower.length - 1)) * 28))}%`;
+
   const camera = Math.max(0, CEILING_ROW - (VISIBLE - tower.length));
   const rowOf = (floor: number) => VISIBLE - 1 - floor + camera;
 
@@ -105,7 +153,8 @@ export function StackView({
                   '--row': row,
                   // El tono sube con la altura: se ve cuánto se lleva subido sin
                   // leer el número.
-                  '--tint': `${String(Math.min(100, 46 + floor * 6))}%`,
+                  '--tone': tone,
+                  '--tint': tintOf(floor),
                 } as CSSVars
               }
               aria-hidden="true"
@@ -115,7 +164,14 @@ export function StackView({
           {!state.dead && (
             <span
               className={s.moving}
-              style={{ '--x': moving.start, '--w': moving.width, '--row': movingRow } as CSSVars}
+              style={
+                {
+                  '--x': moving.start,
+                  '--w': moving.width,
+                  '--row': movingRow,
+                  '--tone': tone,
+                } as CSSVars
+              }
               aria-hidden="true"
             />
           )}

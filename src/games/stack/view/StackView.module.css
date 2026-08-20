@@ -95,14 +95,21 @@
   /*
    * El tono sube con la altura.
    *
-   * Un solo tono con más presencia y no una escalera de colores: el tope de dos
-   * colores saturados de docs/DESIGN_SYSTEM.md §1 vale también acá, y la rampa
-   * dice lo mismo — cuánto se lleva subido — sin convertir la torre en un
-   * arcoíris.
+   * El tono lo pone la vista según el tramo (ver TONES en StackView.tsx) y acá
+   * solo se carga a medida que se sube dentro de ese tramo. Entre las dos cosas
+   * la torre cuenta el progreso sin que haya que leer el contador.
    */
   .piece {
-    background-color: color-mix(in oklab, var(--c-accent) var(--tint), var(--c-surface-sunken));
-    transition-property: transform;
+    background-color: color-mix(in oklab, var(--tone) var(--tint), var(--c-surface-sunken));
+
+    /*
+     * El color se anima igual que la posición.
+     *
+     * Al cruzar una meta la torre entera cambia de tono, y sin animarlo eso
+     * sería un parpadeo de toda la pantalla. Deslizándose, el cambio se lee
+     * como una recompensa que llega, no como un salto.
+     */
+    transition-property: transform, background-color;
     transition-duration: var(--d-base);
     transition-timing-function: var(--e-out);
   }
@@ -110,8 +117,8 @@
   /* El que todavía no se apoyó: mismo idioma, sin relleno, para que se vea que
      está en el aire. */
   .moving {
-    background-color: var(--c-accent-soft);
-    border: var(--bw-base) solid var(--c-accent);
+    background-color: color-mix(in oklab, var(--tone) 16%, var(--c-cell));
+    border: var(--bw-base) solid var(--tone);
   }
 
   .field[data-dead='true'] {

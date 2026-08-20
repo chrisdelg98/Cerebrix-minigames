@@ -18,6 +18,17 @@ const CONFIGS: Record<Difficulty, StackConfig> = {
   5: { slots: 32, target: 34, startWidth: 9, baseMs: 76 },
 };
 
+/**
+ * Las metas de los cinco niveles, en orden.
+ *
+ * Se derivan de CONFIGS y no se escriben aparte: la vista las usa para cambiar
+ * el color de la torre al cruzar cada una, y dos listas iguales en dos archivos
+ * se separan el día que alguien ajusta un nivel.
+ */
+export const LEVEL_TARGETS: readonly number[] = Object.values(CONFIGS)
+  .map((config) => config.target)
+  .sort((a, b) => a - b);
+
 /** Por debajo de esto el juego deja de ser difícil y pasa a ser injusto. */
 const FLOOR_MS = 34;
 

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@design/components/Badge';
 import { Button } from '@design/components/Button';
 import { EmptyState } from '@design/components/EmptyState';
+import { FilterChips } from '@design/components/FilterChips';
 import { Modal } from '@design/components/Modal';
 import { Skeleton } from '@design/components/Skeleton';
 import { ArrowLeftIcon } from '@design/sprites/SettingsIcons';
@@ -21,7 +22,14 @@ import { useStorage } from '../storageContext';
 import s from './History.module.css';
 
 /** How many rows before asking. Long histories are the normal case, not the edge. */
-const PAGE = 20;
+/*
+ * Diez por tanda.
+ *
+ * Con veinte, alguien que jugó un rato abría el historial y se encontraba una
+ * pared de filas antes de ver nada más. Diez entra en una pantalla y deja el
+ * resto a un toque de distancia.
+ */
+const PAGE = 10;
 
 const ALL = '__all__';
 
@@ -115,28 +123,33 @@ export function History() {
 
           <Progress results={results} />
 
-          {/* One tab per game that has been played, plus everything. */}
+          {/*
+            El MISMO control que filtra la portada, no uno propio.
+            Hacen exactamente el mismo trabajo —acortar una lista— y tenerlo dos
+            veces significaba dos aspectos distintos para la misma acción: acá
+            eran pastillas planas y allá, botones con relieve.
+
+            Y `radiogroup` en vez de `tablist`, que es lo que era: no hay paneles
+            que cambiar, hay una sola lista que se acorta.
+          */}
           {played.length > 1 && (
-            <div className={s.filters} role="tablist" aria-label="Filtrar por juego">
-              <FilterTab
-                label="Todos"
-                active={game === ALL}
-                onSelect={() => {
-                  setGame(ALL);
+            <div className={s.filters}>
+              <FilterChips
+                value={game}
+                options={[
+                  { value: ALL, label: 'Todos', count: results.length },
+                  ...played.map((entry) => ({
+                    value: entry.id,
+                    label: entry.preview.name,
+                    count: results.filter((result) => result.gameId === entry.id).length,
+                  })),
+                ]}
+                onChange={(next) => {
+                  setGame(next);
                   setShown(PAGE);
                 }}
+                label="Filtrar por juego"
               />
-              {played.map((entry) => (
-                <FilterTab
-                  key={entry.id}
-                  label={entry.preview.name}
-                  active={game === entry.id}
-                  onSelect={() => {
-                    setGame(entry.id);
-                    setShown(PAGE);
-                  }}
-                />
-              ))}
             </div>
           )}
 
@@ -219,22 +232,6 @@ export function History() {
         <p className={s.warning}>Empezás de cero, y esto no se puede deshacer.</p>
       </Modal>
     </div>
-  );
-}
-
-function FilterTab({
-  label,
-  active,
-  onSelect,
-}: {
-  label: string;
-  active: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button type="button" role="tab" aria-selected={active} className={s.tab} onClick={onSelect}>
-      {label}
-    </button>
   );
 }
 

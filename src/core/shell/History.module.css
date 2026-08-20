@@ -1,6 +1,8 @@
 @layer components {
   .page {
-    inline-size: min(100%, 720px);
+    /* El mismo ancho que la portada (Home.module.css). Con 720 acá y 860 allá,
+       pasar de una a otra movía todo el contenido de lugar. */
+    inline-size: min(100%, 860px);
     margin-inline: auto;
     padding: var(--sp-5) var(--sp-4);
     padding-block-end: calc(var(--sp-6) + env(safe-area-inset-bottom));
@@ -188,26 +190,6 @@
     flex-wrap: wrap;
     gap: var(--sp-2);
     margin-block-end: var(--sp-3);
-  }
-
-  .tab {
-    min-block-size: var(--touch-min);
-    padding-inline: var(--sp-4);
-    background-color: var(--c-surface-raised);
-    border: var(--bw-hair) solid var(--c-border);
-    border-radius: var(--r-full);
-    color: var(--c-text-muted);
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    transition-property: background-color, color, border-color;
-    transition-duration: var(--d-fast);
-    transition-timing-function: var(--e-out);
-  }
-
-  .tab[aria-selected='true'] {
-    background-color: var(--c-accent-soft);
-    border-color: var(--c-accent);
-    color: var(--c-accent);
   }
 
   .more {

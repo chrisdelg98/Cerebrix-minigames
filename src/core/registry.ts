@@ -9,6 +9,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 import { Game2048Icon } from '@games/2048/sprites/Game2048Icons';
 import { CrossingIcon } from '@games/crossing/sprites/CrossingIcons';
 import { SnakeIcon } from '@games/snake/sprites/SnakeIcons';
+import { StackIcon } from '@games/stack/sprites/StackIcons';
 import { LightsOutIcon } from '@games/lights-out/sprites/LightsOutIcons';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
@@ -157,6 +158,21 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: CrossingIcon,
     load: () => import('@games/crossing'),
+  },
+  {
+    id: 'stack',
+    kind: 'reloj',
+    preview: {
+      id: 'stack',
+      name: 'Torre de bloques',
+      tagline: 'Soltá cada bloque justo encima. Lo que sobresale se cae.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['velocidad'],
+      category: 'arcade',
+      estimatedMinutes: [1, 4],
+    },
+    icon: StackIcon,
+    load: () => import('@games/stack'),
   },
   {
     id: 'nonogram',

@@ -560,7 +560,7 @@ están marcadas: encajan en el contrato tal como está hoy.
 | **4 en línea** ✅          | Dejar caer fichas para alinear cuatro, contra la IA    | MESA RÁPIDO        | 2–5 min  | Fácil     |
 | Snake                      | Moverse, comer y crecer sin chocar                     | ARCADE REFLEJOS    | 1–5 min  | Muy fácil |
 | Golpea al topo             | Tocar rápido las casillas que se encienden             | REFLEJOS VELOCIDAD | 1–3 min  | Muy fácil |
-| Torre de bloques           | Frenar el bloque justo encima del anterior             | PRECISIÓN CASUAL   | 1–3 min  | Muy fácil |
+| **Torre de bloques** ✅    | Frenar el bloque justo encima del anterior             | PRECISIÓN CASUAL   | 1–4 min  | Muy fácil |
 | Pong                       | Hacer rebotar la bola contra una IA                    | ARCADE DEPORTE     | 2–5 min  | Muy fácil |
 | Rompebloques               | Rebotar la pelota con una barra para romper bloques    | ARCADE ACCIÓN      | 2–8 min  | Fácil     |
 | Flappy                     | Tocar para mantenerse volando entre obstáculos         | AGILIDAD ACCIÓN    | 1–3 min  | Fácil     |
@@ -610,6 +610,21 @@ convierte en un juego de decisión y no de reflejos.
 **Dos formas de morir, a propósito.** Que te alcance un auto y meterte debajo de
 uno. Con una sola, la otra sale gratis: quedarse quieto en la calle, o cruzar
 sin mirar.
+
+**Torre de bloques. Hecho, y es el único juego de la casa sin azar.** Sudoku,
+Snake, 2048 y Cruzar sortean algo; acá no hay nada que sortear. El bloque sale
+siempre del mismo lado y rebota, y toda la variación la pone el pulso del
+jugador. Dos partidas del mismo nivel arrancan idénticas y ninguna se parece.
+
+**El apoyo perfecto devuelve una ranura**, hasta el ancho de partida. Sin eso la
+torre solo se puede angostar y cada partida tiene un techo fijo por más bien que
+se juegue: la habilidad decidiría cuándo perdés pero nunca si podés remontar. Es
+lo que hace que apuntar rinda más que apurarse.
+
+**La cámara solo entra cuando hace falta.** La torre crece desde el piso del
+tablero y se ve entera; recién cuando la cima llega al techo la cámara empieza a
+subir y los primeros pisos salen por abajo. Un paneo es un transform por pieza,
+no una cuenta rehecha.
 
 ✅ = **entra sin tocar el contrato.** Una jugada produce un estado, el shell
 apila el anterior y deshacer sigue significando algo. En Simon la secuencia se

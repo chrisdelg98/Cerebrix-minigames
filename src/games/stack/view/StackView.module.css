@@ -1,0 +1,131 @@
+@layer game {
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    align-items: center;
+    inline-size: 100%;
+  }
+
+  .hud {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-2);
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+
+  .label {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .label:not(:first-child) {
+    margin-inline-start: var(--sp-3);
+  }
+
+  /* La racha de perfectos: el único momento en que el marcador festeja algo. */
+  .streak {
+    margin-inline-start: var(--sp-3);
+    color: var(--c-gold);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  /* El mismo cálculo de ancho que el resto de los tableros de la casa, con la
+     proporción de esta torre. */
+  .frame {
+    inline-size: min(calc((100dvh - 215px) * 0.62), calc(100vw - var(--sp-4)), 380px);
+    max-inline-size: 100%;
+    margin-inline: auto;
+    padding: var(--sp-2);
+    background-color: var(--c-surface);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+  }
+
+  /*
+   * El tablero ES el botón.
+   *
+   * La mecánica es una sola decisión —soltar— y pedir puntería para soltarlo
+   * sería un segundo desafío que el juego no propone. Como es un <button> de
+   * verdad, el teclado y el lector de pantalla lo alcanzan sin nada extra.
+   */
+  .field {
+    position: relative;
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 0.74;
+    background-color: var(--c-cell);
+    border: 0;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+
+  .piece,
+  .moving {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: calc(100% / var(--slots) * var(--w));
+    block-size: calc(100% / var(--rows));
+    border-radius: var(--r-xs);
+
+    /*
+     * En horizontal el porcentaje es de SU PROPIO ancho, no del tablero.
+     *
+     * La pieza mide `w` ranuras, así que moverla `x` ranuras es moverla
+     * `x / w` veces su ancho. En vertical no hace falta la corrección: cada
+     * pieza mide exactamente una fila, así que un 100% es una fila.
+     */
+    transform: translate(calc(var(--x) * 100% / var(--w)), calc(var(--row) * 100%));
+  }
+
+  /*
+   * El tono sube con la altura.
+   *
+   * Un solo tono con más presencia y no una escalera de colores: el tope de dos
+   * colores saturados de docs/DESIGN_SYSTEM.md §1 vale también acá, y la rampa
+   * dice lo mismo — cuánto se lleva subido — sin convertir la torre en un
+   * arcoíris.
+   */
+  .piece {
+    background-color: color-mix(in oklab, var(--c-accent) var(--tint), var(--c-surface-sunken));
+    transition-property: transform;
+    transition-duration: var(--d-base);
+    transition-timing-function: var(--e-out);
+  }
+
+  /* El que todavía no se apoyó: mismo idioma, sin relleno, para que se vea que
+     está en el aire. */
+  .moving {
+    background-color: var(--c-accent-soft);
+    border: var(--bw-base) solid var(--c-accent);
+  }
+
+  .field[data-dead='true'] {
+    filter: saturate(0.4);
+  }
+
+  .field[data-dead='true'] .piece {
+    transition-property: none;
+  }
+
+  .help {
+    max-inline-size: 32ch;
+    color: var(--c-text-subtle);
+    font-size: var(--fs-sm);
+    text-align: center;
+  }
+}

@@ -1,0 +1,53 @@
+@layer game {
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+  }
+
+  /* Doce ranuras de ancho y tres pisos de alto, en chico. */
+  .mini {
+    position: relative;
+    inline-size: 6rem;
+    block-size: 2.4rem;
+    background-color: var(--c-cell);
+    border: var(--bw-hair) solid var(--c-border-hairline);
+    border-radius: var(--r-xs);
+  }
+
+  .floor,
+  .moving {
+    position: absolute;
+    inset-inline-start: calc(var(--x) * 100% / 12);
+    inline-size: calc(var(--w) * 100% / 12);
+    block-size: 0.7rem;
+    border-radius: 2px;
+  }
+
+  /* Apilados desde abajo: el primero de la lista es el de más arriba. */
+  .floor {
+    inset-block-end: 0;
+    background-color: var(--c-accent);
+  }
+
+  .floor:first-of-type {
+    inset-block-end: 0.8rem;
+  }
+
+  .moving {
+    inset-block-start: 0.1rem;
+    background-color: var(--c-accent-soft);
+    border: var(--bw-hair) solid var(--c-accent);
+  }
+
+  .note {
+    color: var(--c-text-muted);
+    font-size: var(--fs-2xs);
+  }
+}

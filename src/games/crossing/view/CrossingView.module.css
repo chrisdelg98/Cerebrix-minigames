@@ -71,8 +71,11 @@
     inset-block-start: 0;
     block-size: calc(100% / var(--rows));
     transform: translateY(calc(var(--row) * 100%));
+
+    /* La cámara acompaña al paso del jugador, que es rápido y decidido: con una
+       duración más larga el tablero seguía moviéndose después del movimiento. */
     transition-property: transform;
-    transition-duration: var(--d-base);
+    transition-duration: var(--d-fast);
     transition-timing-function: var(--e-out);
   }
 
@@ -107,9 +110,17 @@
     translate: 0 -50%;
   }
 
-  /* La vereda ES el suelo: no necesita color propio, necesita no tener autos. */
+  /*
+   * La vereda es el suelo, pero se le marca el borde.
+   *
+   * Sin la línea, tres veredas seguidas se leían como un vacío blanco enorme y
+   * el tablero parecía a medio dibujar. Una divisoria fina alcanza para que se
+   * vean las filas —que es lo que el jugador cuenta al planear el cruce— sin
+   * meter un color más en pantalla.
+   */
   .lane[data-kind='safe'] {
     background-color: var(--c-cell);
+    border-block-end: var(--bw-hair) solid var(--c-border-hairline);
   }
 
   /* Detrás del punto de partida no hay mundo. */
@@ -120,6 +131,27 @@
 
   .car {
     position: absolute;
+
+    /*
+     * Las ruedas, asomando arriba y abajo.
+     *
+     * El auto va en horizontal, así que sus ruedas quedan en esos dos lados —
+     * al revés que las del jugador, que avanza hacia arriba y las tiene a los
+     * costados. Cuatro nubs chicos —delanteras y traseras— y no dos barras: la
+     * barra de lado a lado se leía como un corchete alrededor del auto y no
+     * como ruedas. Pintadas sobre la caja, sin nodos extra: son treinta en
+     * pantalla.
+     */
+    background-image:
+      linear-gradient(var(--c-text), var(--c-text)), linear-gradient(var(--c-text), var(--c-text)),
+      linear-gradient(var(--c-text), var(--c-text)), linear-gradient(var(--c-text), var(--c-text));
+    background-size: 15% 8%;
+    background-position:
+      27% 11%,
+      73% 11%,
+      27% 89%,
+      73% 89%;
+    background-repeat: no-repeat;
     inset-block: 12%;
     inset-inline-start: 0;
     inline-size: calc(100% / var(--cols));
@@ -132,24 +164,57 @@
     transition-timing-function: linear;
   }
 
-  /* Una barra con punta redondeada del lado al que va: se lee la dirección sin
-     dibujar un auto. */
+  /*
+   * Un auto visto desde arriba: carrocería, cabina y faros.
+   *
+   * El intento anterior pintaba la ventanilla como una banda que cruzaba todo
+   * el ancho, y por eso se leía como un bloque rayado: en una vista cenital la
+   * cabina está METIDA hacia adentro por los cuatro lados, con carrocería
+   * alrededor. Es la diferencia entre una raya y una ventana.
+   */
+
+  /*
+   * UN rasgo por sprite, y nada más.
+   *
+   * El auto se reconoce por el morro redondeado y una línea de parabrisas. La
+   * versión anterior le dibujaba la cabina entera y a este tamaño eso no suma
+   * detalle, suma ruido: se leía como una caja con un agujero. Con dos trazos
+   * se entiende qué es y hacia dónde va.
+   *
+   * El margen alrededor tampoco es decorativo: llegando casi al borde parecía
+   * más ancho de lo que el motor considera, y chocar se sentía injusto porque
+   * lo que se veía no coincidía con lo que mataba.
+   */
   .car::after {
     content: '';
     position: absolute;
-    inset: 0 8%;
+    inset: 14% 15%;
     background-color: var(--c-danger);
     border-radius: var(--r-xs);
   }
 
+  /* El parabrisas: una línea, adelante. */
+  .car::before {
+    content: '';
+    position: absolute;
+    inset: 22% 34% 22% 52%;
+    z-index: 1;
+    background-color: color-mix(in oklab, var(--c-surface) 75%, transparent);
+    border-radius: 1px;
+  }
+
   .car[data-dir='right']::after {
-    border-start-end-radius: var(--r-lg);
-    border-end-end-radius: var(--r-lg);
+    border-start-end-radius: 45%;
+    border-end-end-radius: 45%;
   }
 
   .car[data-dir='left']::after {
-    border-start-start-radius: var(--r-lg);
-    border-end-start-radius: var(--r-lg);
+    border-start-start-radius: 45%;
+    border-end-start-radius: 45%;
+  }
+
+  .car[data-dir='left']::before {
+    inset-inline: 34% 52%;
   }
 
   .player {
@@ -162,6 +227,25 @@
     transition-property: transform;
     transition-duration: var(--d-fast);
     transition-timing-function: var(--e-spring);
+
+    /*
+     * Cuatro ruedas, como los autos pero giradas.
+     *
+     * El jugador avanza en vertical, así que su eje largo es vertical y las
+     * ruedas le quedan a los costados — el mismo tratamiento que el tráfico,
+     * rotado noventa grados. Que compartan idioma es lo que hace que se lean
+     * como cosas del mismo mundo.
+     */
+    background-image:
+      linear-gradient(var(--c-text), var(--c-text)), linear-gradient(var(--c-text), var(--c-text)),
+      linear-gradient(var(--c-text), var(--c-text)), linear-gradient(var(--c-text), var(--c-text));
+    background-size: 7% 14%;
+    background-position:
+      19% 28%,
+      81% 28%,
+      19% 72%,
+      81% 72%;
+    background-repeat: no-repeat;
     z-index: 1;
   }
 
@@ -173,13 +257,76 @@
    * jugador no se dibujaba. `inset` sobre un absoluto sí mide contra su propia
    * caja.
    */
+
+  /*
+   * Las ruedas, asomando a los costados del cuerpo.
+   *
+   * Son dos barritas oscuras pintadas con degradados sobre una caja más ancha
+   * que la carrocería: sin nodos extra y en porcentaje, así que crecen con la
+   * casilla. Es lo que lo convierte en un vehículo visto desde arriba en vez de
+   * un cuadrado verde.
+   */
+
+  /*
+   * La carrocería, más angosta que las ruedas. Sin parabrisas.
+   *
+   * Las ruedas ya dicen que es un vehículo y son lo que lo distingue de los
+   * autos rojos, que se reconocen por el parabrisas. Un rasgo cada uno: dos
+   * siluetas que no se confunden, ninguna recargada.
+   */
+
+  /*
+   * El MISMO auto que el tráfico, girado noventa grados.
+   *
+   * Mismas proporciones, mismo morro redondeado, misma única línea de
+   * parabrisas y las ruedas en la misma posición relativa. Lo único que cambia
+   * es el color y hacia dónde apunta — avanza en vertical, así que su eje largo
+   * es vertical.
+   *
+   * Una versión anterior le puso luneta trasera para distinguirlo, y se veía
+   * como otra cosa. El color ya alcanza para saber cuál es el propio; que la
+   * silueta sea idéntica es lo que los hace pertenecer al mismo mundo.
+   */
   .player::after {
     content: '';
     position: absolute;
-    inset: 14%;
+
+    /*
+     * Angosto y alto, con la MISMA proporción que el auto pero invertida.
+     *
+     * Salía apachado porque yo lo estaba encajando en la casilla entera, que es
+     * cuadrada, mientras que el auto vive en una caja apaisada —76% de alto por
+     * 100% de ancho— y por eso se ve como un auto. Un vehículo que avanza en
+     * vertical tiene que ser el espejo de eso: angosto de ancho y largo de
+     * alto, no un cuadrado con la punta redondeada.
+     */
+    inset: 15% 23%;
+    z-index: 1;
     background-color: var(--c-accent);
-    border: var(--bw-base) solid var(--c-surface);
-    border-radius: var(--r-sm);
+    border-radius: var(--r-xs);
+
+    /* El mismo morro que los autos, sin excepciones: el color ya alcanza para
+       saber cuál es el propio, y cualquier diferencia de forma lo saca del
+       conjunto en vez de distinguirlo. */
+    border-start-start-radius: 45%;
+    border-start-end-radius: 45%;
+  }
+
+  /*
+   * El parabrisas, a la misma distancia del morro que en los autos.
+   *
+   * La proporción ya era la correcta; lo que estaba mal era DÓNDE. En el auto
+   * la línea cae a un 37% del morro hacia atrás, y acá la tenía a un 21% —casi
+   * encima de la punta— así que se leía como una gorra clara en vez de un
+   * vidrio.
+   */
+  .player::before {
+    content: '';
+    position: absolute;
+    inset: 34% 29% 52%;
+    z-index: 2;
+    background-color: color-mix(in oklab, var(--c-surface) 75%, transparent);
+    border-radius: 1px;
   }
 
   .player[data-dead='true']::after {

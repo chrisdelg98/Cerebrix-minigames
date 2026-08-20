@@ -1,8 +1,23 @@
 @layer components {
+  /*
+   * Exactamente el alto de la pantalla, no un mínimo.
+   *
+   * Con `min-block-size`, un contenido alto —las reglas de un juego con reloj,
+   * por ejemplo— hacía crecer la fila del medio y con ella el documento. El
+   * área de juego entonces nunca desbordaba, así que no scrolleaba nada… y como
+   * lleva `overscroll-behavior: contain` para que no se dispare el
+   * pull-to-refresh sobre el tablero, tampoco dejaba pasar la rueda al
+   * documento. El resultado era que solo se podía scrollear arrastrando la
+   * barra.
+   *
+   * Fijando el alto, la fila del medio queda acotada, el área de juego desborda
+   * y scrollea por dentro — que es lo que su `overflow: hidden auto` decía hacer
+   * desde el principio.
+   */
   .shell {
     display: grid;
     grid-template-rows: auto 1fr auto;
-    min-block-size: 100dvh;
+    block-size: 100dvh;
   }
 
   /* --bp-sm — the board takes the width it can get. docs/DESIGN_SYSTEM.md §7.1 */

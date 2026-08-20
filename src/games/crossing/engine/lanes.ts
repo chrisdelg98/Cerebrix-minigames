@@ -32,23 +32,41 @@ function noise(seed: string, row: number, salt: number): number {
 export const SAFE_START = 2;
 
 /**
+ * ¿Esta fila es calle?
+ *
+ * La regla "nunca tres calles seguidas" tiene que mirar las filas que
+ * TERMINARON siendo calle, no las que querrían serlo. Preguntándolo sobre el
+ * sorteo crudo, a densidad alta casi todas querían ser calle, la regla se
+ * disparaba en casi todas y el resultado se invertía: con tráfico 0.85 salía un
+ * 26% de calles y con 0.52 un 37%. El nivel Experto tenía menos obstáculos que
+ * el Fácil.
+ *
+ * Se resuelve caminando desde la primera fila jugable y arrastrando cuántas
+ * calles seguidas se llevan. Son unas decenas de vueltas por consulta — el
+ * mundo entero de una partida son sesenta filas — y a cambio la regla dice lo
+ * que promete.
+ */
+function isRoad(seed: string, row: number, traffic: number): boolean {
+  if (row <= SAFE_START) return false;
+
+  let run = 0;
+  let road = false;
+  for (let r = SAFE_START + 1; r <= row; r += 1) {
+    road = noise(seed, r, 1) <= traffic && run < 2;
+    run = road ? run + 1 : 0;
+  }
+  return road;
+}
+
+/**
  * Qué hay en una fila del mundo.
  *
  * Las primeras filas son siempre vereda: nadie debería morir antes de entender
- * qué hace cada gesto. Y dos calles nunca van seguidas de más de dos, para que
- * siempre haya dónde parar a mirar.
+ * qué hace cada gesto. Y nunca hay más de dos calles seguidas, para que siempre
+ * haya dónde parar a mirar.
  */
 export function laneAt(seed: string, row: number, traffic: number): Lane {
-  if (row <= SAFE_START) {
-    return { kind: 'safe', dir: 1, every: 1, gap: 4, offset: 0 };
-  }
-
-  const roll = noise(seed, row, 1);
-  // Tres calles seguidas es una trampa, no un desafío.
-  const forcedSafe =
-    row > SAFE_START + 2 && isRoad(seed, row - 1, traffic) && isRoad(seed, row - 2, traffic);
-
-  if (forcedSafe || roll > traffic) {
+  if (!isRoad(seed, row, traffic)) {
     return { kind: 'safe', dir: 1, every: 1, gap: 4, offset: 0 };
   }
 
@@ -60,12 +78,6 @@ export function laneAt(seed: string, row: number, traffic: number): Lane {
     gap: 3 + Math.floor(noise(seed, row, 4) * 3),
     offset: Math.floor(noise(seed, row, 5) * 12),
   };
-}
-
-/** Sin la regla de "no tres seguidas", para poder consultarla sin recursión. */
-function isRoad(seed: string, row: number, traffic: number): boolean {
-  if (row <= SAFE_START) return false;
-  return noise(seed, row, 1) <= traffic;
 }
 
 /**

@@ -9,6 +9,16 @@
     margin: auto;
 
     /* Wide enough that a rule is one or two lines, not five. */
+
+    /*
+     * Un piso además del techo.
+     *
+     * Sin mínimo, el ancho lo decidía el contenido: el modal de pausa —dos
+     * líneas y un botón— salía cómodo y el de "Se terminó" salía angosto y
+     * apretado, aunque son el mismo componente y el mismo momento del juego.
+     * Con un piso, todos los avisos del juego miden lo mismo.
+     */
+    inline-size: min(100% - (2 * var(--sp-3)), 400px);
     max-inline-size: min(100% - (2 * var(--sp-3)), 560px);
     padding: 0;
     background-color: var(--c-surface);

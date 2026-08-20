@@ -86,9 +86,17 @@ export function CrossingView({
   const { cols, rows, distance, col, ticks, seed, target, traffic } = state;
 
   // De arriba hacia abajo: la fila 0 de la pantalla es la más lejana.
-  const screen = Array.from({ length: rows }, (_, row) => ({
-    row,
-    world: distance + PLAYER_ROW - row,
+  /*
+   * Una fila de más arriba y abajo de lo que se ve.
+   *
+   * Al avanzar, todas las filas bajan un lugar y la de más arriba entra en
+   * escena. Si recién se montara en ese momento, aparecería ya puesta en su
+   * lugar mientras las demás se deslizan — y el conjunto se ve a los tropezones.
+   * Montada un paso antes, fuera del recorte, entra deslizándose como el resto.
+   */
+  const screen = Array.from({ length: rows + 2 }, (_, i) => ({
+    row: i - 1,
+    world: distance + PLAYER_ROW - (i - 1),
   }));
 
   return (

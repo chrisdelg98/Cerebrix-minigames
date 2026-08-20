@@ -35,10 +35,20 @@
     inline-size: 100%;
   }
 
+  /*
+   * Las reglas arrancan ARRIBA, no centradas.
+   *
+   * El área de juego centra a sus hijos —está pensada para un tablero, que se
+   * ve mejor en el medio— y con contenido más alto que la pantalla eso lo
+   * desborda hacia los DOS lados: la parte de arriba queda fuera del alcance del
+   * scroll y solo se llega arrastrando la barra. Un texto largo se lee desde el
+   * principio, así que se alinea al principio.
+   */
   .intro {
     display: flex;
     flex-direction: column;
     align-items: center;
+    align-self: start;
     gap: var(--sp-4);
     inline-size: min(100%, 460px);
     margin-inline: auto;
@@ -80,9 +90,12 @@
     inline-size: 100%;
   }
 
+  /* Alineado a la izquierda y sin tope de ancho: adentro de un modal, un texto
+     centrado y angosto se parte en renglones desparejos contra los bordes. */
   .message {
-    max-inline-size: 34ch;
+    display: block;
     color: var(--c-text-muted);
-    text-align: center;
+    font-size: var(--fs-reading);
+    line-height: var(--lh-body);
   }
 }

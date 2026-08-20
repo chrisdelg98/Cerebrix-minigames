@@ -7,7 +7,6 @@ import { Modal } from '@design/components/Modal';
 import { Skeleton } from '@design/components/Skeleton';
 import { Timer } from '@design/components/Timer';
 import { ArrowLeftIcon, PlayIcon, PlusIcon } from '@design/sprites/SettingsIcons';
-import { Trophy } from '@design/sprites/Trophy';
 
 import { type Difficulty } from '../contract';
 import { defaultDifficultyFor, difficultyOptions } from '../difficulty';
@@ -15,6 +14,7 @@ import { useArcadeSession } from '../hooks/useArcadeSession';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { findEntry, type ClockEntry } from '../registry';
 import { AppShell } from './AppShell';
+import { OutcomeModal } from './OutcomeModal';
 import { NotFound } from './NotFound';
 import { Link, useParams } from 'react-router-dom';
 
@@ -168,31 +168,35 @@ function ArcadeSession({ entry }: { entry: ClockEntry }) {
         un botón de trampa: en un juego de reflejos, mirar la pantalla quieta el
         tiempo que quieras es exactamente lo que el juego no ofrece.
       */}
-      <Modal open={session.paused && playing} onClose={session.resume} title="En pausa">
-        <p className={s.message}>El tablero espera. Nada se mueve hasta que vuelvas.</p>
-        <Button variant="primary" icon={<PlayIcon />} onClick={session.resume}>
-          Seguir jugando
-        </Button>
+      <Modal
+        open={session.paused && playing}
+        onClose={session.resume}
+        title="En pausa"
+        /*
+          El botón va en la fila de acciones, no dentro del texto.
+          Metido en el cuerpo quedaba pegado al párrafo y el texto se partía
+          alrededor. Todos los avisos del juego tienen la misma forma: título,
+          una línea, y los botones abajo.
+        */
+        actions={
+          <Button variant="primary" icon={<PlayIcon />} onClick={session.resume}>
+            Seguir jugando
+          </Button>
+        }
+      >
+        <span className={s.message}>El tablero espera. Nada se mueve hasta que vuelvas.</span>
       </Modal>
 
-      <Modal
+      <OutcomeModal
         open={outcomeOpen}
         onClose={() => {
           setDismissed(session.roundId);
         }}
-        title={won ? '¡Ganaste!' : 'Se terminó'}
-        centered={won}
-      >
-        {won && <Trophy size={96} state="unlocked" />}
-        <p className={s.message}>
-          {won
-            ? '¡Llegaste a la meta!'
-            : (session.status.kind === 'lost' && session.status.reason) || 'Probá de nuevo.'}
-        </p>
-        <Button variant="primary" icon={<PlusIcon />} onClick={session.restart}>
-          Otra vez
-        </Button>
-      </Modal>
+        won={won}
+        reason={session.status.kind === 'lost' ? session.status.reason : undefined}
+        difficulty={session.difficulty}
+        onRestart={session.restart}
+      />
     </AppShell>
   );
 }

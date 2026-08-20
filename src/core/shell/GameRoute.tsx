@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 
 import { Button } from '@design/components/Button';
 import { Confetti } from '@design/components/Confetti';
@@ -16,7 +16,6 @@ import {
   RedoIcon,
   UndoIcon,
 } from '@design/sprites/SettingsIcons';
-import { Trophy } from '@design/sprites/Trophy';
 
 import { type Difficulty } from '../contract';
 import { DIFFICULTY_LABELS, defaultDifficultyFor, difficultyOptions } from '../difficulty';
@@ -24,6 +23,7 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useGameSession } from '../hooks/useGameSession';
 import { findEntry, type TurnEntry } from '../registry';
 import { AppShell } from './AppShell';
+import { OutcomeModal } from './OutcomeModal';
 import { NotFound } from './NotFound';
 
 import s from './GameRoute.module.css';
@@ -55,7 +55,6 @@ function GameSession({ entry }: { entry: TurnEntry }) {
     entry.preview.name,
     `${entry.preview.tagline} Jugá gratis en el navegador, sin cuenta y sin conexión.`
   );
-  const navigate = useNavigate();
   const toast = useToast();
 
   // Which round's outcome the player already dismissed, so closing the modal
@@ -363,44 +362,16 @@ function GameSession({ entry }: { entry: TurnEntry }) {
         )}
       </Modal>
 
-      <Modal
+      <OutcomeModal
         open={outcomeOpen}
         onClose={() => {
           setDismissedRound(session.roundId);
         }}
-        title={won ? '¡Ganaste!' : 'Se terminó'}
-        centered={won}
-        dismissOnBackdrop={false}
-        actions={
-          <>
-            <Button
-              onClick={() => {
-                void navigate('/');
-              }}
-            >
-              Inicio
-            </Button>
-            <Button variant="primary" onClick={session.restart}>
-              Jugar otra vez
-            </Button>
-          </>
-        }
-      >
-        {won ? (
-          <div className={s.victory}>
-            {/* Grande y arriba del texto: el trofeo es el premio, no una viñeta
-                al costado de una frase. La animación es la que ya trae. */}
-            <Trophy size={96} state="unlocked" />
-            <span className={s.victoryLine}>
-              Completado en {DIFFICULTY_LABELS[session.difficulty]}
-            </span>
-          </div>
-        ) : (
-          <span className={s.outcome}>
-            {(session.status.kind === 'lost' && session.status.reason) || 'Probá de nuevo.'}
-          </span>
-        )}
-      </Modal>
+        won={won}
+        reason={session.status.kind === 'lost' ? session.status.reason : undefined}
+        difficulty={session.difficulty}
+        onRestart={session.restart}
+      />
     </AppShell>
   );
 }

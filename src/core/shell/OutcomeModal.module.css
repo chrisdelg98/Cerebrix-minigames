@@ -1,0 +1,21 @@
+@layer components {
+  .victory {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+    text-align: center;
+  }
+
+  .victoryLine {
+    color: var(--c-text-muted);
+    font-size: var(--fs-reading);
+  }
+
+  .outcome {
+    display: block;
+    color: var(--c-text-muted);
+    font-size: var(--fs-reading);
+    line-height: var(--lh-body);
+  }
+}

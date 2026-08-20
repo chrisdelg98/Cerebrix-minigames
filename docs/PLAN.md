@@ -568,7 +568,7 @@ están marcadas: encajan en el contrato tal como está hoy.
 | Salto infinito             | Saltar sobre plataformas que aparecen más y más arriba | ARCADE HABILIDAD   | 2–6 min  | Media     |
 | Asteroids / Space Invaders | Nave que dispara a figuras que caen                    | ACCIÓN DISPAROS    | 2–7 min  | Media     |
 | Cambio de color            | Cruzar la pelota solo por los obstáculos de su color   | AGILIDAD PRECISIÓN | 1–4 min  | Media     |
-| Cruzar la calle            | Avanzar paso a paso esquivando el tráfico              | HABILIDAD TIEMPO   | 2–6 min  | Media     |
+| **Cruzar la calle** ✅     | Avanzar paso a paso esquivando el tráfico              | HABILIDAD TIEMPO   | 1–5 min  | Media     |
 | Pac-Man                    | Juntar puntos esquivando uno o dos enemigos            | ARCADE ACCIÓN      | 2–8 min  | Media     |
 
 **2048. Hecho, y las tres decisiones que anticipaba salieron como estaban
@@ -593,6 +593,23 @@ oscura es siempre más grande. Chunk: **3.4 kB gzip**, contra un presupuesto de 
 pila de deshacer de pasos idénticos — habría que tocar deshacer cuatro veces
 para volver una jugada — y de paso el shell puede decir por qué, que es
 información real: ese lado está trabado.
+
+**Cruzar la calle. Hecho, el segundo con reloj.** Lo interesante es que el
+mundo **no se guarda**: cada fila y cada auto salen de una función de la semilla
+y del número de fila, así que el estado no crece por más que el jugador avance y
+la partida es reproducible sin esfuerzo. Guardarlo habría significado generarlo
+sobre la marcha, que es exactamente lo que hace que un motor deje de ser puro.
+
+**El reloj acelera con la DISTANCIA, no con el tiempo.** Atado al tiempo,
+quedarse en una vereda a estudiar el tráfico sería un castigo y el juego se
+pondría imposible sin que el jugador hiciera nada. Atado a la distancia, la
+dificultad la elige él cada vez que decide cruzar. Y `applyMove` no adelanta el
+reloj, así que mirar el hueco antes de pasar es gratis: eso es lo que lo
+convierte en un juego de decisión y no de reflejos.
+
+**Dos formas de morir, a propósito.** Que te alcance un auto y meterte debajo de
+uno. Con una sola, la otra sale gratis: quedarse quieto en la calle, o cruzar
+sin mirar.
 
 ✅ = **entra sin tocar el contrato.** Una jugada produce un estado, el shell
 apila el anterior y deshacer sigue significando algo. En Simon la secuencia se

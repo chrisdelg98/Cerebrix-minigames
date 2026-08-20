@@ -1,0 +1,50 @@
+@layer game {
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .strip {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-radius: var(--r-xs);
+    overflow: hidden;
+  }
+
+  .row[data-kind='road'] {
+    background-color: var(--c-cell-covered);
+  }
+
+  .row[data-kind='safe'] {
+    background-color: var(--c-cell-done);
+  }
+
+  .cell {
+    inline-size: 1.1rem;
+    block-size: 1.1rem;
+  }
+
+  .cell[data-car='true'] {
+    background-color: var(--c-danger);
+    border-radius: var(--r-xs);
+    scale: 0.86;
+  }
+
+  .cell[data-player='true'] {
+    background-color: var(--c-accent);
+    border-radius: var(--r-xs);
+    scale: 0.72;
+  }
+
+  .note {
+    color: var(--c-text-muted);
+    font-size: var(--fs-2xs);
+  }
+}

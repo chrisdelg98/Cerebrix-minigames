@@ -7,6 +7,7 @@ import { type AnyGameModule, type GameMeta } from './contract';
 // import(), and by an icon small enough to ride in the initial bundle. The lint
 // exemption for this exact path lives in eslint.config.js.
 import { Game2048Icon } from '@games/2048/sprites/Game2048Icons';
+import { CrossingIcon } from '@games/crossing/sprites/CrossingIcons';
 import { SnakeIcon } from '@games/snake/sprites/SnakeIcons';
 import { LightsOutIcon } from '@games/lights-out/sprites/LightsOutIcons';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
@@ -141,6 +142,21 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: SnakeIcon,
     load: () => import('@games/snake'),
+  },
+  {
+    id: 'crossing',
+    kind: 'reloj',
+    preview: {
+      id: 'crossing',
+      name: 'Cruzar la calle',
+      tagline: 'Avanzá fila por fila sin que te pase un auto por encima.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['velocidad'],
+      category: 'arcade',
+      estimatedMinutes: [1, 5],
+    },
+    icon: CrossingIcon,
+    load: () => import('@games/crossing'),
   },
   {
     id: 'nonogram',

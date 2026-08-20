@@ -1,0 +1,205 @@
+@layer game {
+  .crossing {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    align-items: center;
+    inline-size: 100%;
+  }
+
+  .hud {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+
+  .label {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .label:not(:first-child) {
+    margin-inline-start: var(--sp-3);
+  }
+
+  /* El mismo cálculo de ancho que <Grid> y que Snake: el tablero tiene que
+     medir lo mismo que el de los otros juegos. */
+  .frame {
+    inline-size: min(
+      calc((100dvh - 215px) * var(--cols) / var(--rows)),
+      calc(100vw - var(--sp-4)),
+      440px
+    );
+    max-inline-size: 100%;
+    margin-inline: auto;
+    padding: var(--sp-2);
+    background-color: var(--c-surface);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-lg);
+  }
+
+  .field {
+    position: relative;
+    inline-size: 100%;
+    aspect-ratio: var(--cols) / var(--rows);
+    background-color: var(--c-cell);
+    border-radius: var(--r-md);
+
+    /* Los autos entran y salen por los costados: acá se recortan. */
+    overflow: hidden;
+
+    /* El pulgar dibuja sobre el tablero. */
+    touch-action: none;
+  }
+
+  /*
+   * Cada fila se posiciona por su lugar en PANTALLA y se identifica por su
+   * lugar en el MUNDO. Al avanzar, todas bajan un lugar y la transición hace de
+   * cámara: un transform por fila en vez de redibujar el tablero entero.
+   */
+  .lane {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 0;
+    block-size: calc(100% / var(--rows));
+    transform: translateY(calc(var(--row) * 100%));
+    transition-property: transform;
+    transition-duration: var(--d-base);
+    transition-timing-function: var(--e-out);
+  }
+
+  /*
+   * La calle es más oscura que el suelo: se distingue de un vistazo dónde se
+   * puede parar.
+   *
+   * Estaba al revés y no se notaba: `--c-cell-covered` es BLANCO en tema claro
+   * —es la casilla sin destapar de Buscaminas— así que las calles quedaban
+   * invisibles y lo gris que se veía eran las veredas. `--c-surface-sunken` es
+   * más oscuro que `--c-cell` en los dos temas, que es lo que hacía falta.
+   */
+  .lane[data-kind='road'] {
+    /* Un gris neutro y no un token de superficie: `--c-surface-sunken` es casi
+       el mismo blanco que el suelo en tema claro, y el tablero se leía vacío. */
+    background-color: color-mix(in oklab, var(--c-text) 13%, var(--c-cell));
+  }
+
+  /* La línea del medio, punteada. Es lo que la termina de convertir en calle en
+     vez de una banda gris — y cuesta un degradado, no nodos. */
+  .lane[data-kind='road']::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline: 0;
+    block-size: 2px;
+    background-image: repeating-linear-gradient(
+      to right,
+      color-mix(in oklab, var(--c-cell) 70%, transparent) 0 6%,
+      transparent 6% 12%
+    );
+    translate: 0 -50%;
+  }
+
+  /* La vereda ES el suelo: no necesita color propio, necesita no tener autos. */
+  .lane[data-kind='safe'] {
+    background-color: var(--c-cell);
+  }
+
+  /* Detrás del punto de partida no hay mundo. */
+  .lane[data-kind='void'] {
+    background-color: var(--c-surface);
+    opacity: 0.5;
+  }
+
+  .car {
+    position: absolute;
+    inset-block: 12%;
+    inset-inline-start: 0;
+    inline-size: calc(100% / var(--cols));
+    transform: translateX(calc(var(--col) * 100%));
+
+    /* El auto se desliza al ritmo del paso del reloj, igual que la víbora de
+       Snake: la duración la manda el motor por --step. */
+    transition-property: transform;
+    transition-duration: var(--step, 300ms);
+    transition-timing-function: linear;
+  }
+
+  /* Una barra con punta redondeada del lado al que va: se lee la dirección sin
+     dibujar un auto. */
+  .car::after {
+    content: '';
+    position: absolute;
+    inset: 0 8%;
+    background-color: var(--c-danger);
+    border-radius: var(--r-xs);
+  }
+
+  .car[data-dir='right']::after {
+    border-start-end-radius: var(--r-lg);
+    border-end-end-radius: var(--r-lg);
+  }
+
+  .car[data-dir='left']::after {
+    border-start-start-radius: var(--r-lg);
+    border-end-start-radius: var(--r-lg);
+  }
+
+  .player {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: calc(100% / var(--cols));
+    block-size: calc(100% / var(--rows));
+    transform: translate(calc(var(--col) * 100%), calc(var(--row) * 100%));
+    transition-property: transform;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-spring);
+    z-index: 1;
+  }
+
+  /*
+   * El recuadro se achica con `inset` y no con `padding`.
+   *
+   * Un padding en porcentaje se resuelve contra el ANCHO DEL CONTENEDOR, no del
+   * elemento: 14% de un tablero de 860px se comía la casilla entera y el
+   * jugador no se dibujaba. `inset` sobre un absoluto sí mide contra su propia
+   * caja.
+   */
+  .player::after {
+    content: '';
+    position: absolute;
+    inset: 14%;
+    background-color: var(--c-accent);
+    border: var(--bw-base) solid var(--c-surface);
+    border-radius: var(--r-sm);
+  }
+
+  .player[data-dead='true']::after {
+    background-color: var(--c-danger);
+    scale: 0.7;
+  }
+
+  .field[data-dead='true'] {
+    filter: saturate(0.4);
+  }
+
+  .field[data-dead='true'] .car,
+  .field[data-dead='true'] .lane {
+    transition-property: none;
+  }
+
+  .help {
+    max-inline-size: 34ch;
+    color: var(--c-text-subtle);
+    font-size: var(--fs-sm);
+    text-align: center;
+  }
+}

@@ -26,6 +26,16 @@ export interface SnakeState {
    * reloj aplica uno por paso y cada muerte tiene una causa visible.
    */
   pending: Heading | null;
+  /**
+   * Si la serpiente ya está apoyada contra la pared, gastando su paso de gracia.
+   *
+   * Es el "borde invisible": la primera vez que un paso daría contra la pared la
+   * serpiente se queda quieta en vez de morir, y ese paso —entre 125 y 220 ms
+   * según el nivel— es el que alcanza para girar. Cuando ves la cabeza en la
+   * última casilla, el paso que la mata ya venía en camino; sin esta pausa el
+   * giro llegaba siempre tarde y el borde se sentía injusto.
+   */
+  grace: boolean;
   food: number;
   /** Largo al que hay que llegar para ganar. Lo decide la dificultad. */
   target: number;

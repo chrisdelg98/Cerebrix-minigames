@@ -8,8 +8,6 @@
      */
     margin: auto;
 
-    /* Wide enough that a rule is one or two lines, not five. */
-
     /*
      * Un piso además del techo.
      *
@@ -17,8 +15,12 @@
      * líneas y un botón— salía cómodo y el de "Se terminó" salía angosto y
      * apretado, aunque son el mismo componente y el mismo momento del juego.
      * Con un piso, todos los avisos del juego miden lo mismo.
+     *
+     * El piso es además lo único que decide el ancho en escritorio: el techo
+     * solo limita, así que subirlo no ensancha nada. En un celular no se nota
+     * porque ahí gana el `100% - márgenes`.
      */
-    inline-size: min(100% - (2 * var(--sp-3)), 440px);
+    inline-size: min(100% - (2 * var(--sp-3)), 560px);
     max-inline-size: min(100% - (2 * var(--sp-3)), 620px);
 
     /*

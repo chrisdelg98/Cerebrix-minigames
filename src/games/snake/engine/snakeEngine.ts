@@ -95,6 +95,7 @@ export const snakeEngine: ArcadeEngine<SnakeState, SnakeMove, SnakeConfig> = {
       ...base,
       heading: 'right',
       pending: null,
+      grace: false,
       food: placeFood(base),
       target: config.target,
       baseMs: config.baseMs,
@@ -121,8 +122,20 @@ export const snakeEngine: ArcadeEngine<SnakeState, SnakeMove, SnakeConfig> = {
     const heading = state.pending ?? state.heading;
     const head = ahead(state.body[0] ?? 0, heading, state.cols, state.rows);
 
-    // La pared.
-    if (head === -1) return { ...state, heading, pending: null, dead: true };
+    /*
+     * La pared, pero con un paso de gracia.
+     *
+     * El primer paso contra la pared no mata: la serpiente se queda apoyada y
+     * el jugador tiene ese paso entero para girar. Recién el segundo mata. Sin
+     * esto, el giro había que pedirlo antes de VER la cabeza en la última
+     * casilla, porque para cuando se veía el paso fatal ya estaba en camino.
+     *
+     * No se sale de la grilla: la cabeza no avanza, solo espera.
+     */
+    if (head === -1) {
+      if (!state.grace) return { ...state, heading, pending: null, grace: true };
+      return { ...state, heading, pending: null, dead: true };
+    }
 
     const eating = head === state.food;
     // La cola se va a mover, así que pisarla NO es chocar — salvo que estés
@@ -131,13 +144,14 @@ export const snakeEngine: ArcadeEngine<SnakeState, SnakeMove, SnakeConfig> = {
     if (body.includes(head)) return { ...state, heading, pending: null, dead: true };
 
     const grown = [head, ...body];
-    if (!eating) return { ...state, heading, pending: null, body: grown };
+    if (!eating) return { ...state, heading, pending: null, grace: false, body: grown };
 
     const spawns = state.spawns + 1;
     return {
       ...state,
       heading,
       pending: null,
+      grace: false,
       body: grown,
       spawns,
       food: placeFood({ ...state, body: grown, spawns }),

@@ -11,6 +11,7 @@ function board(over: Partial<SnakeState> = {}): SnakeState {
     body: [12, 11, 10],
     heading: 'right',
     pending: null,
+    grace: false,
     food: -1,
     target: 12,
     baseMs: 200,
@@ -54,16 +55,19 @@ describe('el reloj mueve, el jugador dobla', () => {
 });
 
 describe('lo que termina la partida', () => {
+  // Dos pasos, no uno: el primero contra la pared es el de gracia. Ver
+  // «el paso de gracia contra la pared» más abajo.
   it('la pared', () => {
     // Cabeza en la última columna, yendo a la derecha.
-    const wall = board({ body: [14, 13, 12] });
+    const wall = engine.tick(board({ body: [14, 13, 12] }));
     expect(engine.tick(wall).dead).toBe(true);
     expect(engine.checkStatus(engine.tick(wall)).kind).toBe('lost');
   });
 
   it('no se sale por el costado: la fila de al lado no es "adelante"', () => {
-    const edge = board({ body: [9, 8, 7] });
-    expect(engine.tick(edge).dead, 'cruzó de la fila 2 a la 3').toBe(true);
+    const edge = engine.tick(board({ body: [9, 8, 7] }));
+    expect(edge.body[0], 'cruzó de la fila 2 a la 3').toBe(9);
+    expect(engine.tick(edge).dead).toBe(true);
   });
 
   it('el propio cuerpo', () => {
@@ -136,5 +140,51 @@ describe('el contrato arcade', () => {
   it('la misma semilla da la misma partida', () => {
     const config = engine.getDifficultyConfig(3);
     expect(engine.createInitialState(config, 'x')).toEqual(engine.createInitialState(config, 'x'));
+  });
+});
+
+/*
+ * El borde se sentía injusto: para cuando la cabeza SE VE en la última casilla,
+ * el paso que la mata ya está en camino, así que el giro llegaba tarde siempre.
+ * El primer paso contra la pared ahora no mata, y ese paso alcanza para girar.
+ */
+describe('el paso de gracia contra la pared', () => {
+  /** Cabeza en la última columna de la fila 2, yendo a la derecha. */
+  const contraLaPared = () => board({ body: [14, 13, 12] });
+
+  it('el primer paso contra la pared no mata: la cabeza espera ahí', () => {
+    const next = engine.tick(contraLaPared());
+
+    expect(next.dead).toBe(false);
+    expect(next.grace).toBe(true);
+    // Y no se sale de la grilla: no avanzó.
+    expect(next.body).toEqual([14, 13, 12]);
+  });
+
+  it('ese paso alcanza para girar', () => {
+    const apoyada = engine.tick(contraLaPared());
+    const girada = engine.tick(engine.applyMove(apoyada, { heading: 'up' }));
+
+    expect(girada.dead).toBe(false);
+    expect(girada.body[0]).toBe(9);
+    expect(girada.grace).toBe(false);
+  });
+
+  it('pero es UNO solo: sin girar, el paso siguiente sí mata', () => {
+    const apoyada = engine.tick(contraLaPared());
+    const muerta = engine.tick(apoyada);
+
+    expect(muerta.dead).toBe(true);
+  });
+
+  it('cada contacto nuevo con la pared tiene el suyo', () => {
+    // Se salva contra la derecha, sube, y vuelve a tocar arriba.
+    const apoyada = engine.tick(contraLaPared());
+    const subiendo = engine.tick(engine.applyMove(apoyada, { heading: 'up' }));
+    const enLaFilaCero = engine.tick(subiendo);
+
+    expect(enLaFilaCero.body[0]).toBe(4);
+    expect(enLaFilaCero.grace).toBe(false);
+    expect(engine.tick(enLaFilaCero).dead).toBe(false);
   });
 });

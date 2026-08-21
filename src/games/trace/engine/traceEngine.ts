@@ -16,12 +16,25 @@ import { type TraceConfig, type TraceMove, type TraceState } from './types';
  * y los tres niveles de arriba comparten tablero para que lo único que cambie
  * sea cuánto te dan resuelto.
  */
+/**
+ * La escala corre un escalón y estrena tablero arriba.
+ *
+ * Los cuatro primeros niveles son de deducción y crecen en las dos palancas:
+ * tablero y cuántas anclas quedan. El que era experto —6×6 adelgazado hasta el
+ * hueso, unos siete números sobre treinta y seis— pasa a ser Difícil, porque
+ * ahí abajo la deducción ya no da más de sí y el tablero es lo que quedaba
+ * chico.
+ *
+ * Experto es otra cosa: 8×8, sin exigir solución única. Ver `TraceConfig.unique`
+ * para por qué eso es lo que hace posible el tamaño, y por qué acá los números
+ * SUBEN en vez de bajar.
+ */
 const CONFIGS: Record<Difficulty, TraceConfig> = {
-  1: { size: 4, keep: 9 },
-  2: { size: 5, keep: 13 },
-  3: { size: 6, keep: 15 },
-  4: { size: 6, keep: 11 },
-  5: { size: 6, keep: 0 },
+  1: { size: 4, keep: 9, unique: true },
+  2: { size: 5, keep: 12, unique: true },
+  3: { size: 6, keep: 13, unique: true },
+  4: { size: 6, keep: 0, unique: true },
+  5: { size: 8, keep: 18, unique: false },
 };
 
 function place(index: number, size: number): string {

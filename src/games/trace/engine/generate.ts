@@ -102,6 +102,34 @@ function thinned(
 }
 
 /**
+ * Un tablero sin la exigencia de solución única: recorrido al azar y números
+ * repartidos parejo por encima.
+ *
+ * Sin `countPaths` de por medio no hay búsqueda que pueda dispararse, así que
+ * un 8×8 sale en milisegundos donde demostrar unicidad no terminaría nunca. El
+ * recorrido generado ES una solución, así que el tablero siempre se puede
+ * resolver; lo que no se garantiza es que sea la única, y no hace falta: el
+ * motor valida reglas —arranca en el 1, casillas pegadas, sin repetir, números
+ * en orden— y se gana al cubrir el tablero.
+ *
+ * Parejo y no al azar porque los números son las paradas obligatorias: juntos
+ * dejan medio tablero sin restricción y el trazo se vuelve un garabato libre.
+ */
+function spread(size: number, rng: () => number, count: number): Puzzle {
+  const total = size * size;
+  const path = fullPath(size, rng) ?? [...Array(total).keys()];
+
+  // El principio y el final siempre; el resto a intervalos iguales.
+  const marks = new Set([0, path.length - 1]);
+  const steps = Math.max(2, count) - 1;
+  for (let i = 1; i < steps; i += 1) {
+    marks.add(Math.round((i * (path.length - 1)) / steps));
+  }
+
+  return { size, numbers: numbersFrom(size, path, marks), solution: [...path] };
+}
+
+/**
  * Dibuja un recorrido y le va clavando números hasta que sea el único posible.
  *
  * El primero y el último son obligatorios: sin ellos el recorrido no tiene ni
@@ -114,6 +142,8 @@ function thinned(
 export function generatePuzzle(config: TraceConfig, seed?: string): Puzzle {
   const { size } = config;
   const rng = makeRng(seed ?? String(Date.now()));
+
+  if (!config.unique) return spread(size, rng, config.keep);
 
   for (let attempt = 0; attempt < 40; attempt += 1) {
     const path = fullPath(size, rng);

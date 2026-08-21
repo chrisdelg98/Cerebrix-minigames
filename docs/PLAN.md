@@ -599,8 +599,30 @@ barato; lo caro es demostrar que no hay un segundo, que es lo que exige la
 unicidad. La comprobación de alcance no alcanza: hace falta contar los callejones
 sin salida, porque final hay uno solo y en cuanto aparecen dos la rama está
 muerta aunque todo siga comunicado. Medido con eso: 1 ms en 4×4, 13 ms en 5×5,
-35 ms en 6×6. **Tope en 6×6** — de 7 en adelante el costo crece mucho más rápido
-que la dificultad que aporta.
+35 ms en 6×6. **Tope en 6×6 mientras se exija unicidad** — de 7 en adelante el
+buscador se rinde casi siempre y el generador conserva los números que no pudo
+descartar.
+
+**Y por eso experto renuncia a la unicidad.** El tope no era del tablero sino de
+la demostración: sin ella un 8×8 se genera en 0 ms, medido. El recorrido que
+dibuja el generador ES una solución, así que siempre hay respuesta; lo que no se
+garantiza es que sea la única — y nada la necesita, porque el motor valida
+reglas y no compara contra la solución guardada.
+
+Cambia el TIPO de dificultad, no solo la cantidad: del 1 al 4 el juego es
+deducir cuál es el camino, y en experto es conseguir uno que cubra sesenta y
+cuatro casillas sin dejar ninguna aislada. Con eso viene una inversión que hay
+que tener presente: **con unicidad, menos números es más difícil; sin unicidad,
+menos números es más fácil**, porque hay más caminos válidos. Por eso experto
+lleva 18 números y no 8.
+
+| Nivel | Tablero | Números | Generar |
+| ----- | ------- | ------- | ------- |
+| 1     | 4×4     | 8.6     | 3 ms    |
+| 2     | 5×5     | 11.8    | 29 ms   |
+| 3     | 6×6     | 13.0    | 74 ms   |
+| 4     | 6×6     | 8.4     | 61 ms   |
+| 5     | 8×8     | 18.0    | 0 ms    |
 
 **Inversión compartida:** Tango, Queens y Zip necesitan lo mismo — generar,
 contar soluciones, cortar en dos, reintentar. Nonograma y Sudoku ya lo hacen cada

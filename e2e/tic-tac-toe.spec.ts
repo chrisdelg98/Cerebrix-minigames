@@ -24,6 +24,44 @@ test.describe('Tres en línea', () => {
     await expect(page.getByText(/no cuenta para tu historial/)).toBeVisible();
   });
 
+  /*
+   * Guarda el modal de victoria COMPARTIDO, no este juego: la copa rebota hasta
+   * scale(1.09) girada 8° dentro de un cuerpo que scrollea, y ese desborde
+   * transitorio sacaba la barra por los 680ms de la animación. Se prueba desde
+   * acá porque el tres en línea a dos jugadores es la forma más corta de llegar
+   * a una victoria — cinco toques y sin máquina que conteste.
+   */
+  test('la copa rebota sin sacar la barra de scroll', async ({ page }) => {
+    await page.goto('/game/tic-tac-toe');
+    await page.getByRole('button', { name: 'Dos jugadores' }).click();
+    await page.getByRole('button', { name: /Empezar partida/ }).click();
+
+    const tablero = page.getByRole('grid', { name: 'Tablero de Tres en línea' });
+    for (const nombre of [
+      'arriba izquierda',
+      'izquierda',
+      'arriba centro',
+      'centro',
+      'arriba derecha',
+    ]) {
+      await tablero.getByRole('gridcell', { name: `${nombre}, vacía`, exact: true }).click();
+    }
+    await expect(page.getByText('Ganan las X')).toBeVisible();
+
+    const desborde = await page.evaluate(async () => {
+      let peor = 0;
+      for (let t = 0; t <= 900; t += 60) {
+        const cuerpo = document.querySelector('dialog[open] [class*="body"]');
+        if (cuerpo !== null) peor = Math.max(peor, cuerpo.scrollHeight - cuerpo.clientHeight);
+        await new Promise((res) => setTimeout(res, 60));
+      }
+      return peor;
+    });
+
+    // Sin el aire reservado esto mide 8px a los 240ms.
+    expect(desborde, 'la copa desbordó el cuerpo del modal').toBe(0);
+  });
+
   test('se juega: la ficha aparece donde se toca', async ({ page }) => {
     await page.goto('/game/tic-tac-toe');
     await page.getByRole('button', { name: 'Dos jugadores' }).click();

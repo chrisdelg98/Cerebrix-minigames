@@ -4,6 +4,21 @@
     flex-direction: column;
     align-items: center;
     gap: var(--sp-3);
+
+    /*
+     * El aire que la copa necesita para rebotar.
+     *
+     * `anim-trophy-win` la lleva a scale(1.09) girada 8°, que sobre 96px se
+     * sale unos 8px por lado. El cuerpo del modal scrollea —lo necesita para
+     * las reglas largas—, y un desborde transitorio dentro de un contenedor de
+     * scroll saca la barra: aparecía por los 680ms de la animación y se iba
+     * sola, que es de las cosas que peor se ven.
+     *
+     * Medido: 8px de desborde vertical entre los 240 y los 300ms, decayendo a
+     * 1px y después a cero. Reservar el espacio y no recortar la copa, porque
+     * recortada el rebote pierde justo el instante que lo hace un rebote.
+     */
+    padding: var(--sp-2);
     text-align: center;
   }
 

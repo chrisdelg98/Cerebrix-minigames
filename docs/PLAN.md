@@ -603,26 +603,38 @@ muerta aunque todo siga comunicado. Medido con eso: 1 ms en 4×4, 13 ms en 5×5,
 buscador se rinde casi siempre y el generador conserva los números que no pudo
 descartar.
 
-**Y por eso experto renuncia a la unicidad.** El tope no era del tablero sino de
-la demostración: sin ella un 8×8 se genera en 0 ms, medido. El recorrido que
-dibuja el generador ES una solución, así que siempre hay respuesta; lo que no se
-garantiza es que sea la única — y nada la necesita, porque el motor valida
-reglas y no compara contra la solución guardada.
+**Y por eso los dos niveles de arriba renuncian a la unicidad.** El tope no era
+del tablero sino de la demostración: sin ella un 9×9 se genera en 9 ms, medido.
+El recorrido que dibuja el generador ES una solución, así que siempre hay
+respuesta; lo que no se garantiza es que sea la única — y nada la necesita,
+porque el motor valida reglas y no compara contra la solución guardada.
 
-Cambia el TIPO de dificultad, no solo la cantidad: del 1 al 4 el juego es
-deducir cuál es el camino, y en experto es conseguir uno que cubra sesenta y
-cuatro casillas sin dejar ninguna aislada. Con eso viene una inversión que hay
-que tener presente: **con unicidad, menos números es más difícil; sin unicidad,
-menos números es más fácil**, porque hay más caminos válidos. Por eso experto
-lleva 18 números y no 8.
+Quedan **dos mitades**. Del 1 al 3 se deduce: una sola solución, y el 3 es la
+deducción al hueso (6×6 con ocho anclas sobre treinta y seis). Del 4 al 5 se
+recorre: conseguir un camino que cubra todo sin dejar ninguna casilla aislada.
 
-| Nivel | Tablero | Números | Generar |
-| ----- | ------- | ------- | ------- |
-| 1     | 4×4     | 8.6     | 3 ms    |
-| 2     | 5×5     | 11.8    | 29 ms   |
-| 3     | 6×6     | 13.0    | 74 ms   |
-| 4     | 6×6     | 8.4     | 61 ms   |
-| 5     | 8×8     | 18.0    | 0 ms    |
+Con el cambio de mitad **se invierte la palanca de los números**: con unicidad,
+menos números es más difícil; sin ella es al revés — hasta un punto, porque
+pasado ese punto el tablero se vuelve unir puntos y se ablanda otra vez. Es una
+**U invertida**. Medida con un buscador a lo bruto (menos aciertos = más
+restringido): en 8×8 el fondo va de 14 a 18 números y a 22 ya sube a 4%; en 9×9
+el fondo va de 16 a 23 y sube a partir de 26.
+
+| Nivel | Tablero | Solución | Números | Generar (media / peor) |
+| ----- | ------- | -------- | ------- | ---------------------- |
+| 1     | 4×4     | única    | 9.0     | 1 ms / 4 ms            |
+| 2     | 5×5     | única    | 12.0    | 13 ms / 73 ms          |
+| 3     | 6×6     | única    | 8.3     | 53 ms / 177 ms         |
+| 4     | 8×8     | libre    | 18.0    | 1 ms / 17 ms           |
+| 5     | 9×9     | libre    | 23.0    | 9 ms / 39 ms           |
+
+**El 9×9 es el techo, y el límite no es el costo sino el dedo.** Son celdas de
+36px en un teléfono de 360px y este juego se arrastra; en 10×10 quedan 32px y
+cada giro del trazo pasa a ser una apuesta — eso no es dificultad, es
+imprecisión. Además la restricción medida no sube de 8×8 a 10×10 (1% en los
+tres), así que sería pagar precisión a cambio de nada. Para subir dificultad más
+allá de acá el camino es cambiar la regla —casillas bloqueadas, dos trazos que
+no se crucen—, no el tamaño de la celda.
 
 **Inversión compartida:** Tango, Queens y Zip necesitan lo mismo — generar,
 contar soluciones, cortar en dos, reintentar. Nonograma y Sudoku ya lo hacen cada

@@ -17,24 +17,35 @@ import { type TraceConfig, type TraceMove, type TraceState } from './types';
  * sea cuánto te dan resuelto.
  */
 /**
- * La escala corre un escalón y estrena tablero arriba.
+ * Dos mitades: deducir, y después recorrer.
  *
- * Los cuatro primeros niveles son de deducción y crecen en las dos palancas:
- * tablero y cuántas anclas quedan. El que era experto —6×6 adelgazado hasta el
- * hueso, unos siete números sobre treinta y seis— pasa a ser Difícil, porque
- * ahí abajo la deducción ya no da más de sí y el tablero es lo que quedaba
- * chico.
+ * Del 1 al 3 el tablero tiene UNA sola solución, así que cada movimiento es una
+ * deducción — "esto va acá porque si no aquella esquina queda aislada". El 3 es
+ * la deducción al hueso: 6×6 adelgazado hasta unas ocho anclas sobre treinta y
+ * seis. Ahí termina, y no por gusto: demostrar la unicidad es lo caro y de 7×7
+ * en adelante el buscador se rinde casi siempre (ver `TraceConfig.unique`).
  *
- * Experto es otra cosa: 8×8, sin exigir solución única. Ver `TraceConfig.unique`
- * para por qué eso es lo que hace posible el tamaño, y por qué acá los números
- * SUBEN en vez de bajar.
+ * El 4 y el 5 cambian de género. Sin exigir unicidad el tablero puede crecer, y
+ * la dificultad pasa a ser conseguir un recorrido que cubra todo sin dejar
+ * ninguna casilla aislada. Con eso se invierte la palanca de los números: acá
+ * MÁS números es más difícil, hasta un punto — pasado ese punto el tablero se
+ * vuelve unir puntos y se ablanda otra vez.
+ *
+ * Medido con un buscador a lo bruto, cuanto menos acierta más restringido está
+ * el tablero: en 8×8 el fondo va de 14 a 18 números y a 22 ya se ablanda (4%);
+ * en 9×9 el fondo va de 16 a 23 y sube a partir de 26. De ahí el 18 y el 23.
+ *
+ * El 9×9 es el techo, y el límite no es el costo —se genera en 17 ms— sino el
+ * dedo: son celdas de 36px en un teléfono de 360px, y este juego se arrastra.
+ * En 10×10 quedan 32px y cada giro del trazo pasa a ser una apuesta, que no es
+ * dificultad sino imprecisión.
  */
 const CONFIGS: Record<Difficulty, TraceConfig> = {
   1: { size: 4, keep: 9, unique: true },
   2: { size: 5, keep: 12, unique: true },
-  3: { size: 6, keep: 13, unique: true },
-  4: { size: 6, keep: 0, unique: true },
-  5: { size: 8, keep: 18, unique: false },
+  3: { size: 6, keep: 0, unique: true },
+  4: { size: 8, keep: 18, unique: false },
+  5: { size: 9, keep: 23, unique: false },
 };
 
 function place(index: number, size: number): string {

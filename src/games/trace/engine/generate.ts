@@ -17,22 +17,43 @@ function makeRng(seed: string): () => number {
 }
 
 /**
+ * Techo de pasos por intento de recorrido.
+ *
+ * Warnsdorff acierta casi siempre a la primera, pero cuando falla el backtracking
+ * detrás es exponencial. Sin techo eso no se notaba hasta 6×6 —36 casillas se
+ * deshacen rápido— y en 8×8 colgaba la pestaña: el generador corre en el hilo
+ * principal, así que "Nueva partida" dejaba el tablero anterior pintado y el
+ * reloj en cero para siempre.
+ *
+ * Rendirse y volver a empezar desde otra casilla es órdenes de magnitud más
+ * barato que insistir con un arranque malo.
+ */
+const WALK_BUDGET = 20_000;
+
+/** Cuántos arranques distintos se prueban antes de recurrir a la serpiente. */
+const WALK_TRIES = 60;
+
+/**
  * Un recorrido al azar que pasa por todas las casillas.
  *
  * Elige primero el vecino con menos salidas libres — la heurística de
  * Warnsdorff. Sin ella el recorrido se mete en un rincón y hay que deshacer
  * medio tablero; con ella sale casi siempre al primer intento.
  */
-function fullPath(size: number, rng: () => number): number[] | null {
+function attempt(size: number, rng: () => number): number[] | null {
   const total = size * size;
   const near = neighbours(size);
   const visited = new Array<boolean>(total).fill(false);
   const path: number[] = [];
+  let budget = WALK_BUDGET;
 
   const free = (at: number): number =>
     (near[at] as number[]).filter((n) => visited[n] !== true).length;
 
   const walk = (at: number): boolean => {
+    if (budget <= 0) return false;
+    budget -= 1;
+
     visited[at] = true;
     path.push(at);
     if (path.length === total) return true;
@@ -50,7 +71,34 @@ function fullPath(size: number, rng: () => number): number[] | null {
   };
 
   const first = Math.floor(rng() * total);
-  return walk(first) ? path : null;
+  return walk(first) && path.length === total ? path : null;
+}
+
+/**
+ * La serpiente: fila por fila, alternando el sentido.
+ *
+ * Siempre existe en una cuadrícula rectangular y no hay que buscarla, así que
+ * es la red de seguridad cuando ningún arranque prosperó. El recorrido queda
+ * previsible, pero el jugador no lo ve — solo ve los números — y es
+ * infinitamente mejor que devolver un tablero imposible o colgar la pestaña.
+ */
+function snake(size: number): number[] {
+  const path: number[] = [];
+  for (let row = 0; row < size; row += 1) {
+    for (let i = 0; i < size; i += 1) {
+      const col = row % 2 === 0 ? i : size - 1 - i;
+      path.push(row * size + col);
+    }
+  }
+  return path;
+}
+
+function fullPath(size: number, rng: () => number): number[] {
+  for (let i = 0; i < WALK_TRIES; i += 1) {
+    const path = attempt(size, rng);
+    if (path !== null) return path;
+  }
+  return snake(size);
 }
 
 export interface Puzzle {
@@ -98,6 +146,22 @@ function thinned(
     if (check.exhausted || check.found !== 1) marks.add(position);
   }
 
+  /*
+   * Y si quedaron MENOS de los que el nivel pide, se reponen.
+   *
+   * `keep` es un piso, y hasta acá solo lo era al adelgazar: si la reparación
+   * terminaba por debajo, el nivel salía más difícil de lo que pedía. Empezó a
+   * pasar al sembrar números antes de reparar —con anclas repartidas parejo
+   * hacen falta menos para llegar a único— y se llevaba puesto justo el nivel
+   * fácil, que es el que no puede endurecerse.
+   *
+   * Reponer nunca rompe la unicidad: un número más sobre el mismo recorrido lo
+   * sigue admitiendo y solo puede descartar rivales.
+   */
+  for (let i = 1; i < path.length - 1 && marks.size < keep; i += 1) {
+    marks.add(Math.round((i * (path.length - 1)) / keep));
+  }
+
   return numbersFrom(size, path, marks);
 }
 
@@ -116,8 +180,7 @@ function thinned(
  * dejan medio tablero sin restricción y el trazo se vuelve un garabato libre.
  */
 function spread(size: number, rng: () => number, count: number): Puzzle {
-  const total = size * size;
-  const path = fullPath(size, rng) ?? [...Array(total).keys()];
+  const path = fullPath(size, rng);
 
   // El principio y el final siempre; el resto a intervalos iguales.
   const marks = new Set([0, path.length - 1]);
@@ -147,9 +210,24 @@ export function generatePuzzle(config: TraceConfig, seed?: string): Puzzle {
 
   for (let attempt = 0; attempt < 40; attempt += 1) {
     const path = fullPath(size, rng);
-    if (path === null) continue;
 
+    /*
+     * Arrancar con números ya puestos, no desde cero.
+     *
+     * La reparación agrega UNO y vuelve a resolver el tablero entero, y ese
+     * resolver es el 91% del costo. Empezando solo con principio y final hacen
+     * falta una docena de rondas, cada una con su resolución completa, para
+     * llegar a algo único — y las primeras son las más caras, porque un tablero
+     * casi sin restricciones tiene muchísimos caminos que contar.
+     *
+     * Sembrar unos pocos repartidos parejo salta esa parte cara de una. No
+     * arriesga poner de más: lo que sobre lo saca `thinned` después, que es
+     * justamente para eso.
+     */
     const marks = new Set([0, path.length - 1]);
+    for (let i = 1; i < size; i += 1) {
+      marks.add(Math.round((i * (path.length - 1)) / size));
+    }
 
     for (let step = 0; step < size * size; step += 1) {
       const numbers = numbersFrom(size, path, marks);
@@ -182,7 +260,7 @@ export function generatePuzzle(config: TraceConfig, seed?: string): Puzzle {
     }
   }
 
-  const fallback = fullPath(size, rng) ?? [...Array(size * size).keys()];
+  const fallback = fullPath(size, rng);
   return {
     size,
     numbers: numbersFrom(size, fallback, new Set([0, fallback.length - 1])),

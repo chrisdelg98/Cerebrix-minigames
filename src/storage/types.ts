@@ -20,13 +20,27 @@ export interface SavedSession {
   /** The game's own state shape version, handed back to `engine.deserialize`. */
   stateVersion: number;
   difficulty: number;
+  /**
+   * La variante que se estaba jugando, si el juego ofrece más de una.
+   *
+   * Opcional porque casi ningún juego tiene modos, y porque los guardados que
+   * ya existen no lo traen: al leerlos vale `undefined` y se cae en el modo por
+   * defecto, que es lo mismo que hacían antes.
+   */
+  mode?: string;
   /** Produced by `engine.serialize`. Opaque to storage. */
   state: string;
   elapsedMs: number;
   savedAt: number;
 }
 
-export type Outcome = 'won' | 'lost';
+/**
+ * Un empate no es una derrota con otro nombre: para la racha es neutro. Se
+ * guarda como lo que fue para que `computeStats` pueda distinguirlo; hacerlo
+ * pasar por 'lost' perdería esa diferencia en el momento de escribir, cuando ya
+ * no hay forma de recuperarla.
+ */
+export type Outcome = 'won' | 'lost' | 'draw';
 
 export interface GameResult {
   schemaVersion: number;

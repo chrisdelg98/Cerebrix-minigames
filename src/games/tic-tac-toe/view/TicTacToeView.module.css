@@ -1,0 +1,72 @@
+@layer components {
+  .ticTacToe {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+    inline-size: 100%;
+  }
+
+  .turn {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .turnMark {
+    display: grid;
+    place-items: center;
+    inline-size: var(--sp-5);
+    block-size: var(--sp-5);
+  }
+
+  /*
+   * Dos colores y no más, que es lo que permite el sistema de diseño. X toma el
+   * acento y O el secundario: son los mismos dos que ya usa el resto de la app,
+   * así que nadie tiene que aprender un código nuevo.
+   */
+  .turnMark[data-mark='x'],
+  .mark[data-mark='x'] {
+    color: var(--c-accent);
+  }
+
+  .turnMark[data-mark='o'],
+  .mark[data-mark='o'] {
+    color: var(--c-trace-4);
+  }
+
+  .mark {
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .mark svg {
+    inline-size: 62%;
+    block-size: 62%;
+  }
+
+  /*
+   * La línea que ganó, marcada con opacidad y no con otro color.
+   *
+   * Un tercer color rompería el límite de dos saturados, y encima competiría
+   * con las fichas justo cuando lo que importa es leer CUÁLES tres. Bajar las
+   * demás deja la línea sola sin agregar nada nuevo a la pantalla.
+   */
+  .mark:not([data-winning='true']) {
+    opacity: 1;
+  }
+
+  .ticTacToe:has(.mark[data-winning='true']) .mark:not([data-winning='true']) {
+    opacity: 0.35;
+    transition-property: opacity;
+    transition-duration: var(--d-slow);
+    transition-timing-function: var(--e-out);
+  }
+}

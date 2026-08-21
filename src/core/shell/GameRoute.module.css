@@ -158,6 +158,15 @@
     line-height: 1;
   }
 
+  /* Los modos son hermanos, no una lista: uno al lado del otro y del mismo
+     tamaño, para que se lean como dos caras de la misma elección. */
+  .modes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    justify-content: center;
+  }
+
   .gateNote {
     color: var(--c-text-muted);
     font-size: var(--fs-md);

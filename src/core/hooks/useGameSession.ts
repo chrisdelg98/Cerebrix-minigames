@@ -70,6 +70,9 @@ export interface Session {
   restart: () => void;
   requestHint: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
+  /** La variante elegida, si el juego ofrece modos. */
+  mode: string | undefined;
+  setMode: (mode: string) => void;
   confirmDifficulty: () => void;
   cancelDifficulty: () => void;
 }
@@ -88,8 +91,8 @@ interface Timeline {
   future: unknown[];
 }
 
-function roundKey(difficulty: number, seed: string | undefined): string {
-  return `${String(difficulty)}:${seed ?? 'first'}`;
+function roundKey(difficulty: number, seed: string | undefined, mode: string | undefined): string {
+  return `${String(difficulty)}:${mode ?? 'default'}:${seed ?? 'first'}`;
 }
 
 export function useGameSession(load: GameLoader, initialDifficulty: Difficulty): Session {
@@ -99,12 +102,21 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
   const [error, setError] = useState<Error | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>(initialDifficulty);
 
+  /*
+   * `null` es "todavía no eligió", no "sin modo": el modo por defecto sale del
+   * juego, que aún puede no haber cargado. Derivarlo en vez de sembrarlo con un
+   * efecto evita el render de más y el momento en que la ronda cambia de
+   * identidad sola.
+   */
+  const [chosenMode, setChosenMode] = useState<string | null>(null);
+  const mode = chosenMode ?? module?.meta.modes?.[0]?.id;
+
   /**
    * A fresh seed per round. It is what makes "new game" mean a new board for
    * games that generate one, and it doubles as the identity of the round.
    */
   const [seed, setSeed] = useState<string | undefined>(undefined);
-  const round = roundKey(difficulty, seed);
+  const round = roundKey(difficulty, seed, mode);
 
   /*
    * Past and future, not one array with a pointer. Undo moves a state from one
@@ -198,8 +210,9 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
             setElapsedMs(saved.elapsedMs);
             setResumed(true);
             setDifficulty(saved.difficulty as Difficulty);
+            if (saved.mode !== undefined) setChosenMode(saved.mode);
             setStack({
-              round: roundKey(saved.difficulty, undefined),
+              round: roundKey(saved.difficulty, undefined, saved.mode ?? mode),
               value: { past: [state], future: [] },
             });
             return;
@@ -211,7 +224,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
         }
       }
 
-      const config = module.engine.getDifficultyConfig(difficulty);
+      const config = module.engine.getDifficultyConfig(difficulty, mode);
       const initial = await module.engine.createInitialState(config, seed);
       if (cancelled) return;
 
@@ -227,7 +240,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     return () => {
       cancelled = true;
     };
-  }, [module, difficulty, seed, round, storage]);
+  }, [module, difficulty, mode, seed, round, storage]);
 
   const state = history.length > 0 ? history[history.length - 1] : undefined;
   const ready = module !== null && history.length > 0;
@@ -276,6 +289,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
         gameId: module.meta.id,
         stateVersion: module.meta.stateVersion,
         difficulty,
+        ...(mode !== undefined && { mode }),
         state: module.engine.serialize(state),
         elapsedMs: currentElapsed(),
         savedAt: Date.now(),
@@ -291,16 +305,38 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     if (recordedRoundRef.current === round) return;
     recordedRoundRef.current = round;
 
-    void storage.recordResult(module.meta.id, {
-      schemaVersion: SCHEMA_VERSION,
-      gameId: module.meta.id,
-      difficulty,
-      outcome: status.kind === 'won' ? 'won' : 'lost',
-      elapsedMs: currentElapsed(),
-      finishedAt: Date.now(),
-    });
+    /*
+     * Un modo sin puntaje no escribe NADA, ni siquiera una derrota.
+     *
+     * Dos personas jugando en el mismo teléfono: la mitad de esas partidas las
+     * gana el otro, así que no pueden alimentar la racha. Y guardarlas como
+     * derrotas sería peor, porque ensuciaría también el total de partidas y el
+     * porcentaje. El shell no sabe qué significa el modo; solo mira la bandera.
+     */
+    const ranked = module.meta.modes?.find((one) => one.id === mode)?.ranked ?? true;
+    if (ranked) {
+      void storage.recordResult(module.meta.id, {
+        schemaVersion: SCHEMA_VERSION,
+        gameId: module.meta.id,
+        difficulty,
+        outcome: status.kind === 'won' ? 'won' : status.kind === 'draw' ? 'draw' : 'lost',
+        elapsedMs: currentElapsed(),
+        finishedAt: Date.now(),
+      });
+    }
     void storage.clearSession(module.meta.id);
-  }, [module, ready, playing, started, status.kind, round, difficulty, storage, currentElapsed]);
+  }, [
+    module,
+    ready,
+    playing,
+    started,
+    status.kind,
+    round,
+    difficulty,
+    mode,
+    storage,
+    currentElapsed,
+  ]);
 
   const dispatch = useCallback(
     (move: unknown) => {
@@ -389,6 +425,12 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     setPendingDifficulty(null);
   }, []);
 
+  /* El modo se elige antes de empezar, así que no hace falta la confirmación
+     que sí lleva la dificultad: no hay tablero en juego que perder. */
+  const setMode = useCallback((next: string) => {
+    setChosenMode(next);
+  }, []);
+
   return {
     phase: error ? 'error' : ready ? 'ready' : 'loading',
     error,
@@ -397,6 +439,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     status,
     progress,
     difficulty,
+    mode,
     hint,
     rejection,
     canUndo: history.length > 1 && playing,
@@ -414,6 +457,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     restart,
     requestHint,
     setDifficulty: requestDifficulty,
+    setMode,
     confirmDifficulty,
     cancelDifficulty,
   };

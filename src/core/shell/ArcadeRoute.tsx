@@ -184,7 +184,7 @@ function ArcadeSession({ entry }: { entry: ClockEntry }) {
         onClose={() => {
           setDismissed(session.roundId);
         }}
-        won={won}
+        outcome={won ? 'won' : 'lost'}
         reason={session.status.kind === 'lost' ? session.status.reason : undefined}
         difficulty={session.difficulty}
         onRestart={session.restart}

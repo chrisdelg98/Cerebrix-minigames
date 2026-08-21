@@ -30,7 +30,9 @@ export function AppShell({ header, subheader, children, footer, progress }: AppS
     <div className={s.shell}>
       <header className={s.header}>
         <div className={s.headerRow}>{header}</div>
-        {subheader !== undefined && <div className={s.subRow}>{subheader}</div>}
+        {subheader !== undefined && subheader !== null && (
+          <div className={s.subRow}>{subheader}</div>
+        )}
         {progress !== undefined && (
           <div className={s.progress}>
             <ProgressBar value={progress} label="Progreso de la partida" />

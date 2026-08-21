@@ -133,7 +133,10 @@ export interface GameEngine<TState, TMove, TConfig = unknown> {
 export type ValidationResult = { ok: true } | { ok: false; reason: string; cells?: CellRef[] }; // celdas a resaltar en rojo
 
 export type GameStatus =
-  { kind: 'playing' } | { kind: 'won'; score?: number } | { kind: 'lost'; reason?: string };
+  | { kind: 'playing' }
+  | { kind: 'won'; score?: number; winner?: string }
+  | { kind: 'lost'; reason?: string }
+  | { kind: 'draw'; reason?: string };
 
 export interface Hint {
   cells: CellRef[];
@@ -220,19 +223,48 @@ export const REGISTRY: RegistryEntry[] = [
 
 ## 5. De quién es cada responsabilidad
 
-| Responsabilidad                           |        Shell (`/core`)         |                 Juego                  |
-| ----------------------------------------- | :----------------------------: | :------------------------------------: |
-| Timer, pausa, reanudar                    |               ✅               |                   ❌                   |
-| Selector de dificultad                    |               ✅               |       Solo `getDifficultyConfig`       |
-| Autosave y resumir                        |               ✅               |    Solo `serialize` / `deserialize`    |
-| Deshacer / rehacer                        | ✅ (guarda la pila de estados) | ❌ (por eso `applyMove` debe ser puro) |
-| Estadísticas y rachas                     |               ✅               |                   ❌                   |
-| Botón de pista                            |    ✅ (si existe `getHint`)    |             Solo `getHint`             |
-| Modal de victoria / derrota               |               ✅               |  ❌ (solo reporta vía `checkStatus`)   |
-| Barra de progreso                         |               ✅               |           Solo `getProgress`           |
-| Reglas del juego                          |               ❌               |                   ✅                   |
-| Render del tablero                        |               ❌               |   ✅ (con componentes de `/design`)    |
-| Interacción propia (long-press, chording) |               ❌               |                   ✅                   |
+| Responsabilidad        |        Shell (`/core`)         |                 Juego                  |
+| ---------------------- | :----------------------------: | :------------------------------------: |
+| Timer, pausa, reanudar |               ✅               |                   ❌                   |
+| Selector de dificultad |               ✅               |       Solo `getDifficultyConfig`       |
+| Autosave y resumir     |               ✅               |    Solo `serialize` / `deserialize`    |
+| Deshacer / rehacer     | ✅ (guarda la pila de estados) | ❌ (por eso `applyMove` debe ser puro) |
+
+### El empate y los juegos de dos personas
+
+`draw` no es `lost` con otro texto. Para la racha un empate es **neutro**: no la
+extiende y no la corta. Existe porque el tres en línea está resuelto — con juego
+perfecto de los dos lados el resultado siempre es empate —, así que en los
+niveles altos empatar es el resultado normal de jugar bien, y si cortara la
+racha el nivel más difícil sería el único imposible de sostener.
+
+`winner` solo se manda cuando el shell **no puede asumir que ganó quien juega**.
+Contra la máquina no hace falta: ahí ganar es del jugador y el shell ya sabe
+decirlo. Entre dos personas en el mismo aparato el shell no sabe cuál de las dos
+mira la pantalla, así que el juego escribe la línea entera — `"Ganan las X"` — y
+el shell la muestra sin entenderla.
+
+### Modos
+
+Un juego puede declarar `modes`: variantes que se eligen **antes** de empezar,
+aparte de la dificultad. El shell dibuja el selector y le pasa el `id` a
+`getDifficultyConfig(difficulty, mode)` sin saber qué significa.
+
+`ranked: false` quiere decir que esa partida **no escribe nada** — ni victoria ni
+derrota. Dos personas jugando en el mismo teléfono no pueden alimentar la racha
+de una de ellas, y guardar esas partidas como derrotas ensuciaría también el
+total jugado. El shell tampoco muestra el nivel en un modo así: si el resultado
+no se compara con nada, el nivel al que se jugó no informa. Las dos cosas van
+atadas a la misma bandera a propósito; el día que aparezca un modo que no puntúa
+pero sí escala, ahí se parte en dos.
+
+| Estadísticas y rachas | ✅ | ❌ |
+| Botón de pista | ✅ (si existe `getHint`) | Solo `getHint` |
+| Modal de victoria / derrota | ✅ | ❌ (solo reporta vía `checkStatus`) |
+| Barra de progreso | ✅ | Solo `getProgress` |
+| Reglas del juego | ❌ | ✅ |
+| Render del tablero | ❌ | ✅ (con componentes de `/design`) |
+| Interacción propia (long-press, chording) | ❌ | ✅ |
 
 Si un juego siente que necesita su propio timer o su propio autosave: **es señal de que el contrato está incompleto**. Se extiende el contrato, no se duplica la funcionalidad dentro del juego.
 

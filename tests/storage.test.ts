@@ -233,6 +233,35 @@ describe('stats', () => {
     expect(stats.bestStreak).toBe(2);
   });
 
+  /*
+   * Un empate deja la racha como estaba: ni la extiende ni la corta.
+   *
+   * Existe por el tres en línea, que está resuelto: contra los niveles altos
+   * empatar es el resultado normal de jugar bien. Si cortara, el nivel más
+   * difícil sería el único que nunca se puede sostener, al revés de lo que la
+   * racha quiere premiar.
+   */
+  it('un empate no corta la racha ni la alarga', () => {
+    const stats = computeStats('_dummy', [
+      result({ finishedAt: 1 }),
+      result({ finishedAt: 2 }),
+      result({ finishedAt: 3, outcome: 'draw' }),
+      result({ finishedAt: 4 }),
+    ]);
+
+    expect(stats.currentStreak, 'el empate movió la racha').toBe(3);
+  });
+
+  it('pero sí cuenta como partida jugada', () => {
+    const stats = computeStats('_dummy', [
+      result({ finishedAt: 1 }),
+      result({ finishedAt: 2, outcome: 'draw' }),
+    ]);
+
+    expect(stats.played).toBe(2);
+    expect(stats.completed, 'un empate no es una victoria').toBe(1);
+  });
+
   it('orders by finish time, not by insertion order', () => {
     const stats = computeStats('_dummy', [
       result({ finishedAt: 5 }),

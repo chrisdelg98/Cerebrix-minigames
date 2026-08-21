@@ -450,6 +450,68 @@ de pistas se comía siete columnas. Con 12×12 el máximo son 18 columnas.
 
 ---
 
+## Fase 9 — Dos jugadores: Tres en línea ✊
+
+**Objetivo:** el primer juego que no es de una persona sola, y el primero que
+obliga a ampliar el contrato en vez de parchear el shell.
+
+**Qué cambió en el contrato** (el detalle está en `GAME_CONTRACT.md`):
+
+- `GameStatus` admite `draw`, y un empate es **neutro para la racha**.
+- `won` puede traer `winner` cuando el shell no puede tutear a nadie.
+- `GameMeta.modes` — variantes elegidas antes de empezar. `ranked: false` no
+  escribe historial y esconde el nivel.
+- `getDifficultyConfig(difficulty, mode?)`. El parámetro es opcional, así que
+  los trece juegos anteriores no se tocaron.
+
+**Los cinco niveles son UN algoritmo y una moneda.** La máquina siempre calcula
+la mejor jugada; lo único que cambia es con qué frecuencia se permite no
+hacerla, y cuando no la hace juega la **segunda mejor**, nunca una al azar. El
+nivel 5 **no juega perfecto a propósito**: el tres en línea está resuelto, así
+que una máquina impecable no sería un nivel difícil sino una pared — nunca un
+trofeo, nunca una racha.
+
+| Nivel  | 1   | 2   | 3   | 4   | 5   |
+| ------ | --- | --- | --- | --- | --- |
+| Óptimo | 55% | 70% | 82% | 90% | 96% |
+
+**Una sola perilla, y esa es la decisión de diseño.** Hubo dos versiones con dos
+mecanismos —uno que solo miraba la jugada inmediata y otro que planificaba— y
+las dos se cruzaron de formas invisibles leyendo el código:
+
+- La primera dejó el **nivel 3 más fácil que el 2** (41 victorias contra 23),
+  porque el 2 siempre tapaba y el 3, al titubear, a veces no.
+- La segunda dejó el **nivel 2 más difícil que el 5** — invencible incluso para
+  un minimax —, porque "tapar siempre y tomar el centro" resulta ser casi la
+  estrategia perfecta de este juego.
+
+Con una perilla la escala **no se puede invertir**: más porcentaje es jugar
+mejor, por definición.
+
+**La escala se mide con dos jugadores distintos, y hace falta.** Uno impecable
+(minimax) dice cuál es el techo; uno de instinto —cierro si puedo, tapo si me
+van a ganar, si no el centro— dice si la escala funciona para quien juega
+casual. Sobre 300 partidas:
+
+| Nivel | Instinto: gana / empata / pierde | Impecable: gana / empata / pierde |
+| ----- | -------------------------------- | --------------------------------- |
+| 1     | 222 / 67 / 11                    | 237 / 63 / 0                      |
+| 2     | 167 / 113 / 20                   | 188 / 112 / 0                     |
+| 3     | 103 / 163 / 34                   | 136 / 164 / 0                     |
+| 4     | 61 / 186 / 53                    | 84 / 216 / 0                      |
+| 5     | **29** / 201 / 70                | **35** / 265 / 0                  |
+
+Monótona en las dos lecturas y **todos los niveles ganables sin jugar perfecto**,
+que es lo que las versiones anteriores no lograban: en ellas los niveles 3 a 5
+eran un muro para cualquiera que no calculara.
+
+**Lo que queda pendiente:** Conecta 4 como segundo juego de la categoría. Ahí el
+nivel más alto se gana por habilidad y no porque la máquina se equivoque, porque
+la búsqueda no entra en un navegador. Si Conecta 4 entra sin tocar `/core`, el
+contrato quedó bien.
+
+---
+
 ## 🎯 Orden mental
 
 ```

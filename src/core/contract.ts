@@ -91,6 +91,14 @@ export interface GameMeta {
    */
   examples?: GameExample[];
   /**
+   * Variantes que se eligen antes de empezar. La primera es la de por defecto.
+   *
+   * Sin esto, un juego contra la máquina o contra alguien al lado tendría que
+   * pedirle al shell que conozca su caso — que es exactamente lo que el
+   * contrato existe para evitar.
+   */
+  modes?: GameMode[];
+  /**
    * Si el shell ofrece deshacer y rehacer. Por defecto sí.
    *
    * Existe por Memoria: deshacer devolvería la carta a su lugar pero no te
@@ -114,11 +122,53 @@ export interface CellRef {
 export type ValidationResult = { ok: true } | { ok: false; reason: string; cells?: CellRef[] };
 
 export type GameStatus =
-  { kind: 'playing' } | { kind: 'won'; score?: number } | { kind: 'lost'; reason?: string };
+  | { kind: 'playing' }
+  /**
+   * `winner` solo hace falta cuando el shell no puede asumir que ganó QUIEN
+   * JUEGA: en un juego de dos personas en el mismo aparato, "¡Ganaste!" no
+   * significa nada. El juego pasa la etiqueta —"las X", "las rojas"— y el shell
+   * la muestra tal cual, sin entender qué es. Contra la máquina no se manda:
+   * ahí ganar es del jugador y el shell ya lo sabe decir.
+   */
+  | { kind: 'won'; score?: number; winner?: string }
+  | { kind: 'lost'; reason?: string }
+  /**
+   * Ni ganó ni perdió nadie.
+   *
+   * No es un `lost` con otro texto: para la racha un empate es neutro —no la
+   * extiende pero tampoco la corta— y esa diferencia no se puede expresar si el
+   * empate llega disfrazado de derrota. En un juego resuelto como el tres en
+   * línea, empatar contra un rival fuerte es buen resultado.
+   */
+  | { kind: 'draw'; reason?: string };
 
 export interface Hint {
   cells: CellRef[];
   message: string;
+}
+
+/**
+ * Una variante del juego que se elige ANTES de empezar, aparte de la dificultad.
+ *
+ * El shell dibuja el selector y le pasa el `id` al motor sin saber qué
+ * significa, igual que hace con la dificultad. Nace por los juegos de dos
+ * personas —máquina o alguien al lado— pero no dice nada de eso: cualquier
+ * juego puede ofrecer modos.
+ */
+export interface GameMode {
+  /** Clave en inglés, como los ids de juego. Se guarda; no se traduce. */
+  id: string;
+  /** Lo que lee el jugador. Esto sí se traduce. */
+  label: string;
+  /**
+   * Si el resultado cuenta para el historial y la racha.
+   *
+   * Dos personas jugando en el mismo teléfono no pueden alimentar TU racha: la
+   * mitad de esas partidas las gana el otro. Un modo así no guarda NADA, ni
+   * siquiera una derrota, porque si no también se ensucia el total de partidas
+   * jugadas. El shell no sabe por qué; solo respeta la bandera.
+   */
+  ranked: boolean;
 }
 
 /**
@@ -130,8 +180,14 @@ export interface Hint {
  * without a DOM and runnable inside a Web Worker.
  */
 export interface GameEngine<TState, TMove, TConfig = unknown> {
-  /** Translates the shared 1–5 scale into this game's own configuration. */
-  getDifficultyConfig(difficulty: Difficulty): TConfig;
+  /**
+   * Translates the shared 1–5 scale into this game's own configuration.
+   *
+   * `mode` llega solo si el juego declaró `modes`. Es un parámetro opcional a
+   * propósito: los juegos que no tienen modos siguen escribiendo
+   * `getDifficultyConfig(difficulty)` y no hubo que tocar ninguno.
+   */
+  getDifficultyConfig(difficulty: Difficulty, mode?: string): TConfig;
 
   /**
    * Starts a new game. `seed` makes a board reproducible (daily puzzle, shared

@@ -11,6 +11,7 @@ import { CrossingIcon } from '@games/crossing/sprites/CrossingIcons';
 import { SnakeIcon } from '@games/snake/sprites/SnakeIcons';
 import { StackIcon } from '@games/stack/sprites/StackIcons';
 import { LightsOutIcon } from '@games/lights-out/sprites/LightsOutIcons';
+import { TicTacToeIcon } from '@games/tic-tac-toe/sprites/TicTacToeIcons';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
@@ -257,6 +258,20 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: SequenceIcon,
     load: () => import('@games/sequence'),
+  },
+  {
+    id: 'tic-tac-toe',
+    preview: {
+      id: 'tic-tac-toe',
+      name: 'Tres en línea',
+      tagline: 'Tres tuyas en fila. Contra la máquina o contra quien tengas al lado.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      category: 'lógica',
+      estimatedMinutes: [1, 3],
+    },
+    icon: TicTacToeIcon,
+    load: () => import('@games/tic-tac-toe'),
   },
   {
     id: 'lights-out',

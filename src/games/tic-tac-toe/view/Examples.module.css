@@ -1,0 +1,53 @@
+@layer components {
+  .figure {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .strip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .mini {
+    display: grid;
+    grid-template-columns: repeat(3, 1.5rem);
+    gap: 2px;
+    padding: 2px;
+    background-color: var(--c-border-hairline);
+    border-radius: var(--r-sm);
+  }
+
+  .cell {
+    display: grid;
+    place-items: center;
+    block-size: 1.5rem;
+    background-color: var(--c-cell);
+    border-radius: var(--r-xs);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+    line-height: 1;
+  }
+
+  .cell[data-mark='x'] {
+    color: var(--c-accent);
+  }
+
+  .cell[data-mark='o'] {
+    color: var(--c-trace-4);
+  }
+
+  /* La línea que gana, sin agregar un tercer color: las otras se apagan. */
+  .cell[data-dim='true'] {
+    opacity: 0.3;
+  }
+
+  .note {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    text-align: center;
+  }
+}

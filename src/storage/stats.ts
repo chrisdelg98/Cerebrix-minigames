@@ -17,12 +17,21 @@ import { type GameResult, type GameStats, type GlobalStats } from './types';
  * "Streak" here means consecutive WINS, broken by a loss — not days played.
  * It is the reading that fits the rest of the list (games, completed, success
  * rate) and the one the flame sprite stops for when it hits zero.
+ *
+ * Un empate NO la corta, pero tampoco la extiende: la deja como está.
+ *
+ * No es indulgencia. El tres en línea está resuelto —con juego perfecto de los
+ * dos lados el resultado es siempre empate—, así que en los niveles altos
+ * empatar es el resultado normal de jugar bien. Si cortara la racha, el nivel
+ * más difícil sería el único que nunca podés sostener, que es al revés de lo
+ * que la racha quiere premiar.
  */
 function streaks(ordered: readonly GameResult[]): { current: number; best: number } {
   let best = 0;
   let run = 0;
 
   for (const result of ordered) {
+    if (result.outcome === 'draw') continue;
     run = result.outcome === 'won' ? run + 1 : 0;
     if (run > best) best = run;
   }

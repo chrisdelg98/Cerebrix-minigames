@@ -63,6 +63,18 @@ function GameSession({ entry }: { entry: TurnEntry }) {
   const [dismissedRound, setDismissedRound] = useState<string | null>(null);
   const [rulesOpen, setRulesOpen] = useState(false);
 
+  /*
+   * Si esta partida cuenta para el historial.
+   *
+   * Va atado al modo y no a una bandera aparte porque las dos cosas se mueven
+   * juntas: un modo que no puntúa tampoco tiene nivel que mostrar —dos personas
+   * jugando entre sí no jugaron "en Difícil", jugaron entre ellas—, así que el
+   * selector de dificultad se esconde con el mismo dato. Si algún día aparece
+   * un modo que no puntúa pero sí escala, ahí se parte en dos banderas.
+   */
+  const modes = session.module?.meta.modes;
+  const scored = modes?.find((one) => one.id === session.mode)?.ranked ?? true;
+
   const playing = session.status.kind === 'playing';
   const outcomeOpen = !playing && session.phase === 'ready' && dismissedRound !== session.roundId;
 
@@ -94,13 +106,13 @@ function GameSession({ entry }: { entry: TurnEntry }) {
     </>
   );
 
-  const subheader = (
+  const subheader = scored ? (
     <DifficultyPicker<Difficulty>
       value={session.difficulty}
       options={difficultyOptions(session.module?.meta.difficulties ?? entry.preview.difficulties)}
       onChange={changeDifficulty}
     />
-  );
+  ) : null;
 
   if (session.phase === 'error') {
     return (
@@ -137,11 +149,33 @@ function GameSession({ entry }: { entry: TurnEntry }) {
       <AppShell header={header} subheader={subheader}>
         <div className={`${s.gate} anim-slide-up`}>
           <h2 className={s.gateTitle}>{session.module.meta.name}</h2>
-          <p className={s.gateLevel}>
-            {session.resumed ? 'Tenés una partida a medias en ' : 'Vas a jugar en '}
-            <strong>{DIFFICULTY_LABELS[session.difficulty]}</strong>
-            {session.resumed ? '.' : '. Podés cambiar el nivel arriba antes de empezar.'}
-          </p>
+
+          {modes !== undefined && modes.length > 1 && (
+            <div className={s.modes} role="group" aria-label="Modo de juego">
+              {modes.map((one) => (
+                <Button
+                  key={one.id}
+                  variant={one.id === session.mode ? 'primary' : 'ghost'}
+                  aria-pressed={one.id === session.mode}
+                  onClick={() => {
+                    session.setMode(one.id);
+                  }}
+                >
+                  {one.label}
+                </Button>
+              ))}
+            </div>
+          )}
+
+          {scored ? (
+            <p className={s.gateLevel}>
+              {session.resumed ? 'Tenés una partida a medias en ' : 'Vas a jugar en '}
+              <strong>{DIFFICULTY_LABELS[session.difficulty]}</strong>
+              {session.resumed ? '.' : '. Podés cambiar el nivel arriba antes de empezar.'}
+            </p>
+          ) : (
+            <p className={s.gateLevel}>Esta partida no cuenta para tu historial ni tu racha.</p>
+          )}
 
           <div className={s.gateActions}>
             <Button
@@ -353,9 +387,18 @@ function GameSession({ entry }: { entry: TurnEntry }) {
         onClose={() => {
           setDismissedRound(session.roundId);
         }}
-        won={won}
-        reason={session.status.kind === 'lost' ? session.status.reason : undefined}
-        difficulty={session.difficulty}
+        outcome={
+          session.status.kind === 'won' ? 'won' : session.status.kind === 'draw' ? 'draw' : 'lost'
+        }
+        reason={
+          session.status.kind === 'lost' || session.status.kind === 'draw'
+            ? session.status.reason
+            : undefined
+        }
+        winner={session.status.kind === 'won' ? session.status.winner : undefined}
+        /* Sin puntaje, el nivel no significa nada: dos personas jugando entre
+           sí no jugaron "en Difícil", jugaron entre ellas. */
+        difficulty={scored ? session.difficulty : undefined}
         onRestart={session.restart}
       />
     </AppShell>

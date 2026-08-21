@@ -12,10 +12,24 @@ import s from './OutcomeModal.module.css';
 export interface OutcomeModalProps {
   open: boolean;
   onClose: () => void;
-  won: boolean;
+  outcome: 'won' | 'lost' | 'draw';
   /** Por qué terminó, si el juego lo explica. */
   reason?: string | undefined;
-  difficulty: Difficulty;
+  /**
+   * El título de la victoria, cuando "¡Ganaste!" no aplica.
+   *
+   * Es una frase completa —"Ganan las X"— y no un nombre, para que el shell no
+   * tenga que construir la oración. En un juego de dos personas en el mismo
+   * aparato el shell no sabe cuál de las dos está mirando la pantalla, así que
+   * no puede tutear a ninguna; el juego, que sí sabe quién puso qué, escribe la
+   * línea entera.
+   */
+  winner?: string | undefined;
+  /**
+   * El nivel al que se jugó, o `undefined` cuando no significa nada — dos
+   * personas jugando entre sí no jugaron "en Difícil", jugaron entre ellas.
+   */
+  difficulty?: Difficulty | undefined;
   onRestart: () => void;
 }
 
@@ -28,21 +42,29 @@ export interface OutcomeModalProps {
  * suelta. Perder no puede sentirse distinto según qué motor tenga el juego, y el
  * jugador no sabe ni debería saber que hay dos.
  */
+const TITLES = {
+  won: '¡Ganaste!',
+  lost: 'Se terminó',
+  draw: 'Empate',
+} as const;
+
 export function OutcomeModal({
   open,
   onClose,
-  won,
+  outcome,
   reason,
+  winner,
   difficulty,
   onRestart,
 }: OutcomeModalProps) {
   const navigate = useNavigate();
+  const won = outcome === 'won';
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={won ? '¡Ganaste!' : 'Se terminó'}
+      title={won && winner !== undefined ? winner : TITLES[outcome]}
       centered={won}
       /* Un clic distraído en cualquier parte borraba el resultado antes de
          poder leerlo. La cruz y Esc siguen estando. */
@@ -67,10 +89,15 @@ export function OutcomeModal({
           {/* Grande y arriba del texto: el trofeo es el premio, no una viñeta
               al costado de una frase. La animación es la que ya trae. */}
           <Trophy size={96} state="unlocked" />
-          <span className={s.victoryLine}>Completado en {DIFFICULTY_LABELS[difficulty]}</span>
+          {difficulty !== undefined && (
+            <span className={s.victoryLine}>Completado en {DIFFICULTY_LABELS[difficulty]}</span>
+          )}
         </div>
       ) : (
-        <span className={s.outcome}>{reason ?? 'Probá de nuevo.'}</span>
+        <span className={s.outcome}>
+          {reason ??
+            (outcome === 'draw' ? 'Nadie ganó. La racha queda como está.' : 'Probá de nuevo.')}
+        </span>
       )}
     </Modal>
   );

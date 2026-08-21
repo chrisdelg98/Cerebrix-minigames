@@ -23,6 +23,7 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useGameSession } from '../hooks/useGameSession';
 import { findEntry, type TurnEntry } from '../registry';
 import { AppShell } from './AppShell';
+import { Examples } from './Examples';
 import { OutcomeModal } from './OutcomeModal';
 import { NotFound } from './NotFound';
 
@@ -209,22 +210,7 @@ function GameSession({ entry }: { entry: TurnEntry }) {
           </ol>
 
           {session.module.meta.examples !== undefined && (
-            <section className={s.examples}>
-              <h3 className={s.examplesTitle}>Ejemplos</h3>
-              <div className={s.examplesGrid}>
-                {session.module.meta.examples.map((example) => {
-                  const Figure = example.figure;
-                  return (
-                    <figure key={example.caption} className={s.example}>
-                      <div className={s.exampleArt} aria-hidden="true">
-                        <Figure />
-                      </div>
-                      <figcaption>{example.caption}</figcaption>
-                    </figure>
-                  );
-                })}
-              </div>
-            </section>
+            <Examples items={session.module.meta.examples} />
           )}
         </Modal>
       </AppShell>

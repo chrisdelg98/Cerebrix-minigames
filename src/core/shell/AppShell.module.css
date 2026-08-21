@@ -139,7 +139,25 @@
      * a fraction of its size, at every difficulty.
      */
     grid-template-columns: minmax(0, 1fr);
-    place-items: center;
+
+    /* Los dos ejes no dicen lo mismo —uno lleva `safe`, el otro no— y
+       `place-items` los junta perdiendo justo esa diferencia. */
+    justify-items: center;
+
+    /*
+     * `safe` no es decorativo: es lo que hace que se pueda leer lo de arriba.
+     *
+     * Un tablero se ve mejor en el medio, pero centrar algo MÁS ALTO que la
+     * pantalla lo desborda hacia los dos lados a la vez, y la mitad de arriba
+     * queda antes del origen del scroll: inalcanzable, por más que se arrastre.
+     * Era el "en móvil se va hasta abajo y cuesta llegar arriba".
+     *
+     * Con `safe`, en cuanto el contenido no cabe el centrado se rinde y alinea
+     * al principio, que es de donde se empieza a leer. Mientras quepa —o sea,
+     * casi siempre— se sigue viendo centrado.
+     */
+    /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
+    align-items: safe center;
     padding: var(--sp-4);
 
     /* The board never causes horizontal scroll, and pull-to-refresh must not

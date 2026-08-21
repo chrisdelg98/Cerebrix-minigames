@@ -14,6 +14,7 @@ import { useArcadeSession } from '../hooks/useArcadeSession';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { findEntry, type ClockEntry } from '../registry';
 import { AppShell } from './AppShell';
+import { Examples } from './Examples';
 import { OutcomeModal } from './OutcomeModal';
 import { NotFound } from './NotFound';
 import { Link, useParams } from 'react-router-dom';
@@ -113,16 +114,7 @@ function ArcadeSession({ entry }: { entry: ClockEntry }) {
             ))}
           </ul>
 
-          {meta.examples !== undefined && (
-            <div className={s.examples}>
-              {meta.examples.map(({ figure: Figure, caption }) => (
-                <figure key={caption} className={s.example}>
-                  <Figure />
-                  <figcaption>{caption}</figcaption>
-                </figure>
-              ))}
-            </div>
-          )}
+          {meta.examples !== undefined && <Examples items={meta.examples} />}
 
           <Button variant="primary" size="lg" icon={<PlayIcon />} onClick={session.start}>
             Empezar partida

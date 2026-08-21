@@ -6,6 +6,7 @@
      * the top-left corner. Restated here rather than exempting dialog from the
      * reset, so the centring is visible where the modal is defined.
      */
+    display: flex;
     margin: auto;
 
     /* Wide enough that a rule is one or two lines, not five. */
@@ -18,9 +19,21 @@
      * apretado, aunque son el mismo componente y el mismo momento del juego.
      * Con un piso, todos los avisos del juego miden lo mismo.
      */
-    inline-size: min(100% - (2 * var(--sp-3)), 400px);
-    max-inline-size: min(100% - (2 * var(--sp-3)), 560px);
+    inline-size: min(100% - (2 * var(--sp-3)), 440px);
+    max-inline-size: min(100% - (2 * var(--sp-3)), 620px);
+
+    /*
+     * Alto acotado y el desborde adentro.
+     *
+     * `margin: auto` centra el diálogo igual que el área de juego centra al
+     * tablero, y con reglas largas —los juegos por turnos las muestran acá
+     * dentro— traía el mismo problema: el modal más alto que la pantalla se
+     * salía por arriba y por abajo, y el título quedaba fuera del alcance. Se le
+     * pone techo y lo que sobra scrollea adentro, en `.body`.
+     */
+    max-block-size: calc(100dvh - (2 * var(--sp-5)));
     padding: 0;
+    overflow: hidden;
     background-color: var(--c-surface);
     border: var(--bw-base) solid var(--c-border-strong);
     border-radius: var(--r-lg);
@@ -36,8 +49,12 @@
   .panel {
     position: relative;
     display: flex;
+    flex: 1;
     flex-direction: column;
     gap: var(--sp-4);
+
+    /* Deja que `.body` se achique por debajo de su contenido y scrollee. */
+    min-block-size: 0;
     padding: var(--sp-6) var(--sp-5);
   }
 
@@ -83,7 +100,12 @@
     }
   }
 
+  /* Scrollea el cuerpo, no el modal entero: el título y los botones no se van
+     de la pantalla mientras se leen las reglas largas. */
   .body {
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     color: var(--c-text);
     font-size: var(--fs-md);
     line-height: var(--lh-body);

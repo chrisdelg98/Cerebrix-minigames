@@ -158,66 +158,6 @@
     line-height: 1;
   }
 
-  .examples {
-    margin-block-start: var(--sp-5);
-    padding-block-start: var(--sp-4);
-    border-block-start: var(--bw-hair) solid var(--c-border-hairline);
-    text-align: start;
-  }
-
-  .examplesTitle {
-    margin-block-end: var(--sp-3);
-    color: var(--c-text-muted);
-    font-size: var(--fs-xs);
-    font-weight: var(--fw-bold);
-    letter-spacing: var(--ls-wide);
-    text-transform: uppercase;
-  }
-
-  /* Two side by side is the comparison — correcto next to incorrecto. They drop
-     to one column only when two would be too narrow to read. */
-  .examplesGrid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--sp-4);
-  }
-
-  /*
-   * En un celular van uno debajo del otro.
-   *
-   * El corte estaba en 380px, así que en cualquier teléfono los dos ejemplos
-   * compartían el ancho del modal y cada tablerito quedaba del tamaño de una
-   * uña — que es justo lo contrario de para qué está dibujado. Dos filas cuestan
-   * scroll; dos columnas cuestan poder verlo.
-   */
-  @media (width < 560px) {
-    .examplesGrid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-  .example {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-2);
-    margin: 0;
-  }
-
-  .exampleArt {
-    display: grid;
-    place-items: center;
-    padding: var(--sp-3);
-    background-color: var(--c-surface);
-    border: var(--bw-hair) solid var(--c-border-hairline);
-    border-radius: var(--r-md);
-  }
-
-  .example figcaption {
-    color: var(--c-text-muted);
-    font-size: var(--fs-xs);
-    line-height: var(--lh-snug);
-  }
-
   .gateNote {
     color: var(--c-text-muted);
     font-size: var(--fs-md);

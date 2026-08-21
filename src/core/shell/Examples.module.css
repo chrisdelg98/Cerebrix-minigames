@@ -1,0 +1,79 @@
+@layer components {
+  .examples {
+    margin-block-start: var(--sp-5);
+    padding-block-start: var(--sp-4);
+    border-block-start: var(--bw-hair) solid var(--c-border-hairline);
+    text-align: start;
+  }
+
+  .title {
+    margin-block-end: var(--sp-3);
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  /* Dos al lado del otro es la comparación: lo correcto junto a lo incorrecto. */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-4);
+  }
+
+  .example {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .art {
+    display: grid;
+    place-items: center;
+    padding: var(--sp-3);
+    background-color: var(--c-surface);
+    border: var(--bw-hair) solid var(--c-border-hairline);
+    border-radius: var(--r-md);
+
+    /*
+     * Los dibujos están hechos de casillas de entre 0.9rem y 1.7rem: legibles en
+     * un tablero, pero un ejemplo se mira una vez y de reojo, así que se amplían.
+     *
+     * `zoom` y no `transform: scale()` porque zoom sí cambia el tamaño que el
+     * dibujo ocupa en el layout — con scale la caja seguiría midiendo lo de
+     * antes y el dibujo se saldría del marco. Donde no exista, el ejemplo se ve
+     * como se veía; no se rompe nada.
+     */
+    zoom: 1.25;
+  }
+
+  .example figcaption {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    line-height: var(--lh-snug);
+  }
+
+  /*
+   * En un celular van uno debajo del otro, y más grandes.
+   *
+   * Compartiendo el ancho, cada tablerito quedaba del tamaño de una uña, que es
+   * justo lo contrario de para qué está dibujado. Dos filas cuestan scroll; dos
+   * columnas cuestan poder verlo.
+   */
+  @media (width < 560px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .art {
+      zoom: 1.6;
+    }
+
+    .example figcaption {
+      font-size: var(--fs-sm);
+      text-align: center;
+    }
+  }
+}

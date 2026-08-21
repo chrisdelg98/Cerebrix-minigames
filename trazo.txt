@@ -1,0 +1,5 @@
+size 6 #0: 254 ms, pistas 6 de 36
+size 6 #1: 113 ms, pistas 9 de 36
+size 6 #2: 21 ms, pistas 9 de 36
+size 7 #0: 15038029 ms, pistas 10 de 49
+size 7 #1: 4425531 ms, pistas 11 de 49

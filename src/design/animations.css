@@ -206,10 +206,41 @@
   }
 }
 
+/*
+ * Una ficha que cae hasta su lugar. La distancia la pasa quien la usa, en
+ * filas:  <span style={{ '--fall': rows }} className="anim-drop-in" />
+ *
+ * En filas y no en píxeles porque la casilla mide distinto en cada pantalla, y
+ * lo que tiene que verse igual es el gesto: caer desde arriba del tablero hasta
+ * donde para. Solo se anima `transform`.
+ */
+@keyframes drop-in {
+  0% {
+    transform: translateY(calc(var(--fall, 3) * -100%));
+  }
+
+  60% {
+    transform: translateY(0);
+  }
+
+  /* El rebotito del final: una ficha que se detiene en seco parece pegada. */
+  80% {
+    transform: translateY(-12%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
 /* ─────────── Utility classes ─────────── */
 
 .anim-pop-in {
   animation: pop-in var(--d-fast) var(--e-spring) backwards;
+}
+
+.anim-drop-in {
+  animation: drop-in var(--d-base) var(--e-out) backwards;
 }
 
 .anim-bounce-in {

@@ -1,0 +1,51 @@
+@layer components {
+  .figure {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .strip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .mini {
+    display: grid;
+    grid-template-columns: repeat(5, 1.1rem);
+    gap: 2px;
+    padding: 3px;
+    background-color: var(--c-surface-raised);
+    border: var(--bw-hair) solid var(--c-border-hairline);
+    border-radius: var(--r-sm);
+  }
+
+  .cell {
+    block-size: 1.1rem;
+
+    /* Mismo motivo que en el tablero: `--c-cell` y el fondo del marco son el
+       mismo color en los dos temas. */
+    background-color: color-mix(in oklab, var(--c-text) 12%, var(--c-cell));
+    border-radius: var(--r-full);
+  }
+
+  .cell[data-disc='red'] {
+    background-color: var(--c-trace-6);
+  }
+
+  .cell[data-disc='yellow'] {
+    background-color: var(--c-gold);
+  }
+
+  .cell[data-dim='true'] {
+    opacity: 0.3;
+  }
+
+  .note {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    text-align: center;
+  }
+}

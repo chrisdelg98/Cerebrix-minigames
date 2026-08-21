@@ -512,6 +512,50 @@ contrato quedó bien.
 
 ---
 
+## Fase 10 — Conecta 4: el contrato a prueba 🔴
+
+**Objetivo:** el segundo juego de dos personas, y la comprobación de que los
+modos, `draw` y el ganador con nombre quedaron bien resueltos en la Fase 9.
+Entró **sin tocar `/core`** salvo su entrada en el registro.
+
+**Por qué este y no otro.** La entrada es la más perdonadora que existe en un
+teléfono —se toca una columna entera, no una casilla— y coincide con la regla:
+no elegís dónde cae la ficha, elegís por dónde la tirás.
+
+**Los cinco niveles son una perilla, con una diferencia frente al tres en
+línea: el nivel 5 vale 1 y nunca se equivoca.** Allá era imposible que no lo
+hiciera, porque el juego está resuelto. Acá la profundidad es un límite honesto
+y ganarle es verlo venir antes que él.
+
+### Tres cosas que solo aparecieron midiendo
+
+1. **El signo de la bonificación por profundidad estaba invertido.** `depth` es
+   lo que FALTA por mirar, así que decrece al bajar — al revés que en el tres en
+   línea, donde contaba para arriba. Con la fórmula copiada, la máquina prefería
+   ganar lo más tarde posible: el nivel 4 perdía **24 de 24** contra un rival de
+   instinto.
+2. **El efecto de paridad.** Contra una referencia fija, profundidad 6 perdía
+   6-3 mientras que 5 ganaba 7-0 y 7 ganaba 7-1: evaluar justo después de la
+   jugada propia o después de la del rival sesga distinto. La búsqueda va de dos
+   en dos para que todas las pasadas sean impares.
+3. **El techo útil es profundidad 5.** Medido, 7 **no** juega mejor que 5
+   (5-5 en veinte partidas) y 9 sí, pero tarda **5,3 s** por jugada. Con la
+   búsqueda sobre `Int8Array` y ventanas aplanadas, profundidad 5 cuesta 29 ms.
+
+Escala final, nivel contra el de abajo (20 partidas, alternando quién empieza):
+**14-2, 10-5, 8-6, 10-4.** Monótona.
+
+### Y una lección de CSS que ya estaba escrita
+
+El tablero salía de 86px sobre 412 disponibles. `inline-size: 100%` contra el
+área de juego —que centra a sus hijos, así que su ancho es indefinido— es un
+ciclo que el navegador resuelve colapsando. Está documentado en
+`AppShell.module.css` y el `Grid` compartido lo esquiva midiendo contra el
+viewport. Este tablero no usa `Grid` porque sus objetivos son columnas enteras,
+así que se llevó el problema entero de nuevo.
+
+---
+
 ## 🎯 Orden mental
 
 ```

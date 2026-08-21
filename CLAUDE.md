@@ -99,8 +99,9 @@ inicial ≤ 120 kB gzip, cada juego ≤ 60 kB gzip aparte.
 
 Fases 0 a 9 terminadas: andamiaje, contrato + shell, sistema de diseño,
 persistencia, dificultad unificada, Sudoku, Buscaminas, PWA offline e instalable,
-Nonograma y Tres en línea — el primero de dos personas, que trajo `draw`,
-ganador con nombre y `modes` al contrato. El detalle, los criterios de aceptación y lo que quedó
+Nonograma, Tres en línea —el primero de dos personas, que trajo `draw`, ganador
+con nombre y `modes` al contrato— y Conecta 4, que entró sin tocar `/core` y con
+eso dio por buena esa parte del contrato. El detalle, los criterios de aceptación y lo que quedó
 explícitamente pendiente están en [`docs/PLAN.md`](docs/PLAN.md).
 
 `src/games/_dummy` **no se borra** cuando lleguen los juegos reales: es la

@@ -12,6 +12,7 @@ import { SnakeIcon } from '@games/snake/sprites/SnakeIcons';
 import { StackIcon } from '@games/stack/sprites/StackIcons';
 import { LightsOutIcon } from '@games/lights-out/sprites/LightsOutIcons';
 import { TicTacToeIcon } from '@games/tic-tac-toe/sprites/TicTacToeIcons';
+import { ConnectFourIcon } from '@games/connect-four/sprites/ConnectFourIcons';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
@@ -129,6 +130,21 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: TicTacToeIcon,
     load: () => import('@games/tic-tac-toe'),
+  },
+  {
+    id: 'connect-four',
+    preview: {
+      id: 'connect-four',
+      name: 'Conecta 4',
+      tagline:
+        'Cuatro en línea antes que el otro. Contra la máquina o contra quien tengas al lado.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      category: 'lógica',
+      estimatedMinutes: [2, 5],
+    },
+    icon: ConnectFourIcon,
+    load: () => import('@games/connect-four'),
   },
   {
     id: 'snake',

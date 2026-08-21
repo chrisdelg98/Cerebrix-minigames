@@ -1,0 +1,151 @@
+@layer components {
+  .connectFour {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+
+  .turn {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: center;
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .turnDisc {
+    inline-size: var(--sp-4);
+    block-size: var(--sp-4);
+    border-radius: var(--r-full);
+  }
+
+  /*
+   * Rojo y amarillo de verdad, que son la identidad del juego.
+   *
+   * La primera versión usaba `--c-accent` y `--c-trace-4`, que son teal y
+   * violeta: el texto decía "ganan las rojas" y salía una ficha violeta. Un
+   * token no dice de qué color es por su nombre — hay que ir a mirarlo.
+   *
+   * Estos dos ya existen en la paleta con sus dos temas resueltos, así que no
+   * se inventa ningún color ni se pasa del límite de dos saturados.
+   */
+  .turnDisc[data-disc='red'],
+  .disc[data-disc='red'] {
+    background-color: var(--c-trace-6);
+  }
+
+  .turnDisc[data-disc='yellow'],
+  .disc[data-disc='yellow'] {
+    background-color: var(--c-gold);
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--sp-1);
+
+    /*
+     * Medido contra la PANTALLA, nunca contra el padre.
+     *
+     * `inline-size: 100%` acá colapsaba el tablero a 86px de los 412
+     * disponibles: el área de juego centra a sus hijos, así que su ancho es
+     * indefinido, y un porcentaje contra eso es un ciclo que el navegador
+     * resuelve dejándolo en casi nada. Es exactamente lo que documenta
+     * AppShell.module.css, y el `Grid` compartido lo esquiva igual — por eso
+     * `max-inline-size: 100%` sí vale: un máximo contra un ancho indefinido no
+     * cicla, simplemente no aplica.
+     *
+     * El tope por alto existe porque son siete columnas por seis filas: si solo
+     * se limitara el ancho, en una pantalla baja el tablero se saldría por
+     * abajo.
+     */
+    inline-size: min(96vw, calc((100dvh - 260px) * 7 / 6), 32rem);
+    max-inline-size: 100%;
+    padding: var(--sp-2);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-md);
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+  }
+
+  .column:disabled {
+    cursor: default;
+  }
+
+  /* La columna que sugiere la pista, y la que está debajo del dedo. */
+  .column[data-hinted='true'] {
+    background-color: var(--c-hint-surface, var(--c-cell-hover));
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .column:not(:disabled):hover {
+      background-color: var(--c-cell-hover);
+    }
+  }
+
+  /*
+   * El agujero tiene que verse COMO un agujero.
+   *
+   * `--c-cell` y `--c-surface-raised` son el mismo color en los dos temas
+   * —blanco en claro, slate-800 en oscuro—, así que las casillas quedaban
+   * invisibles sobre el tablero y este se veía como un rectángulo vacío. Un
+   * token no se puede dar por contrastante contra otro sin mirarlo: ya había
+   * pasado en Cruzar la calle con `--c-cell-covered`.
+   *
+   * Mezclar con el color del texto lo resuelve en ambos temas de una vez: en
+   * claro oscurece, en oscuro aclara, porque el texto siempre contrasta con su
+   * fondo.
+   */
+  .slot {
+    display: grid;
+
+    /*
+     * `flex: none` es lo que hace que la casilla sea redonda.
+     *
+     * En una columna flex un hijo se encoge por debajo de su contenido si hace
+     * falta, y `aspect-ratio` no lo impide: las casillas quedaban de 21px de
+     * alto por 50 de ancho, óvalos aplastados. El alto del tablero ya lo
+     * controla el tope de ancho de arriba, así que acá no hace falta que cedan.
+     */
+    flex: none;
+    place-items: center;
+    aspect-ratio: 1;
+    inline-size: 100%;
+    background-color: color-mix(in oklab, var(--c-text) 12%, var(--c-cell));
+    border-radius: var(--r-full);
+  }
+
+  .disc {
+    inline-size: 88%;
+    block-size: 88%;
+    border-radius: var(--r-full);
+  }
+
+  /*
+   * La línea que ganó, marcada apagando el resto y no con un tercer color.
+   *
+   * Un color más rompería el límite de dos saturados y competiría con las
+   * fichas justo cuando lo que importa es leer CUÁLES cuatro.
+   */
+  .board:has(.disc[data-winning='true']) .disc:not([data-winning='true']) {
+    opacity: 0.3;
+    transition-property: opacity;
+    transition-duration: var(--d-slow);
+    transition-timing-function: var(--e-out);
+  }
+}

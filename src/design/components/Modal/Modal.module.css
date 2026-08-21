@@ -6,7 +6,6 @@
      * the top-left corner. Restated here rather than exempting dialog from the
      * reset, so the centring is visible where the modal is defined.
      */
-    display: flex;
     margin: auto;
 
     /* Wide enough that a rule is one or two lines, not five. */
@@ -39,6 +38,17 @@
     border-radius: var(--r-lg);
     box-shadow: var(--sh-pop);
     color: var(--c-text);
+  }
+
+  /*
+   * Contenedor flex SOLO cuando está abierto.
+   *
+   * `display` en `.modal` a secas pisa el `display: none` que el navegador le da
+   * al <dialog> cerrado, y todos los modales quedaban visibles de entrada. Lo
+   * necesita para pasarle el alto a `.panel`, así que va condicionado.
+   */
+  .modal[open] {
+    display: flex;
   }
 
   .modal::backdrop {

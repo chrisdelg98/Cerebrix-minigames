@@ -17,8 +17,16 @@ import s from './StackView.module.css';
  */
 const VISIBLE = 9;
 
-/** Lo más arriba que la cima puede llegar antes de que la cámara empiece a subir. */
-const CEILING_ROW = 2;
+/**
+ * Lo más arriba que la cima puede llegar antes de que la cámara empiece a subir.
+ *
+ * Tres y no dos: el bloque que se mueve va una fila por encima de la cima, así
+ * que con dos quedaba estacionado en la fila 1 de 9 —una sola fila de aire— y se
+ * veía pegado al techo del marco, como a punto de salirse. El aire de arriba
+ * además es la señal de que la torre todavía tiene hacia dónde crecer; sin él
+ * parece que llegaste al final aunque falten pisos.
+ */
+const CEILING_ROW = 3;
 
 /**
  * Los tonos, en orden CROMÁTICO y no por contraste.

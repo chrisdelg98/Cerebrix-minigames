@@ -1,0 +1,58 @@
+@layer components {
+  .figure {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .strip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .mini {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1.3rem);
+    background-color: var(--c-cell);
+    border: var(--bw-hair) solid var(--c-border-strong);
+    border-radius: var(--r-sm);
+  }
+
+  .cell {
+    display: grid;
+    place-items: center;
+    block-size: 1.3rem;
+    border-inline-end: var(--bw-hair) solid var(--c-border-hairline);
+    border-block-end: var(--bw-hair) solid var(--c-border-hairline);
+    font-family: var(--font-num);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-black);
+    line-height: 1;
+  }
+
+  /* La pieza dibujada encima, con el mismo lavado que en el tablero. */
+  .piece {
+    position: absolute;
+    inset-inline-start: calc(var(--x) * 1.3rem);
+    inset-block-start: calc(var(--y) * 1.3rem);
+    inline-size: calc(var(--w) * 1.3rem);
+    block-size: calc(var(--h) * 1.3rem);
+    background-color: var(--tone);
+    border: var(--bw-base) solid color-mix(in oklab, var(--tone) 62%, var(--c-text) 38%);
+    border-radius: var(--r-sm);
+  }
+
+  .piece[data-bad='true'] {
+    background-color: color-mix(in oklab, var(--c-danger) 12%, var(--c-cell));
+    border-color: var(--c-danger);
+  }
+
+  .note {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    text-align: center;
+  }
+}

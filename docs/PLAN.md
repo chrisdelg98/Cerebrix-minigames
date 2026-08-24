@@ -556,6 +556,74 @@ así que se llevó el problema entero de nuevo.
 
 ---
 
+## Fase 11 — Shikaku 🔲
+
+**Objetivo:** repartir el tablero en rectángulos, cada uno con su número y con su
+área igual a ese número. Entró **sin tocar `/core`**.
+
+**Lo contrario de Trazo.** Ahí demostrar que la solución era única topaba el
+tablero en 6×6; acá sale casi gratis, porque la regla —un número por rectángulo
+**y** el área tiene que coincidir— poda la búsqueda de inmediato. Medido con
+solución única garantizada: todo por debajo de 12 ms, incluido 16×16.
+
+**El techo lo pone el dedo, no el costo: 10×10.** A 360px son casillas de 33px;
+en 12×12 bajan a 28 y esto se juega arrastrando.
+
+| Nivel | Tablero | Área máx. | Pistas | Casillas por pista |
+| ----- | ------- | --------- | ------ | ------------------ |
+| 1     | 5×5     | 4         | 11.3   | 2.2                |
+| 2     | 7×7     | 6         | 18.6   | 2.6                |
+| 3     | 8×8     | 9         | 18.7   | 3.4                |
+| 4     | 10×10   | 12        | 24.0   | 4.2                |
+| 5     | 10×10   | 20        | 17.3   | 5.8                |
+
+Con el tamaño topado, la dificultad de arriba la pone el **área máxima**:
+rectángulos más grandes son menos números, así que cada pista manda sobre más
+casillas. El nivel 5 exige más por pista que el 12×12 que se descartó.
+
+### Se rechaza en vez de permitir, a propósito
+
+Los Shikaku digitales clásicos —el _Rectangles_ de Simon Tatham— son permisivos:
+dejan dibujar cualquier cosa y solo sombrean la correcta. Acá se rechaza con
+motivo, y **no quita dificultad**: un rectángulo sin número, con dos, o cuya área
+no coincide **no está en ninguna solución posible**, nunca. Lo difícil es elegir
+entre los VÁLIDOS cuál es el bueno.
+
+Lo que sí es igual que siempre: **dibujar encima reemplaza**.
+
+### El color dice el ÁREA
+
+Un matiz por **número**, no por rectángulo: todos los 2 de una partida son del
+mismo color. Así el color deja de ser decoración y se ve de un vistazo qué áreas
+están repartidas.
+
+La primera versión coloreaba por vecindad —dos pegados nunca compartían, por
+coloreo de grafos— y era correcta pero ilegible: el mismo 2 salía de cinco
+colores distintos en el mismo tablero.
+
+**La paleta es `--c-region-1..9`, no `--c-trace-*`.** Existía en `theme.css` sin
+que ningún juego la usara, y es la correcta: la de trazo es una escala de seis
+para pintar UNA línea por tablero, y lavada, su teal y su verde son casi el mismo
+color. Los nueve de región van **ordenados por separación medida**, no por número
+de token: convertidos a OKLab y compuestos sobre la casilla, la secuencia que
+maximiza la distancia mínima es ámbar, violeta, teal, rojo, celeste, naranja,
+índigo, verde, rosa. Se toman los primeros N, con N las áreas distintas del
+tablero, y se barajan con él.
+
+Importa porque la distancia mínima cae rápido: **0.055 con cuatro matices, 0.035
+con cinco, 0.014 con los nueve**. Los niveles bajos tienen tres o cuatro áreas y
+se llevan los más separados; los altos llegan a once, y ahí la repetición es
+inevitable — no existen once lavados claramente distintos.
+
+### Las piezas llevan aire
+
+Pegadas, dos vecinas mostraban sus dos bordes uno junto al otro —una línea
+doble— y sus esquinas redondeadas dejaban muescas donde se encontraban. Se veía
+enredado. Con dos píxeles de separación cada borde se lee solo, el radio tiene
+lugar para curvar, y dos vecinas del mismo matiz siguen distinguiéndose.
+
+---
+
 ## 🎯 Orden mental
 
 ```

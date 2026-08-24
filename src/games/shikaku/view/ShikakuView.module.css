@@ -1,0 +1,181 @@
+@layer components {
+  .shikaku {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .hud {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: baseline;
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  .label {
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  /*
+   * Medido contra la PANTALLA, nunca contra el padre: el área de juego centra a
+   * sus hijos, así que su ancho es indefinido y un porcentaje contra eso
+   * colapsa. Está documentado en AppShell.module.css y Conecta 4 se lo llevó
+   * puesto igual.
+   */
+  .board {
+    position: relative;
+    container-type: inline-size;
+    inline-size: min(94vw, calc(100dvh - 280px), 30rem);
+    max-inline-size: 100%;
+    aspect-ratio: 1;
+    background-color: var(--c-cell);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-md);
+
+    /* El gesto es del juego: sin esto un arrastre dispara el scroll. */
+    touch-action: none;
+  }
+
+  .pieces,
+  .grid {
+    position: absolute;
+    inset: 0;
+  }
+
+  .pieces {
+    pointer-events: none;
+  }
+
+  /*
+   * Un rectángulo colocado: lavado suave del matiz que le tocó, borde definido.
+   *
+   * El relleno es una mezcla al 15% y no el color puro porque en el área de
+   * juego solo pueden verse dos colores saturados a la vez, y acá puede haber
+   * cuarenta rectángulos. Lavados se distinguen igual entre sí y el color fuerte
+   * queda libre para lo que importa. El borde toma el mismo matiz más cargado,
+   * que es lo que le da la lectura de pieza recortada en vez de mancha.
+   */
+  .rect {
+    position: absolute;
+
+    /*
+     * Con aire alrededor, y ese aire es lo que arregla el dibujo.
+     *
+     * Pegadas, dos piezas vecinas mostraban sus DOS bordes uno junto al otro
+     * —una línea doble— y sus esquinas redondeadas dejaban muescas blancas donde
+     * se encontraban. Se veía enredado. Separándolas dos píxeles cada borde se
+     * lee solo, el radio tiene lugar para curvar, y de paso dos vecinas del
+     * mismo matiz siguen distinguiéndose.
+     */
+    inset-inline-start: calc(var(--x) + 2px);
+    inset-block-start: calc(var(--y) + 2px);
+    inline-size: calc(var(--w) - 4px);
+    block-size: calc(var(--h) - 4px);
+
+    /* El token de región ya viene lavado y con su versión oscura, así que se
+       usa tal cual. El borde es el mismo matiz llevado hacia el color del
+       texto, que lo densifica en los dos temas sin inventar un color nuevo. */
+    background-color: var(--tone);
+    border: var(--bw-base) solid color-mix(in oklab, var(--tone) 62%, var(--c-text) 38%);
+    border-radius: var(--r-md);
+  }
+
+  /*
+   * El rectángulo que se está dibujando, con su cuenta en vivo.
+   *
+   * Saber si cierra ANTES de soltar es la mitad de la sensación: `partial`
+   * mientras falta, `ok` cuando el área coincide con el número, `bad` cuando no
+   * hay número o hay dos. Se anuncia con el borde y el grosor, no con un color
+   * nuevo.
+   */
+  .preview {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    inset-inline-start: var(--x);
+    inset-block-start: var(--y);
+    inline-size: var(--w);
+    block-size: var(--h);
+    border: var(--bw-thick, 3px) dashed var(--c-text-subtle);
+    border-radius: var(--r-md);
+    background-color: color-mix(in oklab, var(--c-text) 6%, transparent);
+  }
+
+  .preview[data-state='ok'] {
+    border-style: solid;
+    border-color: var(--c-accent);
+    background-color: color-mix(in oklab, var(--c-accent) 16%, transparent);
+  }
+
+  .preview[data-state='bad'] {
+    border-color: var(--c-danger);
+    background-color: color-mix(in oklab, var(--c-danger) 10%, transparent);
+  }
+
+  .count {
+    padding: 0 var(--sp-1);
+    background-color: var(--c-surface);
+    border-radius: var(--r-sm);
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-black);
+    line-height: 1.4;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(var(--size), minmax(0, 1fr));
+  }
+
+  /*
+   * La cuadrícula es una guía tenue, no una reja: lo que tiene que leerse son
+   * los rectángulos. Se dibuja con un borde interior que el rectángulo de
+   * encima tapa cuando la casilla ya está repartida.
+   */
+  .cell {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-inline-end: var(--bw-hair) solid var(--c-border-hairline);
+    border-block-end: var(--bw-hair) solid var(--c-border-hairline);
+    cursor: crosshair;
+  }
+
+  .cell:disabled {
+    cursor: default;
+  }
+
+  .cell[data-hinted='true'] {
+    background-color: color-mix(in oklab, var(--c-accent) 18%, transparent);
+  }
+
+  /*
+   * El número es una pista, no una ficha.
+   *
+   * La primera versión lo metía en una pastilla con sombra y quedaba como una
+   * pieza de juego: dominaba el tablero y competía justo con lo que hay que
+   * mirar, que son los rectángulos. Un numeral pelado y bien negro se lee igual
+   * de bien sobre el lavado —está al 15%— y deja el protagonismo donde va.
+   */
+  .number {
+    color: var(--c-text);
+    font-family: var(--font-num);
+    font-size: clamp(0.85rem, 4.4cqi, 1.5rem);
+    font-weight: var(--fw-black);
+    line-height: 1;
+  }
+
+  .help {
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    text-align: center;
+  }
+}

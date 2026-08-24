@@ -16,6 +16,7 @@ import { ConnectFourIcon } from '@games/connect-four/sprites/ConnectFourIcons';
 import { DummyIcon } from '@games/_dummy/sprites/DummyIcon';
 import { MinesweeperIcon } from '@games/minesweeper/sprites/MinesweeperIcons';
 import { NonogramIcon } from '@games/nonogram/sprites/NonogramIcons';
+import { ShikakuIcon } from '@games/shikaku/sprites/ShikakuIcons';
 import { MemoryIcon } from '@games/memory/sprites/MemoryIcons';
 import { QueensIcon } from '@games/queens/sprites/QueensIcons';
 import { SequenceIcon } from '@games/sequence/sprites/SequenceIcons';
@@ -204,6 +205,20 @@ export const REGISTRY: readonly RegistryEntry[] = [
     },
     icon: NonogramIcon,
     load: () => import('@games/nonogram'),
+  },
+  {
+    id: 'shikaku',
+    preview: {
+      id: 'shikaku',
+      name: 'Shikaku',
+      tagline: 'Repartí el tablero en rectángulos. Cada uno con su número.',
+      difficulties: [1, 2, 3, 4, 5],
+      tags: ['lógica'],
+      category: 'lógica',
+      estimatedMinutes: [3, 12],
+    },
+    icon: ShikakuIcon,
+    load: () => import('@games/shikaku'),
   },
   {
     id: 'trace',

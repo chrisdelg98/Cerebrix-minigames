@@ -7,26 +7,28 @@ import { type Rect, type ShikakuConfig, type ShikakuMove, type ShikakuState } fr
 /**
  * Dos palancas: el tablero y el área máxima de un rectángulo.
  *
- * El tablero llega hasta 10×10 y ahí se corta — no por costo, que es de un
- * milisegundo, sino por el dedo: a 360px son casillas de 33px, y en 12×12
- * bajaban a 28, que con arrastre queda apretado.
+ * El tablero va de 5×5 a 10×10 y ahí se corta — no por costo, que es de un
+ * milisegundo en todos los niveles, sino por el dedo: a 360px un 10×10 da
+ * casillas de 33px, y en 12×12 bajan a 28, que con arrastre queda apretado.
  *
- * Con el tamaño topado, la dificultad de arriba la pone la otra palanca.
- * Rectángulos más grandes significan menos números, así que cada pista manda
- * sobre más casillas y hay más que deducir. Medido en 10×10: con piezas de hasta
- * 9 son 3.25 casillas por pista; hasta 20, son 5.78 — más exigente que el viejo
- * 12×12, en un tablero más cómodo.
+ * El área máxima **no es redundante con el tamaño y hay que calibrarla**: con
+ * los tamaños muy juntos, un tablero más grande con piezas igual de chicas sale
+ * MÁS fácil, no más difícil. Medido, 6×6 con piezas de hasta 4 da 2.07 casillas
+ * por pista contra 2.23 del 5×5 — la escala se daba vuelta en el segundo
+ * escalón. Rectángulos más grandes son menos números, así que cada pista manda
+ * sobre más casillas y hay más que deducir.
  *
- * Y es la palanca que hace al nivel 1 realmente fácil: en 5×5 con piezas de
- * hasta 4, cada número manda sobre dos casillas y se ve de un vistazo.
+ * Casillas por pista, medido sobre 24 tableros por nivel:
+ * 2.23 · 2.63 · 2.95 · 3.41 · 5.94.
  *
- * Casillas por pista, medido: 2.2 · 2.6 · 3.4 · 4.2 · 5.8.
+ * El salto de experto es el más grande a propósito: es el único 10×10 y el único
+ * con piezas de hasta 20.
  */
 const CONFIGS: Record<Difficulty, ShikakuConfig> = {
   1: { size: 5, maxArea: 4 },
-  2: { size: 7, maxArea: 6 },
-  3: { size: 8, maxArea: 9 },
-  4: { size: 10, maxArea: 12 },
+  2: { size: 6, maxArea: 6 },
+  3: { size: 7, maxArea: 7 },
+  4: { size: 8, maxArea: 9 },
   5: { size: 10, maxArea: 20 },
 };
 

@@ -571,15 +571,17 @@ en 12×12 bajan a 28 y esto se juega arrastrando.
 
 | Nivel | Tablero | Área máx. | Pistas | Casillas por pista |
 | ----- | ------- | --------- | ------ | ------------------ |
-| 1     | 5×5     | 4         | 11.3   | 2.2                |
-| 2     | 7×7     | 6         | 18.6   | 2.6                |
-| 3     | 8×8     | 9         | 18.7   | 3.4                |
-| 4     | 10×10   | 12        | 24.0   | 4.2                |
-| 5     | 10×10   | 20        | 17.3   | 5.8                |
+| 1     | 5×5     | 4         | 11.2   | 2.23               |
+| 2     | 6×6     | 6         | 13.7   | 2.63               |
+| 3     | 7×7     | 7         | 16.6   | 2.95               |
+| 4     | 8×8     | 9         | 18.8   | 3.41               |
+| 5     | 10×10   | 20        | 16.8   | 5.94               |
 
-Con el tamaño topado, la dificultad de arriba la pone el **área máxima**:
-rectángulos más grandes son menos números, así que cada pista manda sobre más
-casillas. El nivel 5 exige más por pista que el 12×12 que se descartó.
+**El área máxima hay que calibrarla, no elegirla al gusto.** Con los tamaños tan
+juntos, un tablero más grande con piezas igual de chicas sale MÁS fácil: 6×6 con
+piezas de hasta 4 da 2.07 casillas por pista contra 2.23 del 5×5, y la escala se
+daba vuelta en el segundo escalón. El salto de experto es el más grande a
+propósito — es el único 10×10 y el único con piezas de hasta 20.
 
 ### Se rechaza en vez de permitir, a propósito
 

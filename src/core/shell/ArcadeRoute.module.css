@@ -27,12 +27,25 @@
     gap: var(--sp-2);
   }
 
+  /*
+   * El escenario ocupa el área entera, no lo que mida su contenido.
+   *
+   * Un juego puede querer escuchar el gesto en toda la pantalla —Snake lo
+   * necesita, porque girar sobre el tablero obliga a taparlo— y para eso el
+   * contenedor tiene que llegar hasta los bordes. `stretch` y no `100%`: el
+   * área de juego centra a sus hijos, así que su ancho es indefinido y un
+   * porcentaje contra eso colapsa (AppShell.module.css lo documenta, y Conecta
+   * 4 se lo llevó puesto igual).
+   *
+   * El contenido se sigue viendo centrado porque lo centra el flex de acá.
+   */
   .stage {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: var(--sp-3);
-    inline-size: 100%;
+    place-self: stretch stretch;
   }
 
   /*

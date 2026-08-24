@@ -27,6 +27,20 @@ export interface SnakeState {
    */
   pending: Heading | null;
   /**
+   * El giro de DESPUÉS del pendiente, si el jugador ya lo pidió.
+   *
+   * Dos y no uno porque con uno solo se perdían giros, y se sentía como que el
+   * juego no respondía. Yendo a la derecha, pedir "arriba" y enseguida
+   * "izquierda" se rechazaba —izquierda es opuesta a derecha— aunque después de
+   * girar arriba fuera perfectamente legal; y si se aceptaba, pisaba al
+   * anterior, que entonces no ocurría nunca.
+   *
+   * Con dos, cada pedido se valida contra el ÚLTIMO ENCOLADO y no contra el
+   * rumbo actual, así que una esquina se dibuja de un solo movimiento del
+   * pulgar. Tres no: encolar más de lo que se ve en pantalla es jugar a ciegas.
+   */
+  queued: Heading | null;
+  /**
    * Si la serpiente ya está apoyada contra la pared, gastando su paso de gracia.
    *
    * Es el "borde invisible": la primera vez que un paso daría contra la pared la

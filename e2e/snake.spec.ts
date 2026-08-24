@@ -166,3 +166,64 @@ test('está en el estante Arcade de la portada y lleva a /arcade', async ({ page
   await expect(card).toBeVisible();
   await expect(card.getByText('Snake')).toBeVisible();
 });
+
+/*
+ * Se gira sin tocar el tablero.
+ *
+ * Con el gesto encima del tablero había que taparlo con la mano justo cuando
+ * hacía falta verlo. El área de gesto ahora es todo el escenario, así que se
+ * puede girar desde el margen — esto lo comprueba deslizando por DEBAJO del
+ * tablero y verificando que la víbora respondió.
+ */
+test('gira deslizando fuera del tablero', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 780 });
+  await page.goto('/arcade/snake');
+  await page.getByRole('button', { name: /Empezar partida/ }).click();
+  await page.waitForTimeout(300);
+
+  const cajas = await page.evaluate(() => {
+    const caja = (sel: string) => {
+      const el = document.querySelector(sel);
+      if (el === null) return null;
+      const r = el.getBoundingClientRect();
+      return { y: r.y, h: r.height };
+    };
+    return {
+      area: caja('[class*="SwipeArea"]'),
+      tablero: caja('[class*="SnakeView"][class*="frame"]'),
+    };
+  });
+
+  const area = cajas.area;
+  const tablero = cajas.tablero;
+  expect(area, 'no hay área de gesto').not.toBeNull();
+  expect(tablero).not.toBeNull();
+  if (area === null || tablero === null) return;
+
+  const y = Math.round(area.y + area.h - 12);
+  expect(y, 'el área no sobresale del tablero').toBeGreaterThan(tablero.y + tablero.h);
+
+  const posiciones = () =>
+    page.evaluate(() =>
+      Array.from(document.querySelectorAll('[class*="segment"]'))
+        .map((e) => (e as HTMLElement).style.cssText)
+        .join('|')
+    );
+  const antes = await posiciones();
+
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [{ x: 195, y }],
+  });
+  for (let i = 1; i <= 6; i += 1) {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x: 195, y: y - i * 12 }],
+    });
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await page.waitForTimeout(700);
+
+  expect(await posiciones(), 'el gesto fuera del tablero no hizo nada').not.toBe(antes);
+});

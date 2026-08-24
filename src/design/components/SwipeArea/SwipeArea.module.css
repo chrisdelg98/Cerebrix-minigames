@@ -1,0 +1,25 @@
+@layer components {
+  .area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-3);
+
+    /*
+     * Ocupa todo lo que le den, en los dos ejes.
+     *
+     * Es la razón de ser del componente: cuanto más grande el área, menos falta
+     * tapar el tablero para girar. `stretch` y no un porcentaje — el área de
+     * juego centra a sus hijos, así que su ancho es indefinido y un porcentaje
+     * contra eso colapsa (está documentado en AppShell.module.css).
+     */
+    place-self: stretch stretch;
+
+    /*
+     * El gesto es del juego, no del navegador: sin esto un arrastre vertical
+     * dispara el scroll o el tirón de recargar y el giro nunca llega.
+     */
+    touch-action: none;
+  }
+}

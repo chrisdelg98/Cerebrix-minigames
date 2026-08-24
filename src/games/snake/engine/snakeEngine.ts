@@ -95,6 +95,7 @@ export const snakeEngine: ArcadeEngine<SnakeState, SnakeMove, SnakeConfig> = {
       ...base,
       heading: 'right',
       pending: null,
+      queued: null,
       grace: false,
       food: placeFood(base),
       target: config.target,
@@ -104,22 +105,39 @@ export const snakeEngine: ArcadeEngine<SnakeState, SnakeMove, SnakeConfig> = {
   },
 
   /**
-   * El giro se encola, no se aplica.
+   * El giro se encola, no se aplica — y caben dos.
    *
-   * Y se rechaza el opuesto exacto: pedir "izquierda" yendo a la derecha
-   * metería la cabeza en el propio cuello en el paso siguiente. No es una regla
-   * inventada — es que ese movimiento no existe en el juego.
+   * Se rechaza el opuesto exacto: pedir "izquierda" yendo a la derecha metería
+   * la cabeza en el propio cuello en el paso siguiente. No es una regla
+   * inventada, es que ese movimiento no existe en el juego.
+   *
+   * Lo que sí cambió es CONTRA QUÉ se compara: contra el último rumbo encolado
+   * y no contra el actual. Yendo a la derecha, "arriba" y después "izquierda"
+   * son dos giros válidos y consecutivos; comparando contra el rumbo actual, el
+   * segundo se rechazaba por opuesto y el jugador veía que su gesto no hacía
+   * nada.
    */
   applyMove(state, move) {
     if (state.dead) return state;
-    if (move.heading === state.heading || move.heading === OPPOSITE[state.heading]) return state;
-    return { ...state, pending: move.heading };
+
+    /* Con la cola llena se ignora lo nuevo en vez de pisar lo encolado: así se
+       ven los dos giros que se pidieron, en orden, en vez de que el del medio
+       desaparezca sin explicación. */
+    if (state.queued !== null) return state;
+
+    const last = state.pending ?? state.heading;
+    if (move.heading === last || move.heading === OPPOSITE[last]) return state;
+
+    if (state.pending === null) return { ...state, pending: move.heading };
+    return { ...state, queued: move.heading };
   },
 
   tick(state) {
     if (state.dead) return state;
 
     const heading = state.pending ?? state.heading;
+    // Consumido el pendiente, el que esperaba detrás pasa a ser el pendiente.
+    const pending = state.queued;
     const head = ahead(state.body[0] ?? 0, heading, state.cols, state.rows);
 
     /*
@@ -133,24 +151,25 @@ export const snakeEngine: ArcadeEngine<SnakeState, SnakeMove, SnakeConfig> = {
      * No se sale de la grilla: la cabeza no avanza, solo espera.
      */
     if (head === -1) {
-      if (!state.grace) return { ...state, heading, pending: null, grace: true };
-      return { ...state, heading, pending: null, dead: true };
+      if (!state.grace) return { ...state, heading, pending, queued: null, grace: true };
+      return { ...state, heading, pending, queued: null, dead: true };
     }
 
     const eating = head === state.food;
     // La cola se va a mover, así que pisarla NO es chocar — salvo que estés
     // creciendo, en cuyo caso la cola se queda donde está.
     const body = eating ? state.body : state.body.slice(0, -1);
-    if (body.includes(head)) return { ...state, heading, pending: null, dead: true };
+    if (body.includes(head)) return { ...state, heading, pending, queued: null, dead: true };
 
     const grown = [head, ...body];
-    if (!eating) return { ...state, heading, pending: null, grace: false, body: grown };
+    if (!eating) return { ...state, heading, pending, queued: null, grace: false, body: grown };
 
     const spawns = state.spawns + 1;
     return {
       ...state,
       heading,
-      pending: null,
+      pending,
+      queued: null,
       grace: false,
       body: grown,
       spawns,

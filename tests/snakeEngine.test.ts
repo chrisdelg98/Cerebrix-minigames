@@ -11,6 +11,7 @@ function board(over: Partial<SnakeState> = {}): SnakeState {
     body: [12, 11, 10],
     heading: 'right',
     pending: null,
+    queued: null,
     grace: false,
     food: -1,
     target: 12,
@@ -186,5 +187,48 @@ describe('el paso de gracia contra la pared', () => {
     expect(enLaFilaCero.body[0]).toBe(4);
     expect(enLaFilaCero.grace).toBe(false);
     expect(engine.tick(enLaFilaCero).dead).toBe(false);
+  });
+});
+
+/*
+ * Se sentía como que el juego no respondía, y en parte no respondía de verdad:
+ * el segundo giro de una esquina se perdía. Ver `SnakeState.queued`.
+ */
+describe('encolar dos giros', () => {
+  it('una esquina entera se pide de un solo movimiento', () => {
+    // Yendo a la derecha: arriba, y enseguida izquierda.
+    const pedida = engine.applyMove(engine.applyMove(board(), { heading: 'up' }), {
+      heading: 'left',
+    });
+
+    expect(pedida.pending, 'el primer giro se perdió').toBe('up');
+    expect(pedida.queued, 'el segundo giro se descartó').toBe('left');
+
+    // Y el reloj los aplica en orden, uno por paso.
+    const primero = engine.tick(pedida);
+    expect(primero.heading).toBe('up');
+    expect(primero.pending).toBe('left');
+
+    expect(engine.tick(primero).heading).toBe('left');
+  });
+
+  it('sigue sin aceptar el opuesto exacto de lo último encolado', () => {
+    // Yendo a la derecha, pedir arriba y después abajo: abajo es el opuesto de
+    // arriba, así que la cabeza se metería en su propio cuello.
+    const state = engine.applyMove(engine.applyMove(board(), { heading: 'up' }), {
+      heading: 'down',
+    });
+
+    expect(state.queued).toBeNull();
+  });
+
+  it('y tampoco encola tres: lo que no se ve no se pide', () => {
+    let state = board();
+    for (const heading of ['up', 'left', 'down'] as const) {
+      state = engine.applyMove(state, { heading });
+    }
+
+    expect(state.pending).toBe('up');
+    expect(state.queued).toBe('left');
   });
 });

@@ -129,8 +129,29 @@ export function ShikakuView({
                   ? `fila ${String(Math.floor(cell / size) + 1)}, columna ${String((cell % size) + 1)}, número ${String(number)}`
                   : `fila ${String(Math.floor(cell / size) + 1)}, columna ${String((cell % size) + 1)}`
               }
-              onPointerDown={() => {
-                if (interactive) setDrag({ from: cell, to: cell });
+              onPointerDown={(event) => {
+                if (!interactive) return;
+                /*
+                 * Soltar la captura implícita, o en un teléfono no se arrastra.
+                 *
+                 * Al tocar, el navegador le da al elemento del `pointerdown`
+                 * la captura del puntero: todo lo que viene después va a ESA
+                 * casilla, así que `pointerenter` no se dispara en ninguna otra
+                 * y el rectángulo se queda en la primera. Con ratón no pasa, y
+                 * por eso no se veía.
+                 *
+                 * Se suelta desde `event.target`, que es quien la tiene de
+                 * verdad — el botón nunca la tuvo. Es el mismo arreglo que
+                 * `<Cell>` hace para Trazo y Nonograma; este tablero dibuja sus
+                 * casillas a mano y por eso no lo heredó.
+                 */
+                const holder = event.target;
+                if (holder instanceof Element && typeof holder.hasPointerCapture === 'function') {
+                  if (holder.hasPointerCapture(event.pointerId)) {
+                    holder.releasePointerCapture(event.pointerId);
+                  }
+                }
+                setDrag({ from: cell, to: cell });
               }}
               onPointerEnter={() => {
                 setDrag((current) => (current === null ? null : { ...current, to: cell }));

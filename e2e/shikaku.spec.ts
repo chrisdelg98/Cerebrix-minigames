@@ -112,4 +112,94 @@ test.describe('Shikaku', () => {
     const desborda = await page.evaluate(() => document.documentElement.scrollWidth > 360);
     expect(desborda, 'el tablero desborda a lo ancho').toBe(false);
   });
+
+  /*
+   * El arrastre CON EL DEDO, que es distinto del arrastre con ratón.
+   *
+   * Al tocar, el navegador le da la captura del puntero al elemento donde empezó
+   * el toque: todo lo que viene después va a esa casilla y `pointerenter` no se
+   * dispara en ninguna otra, así que el rectángulo se queda en la primera. Con
+   * ratón no pasa — por eso las pruebas anteriores no lo veían y el juego llegó
+   * roto al teléfono.
+   */
+  test('se arrastra con el dedo, no solo con el ratón', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 780 });
+    await page.goto('/game/shikaku');
+    await page.getByRole('button', { name: /Empezar partida/ }).click();
+    await page.waitForTimeout(400);
+
+    const tablero = await page.evaluate(() => {
+      const celdas = Array.from(document.querySelectorAll('[role="gridcell"]'));
+      return celdas.map((el, i) => {
+        const m = /número (\d+)/.exec(el.getAttribute('aria-label') ?? '');
+        const r = el.getBoundingClientRect();
+        return { i, n: m === null ? 0 : Number(m[1]), x: r.x + r.width / 2, y: r.y + r.height / 2 };
+      });
+    });
+    const size = Math.round(Math.sqrt(tablero.length));
+    const numero = (c: number) => tablero[c]?.n ?? 0;
+
+    // Un rectángulo válido de más de una casilla, para que el arrastre importe.
+    let objetivo: { a: number; b: number } | undefined;
+    for (const { i, n } of tablero) {
+      if (n < 2 || objetivo !== undefined) continue;
+      for (let w = 1; w <= n && objetivo === undefined; w += 1) {
+        if (n % w !== 0) continue;
+        const h = n / w;
+        const cx = i % size;
+        const cy = Math.floor(i / size);
+        for (let x = Math.max(0, cx - w + 1); x <= cx && x + w <= size; x += 1) {
+          for (let y = Math.max(0, cy - h + 1); y <= cy && y + h <= size; y += 1) {
+            let cuantos = 0;
+            for (let dy = 0; dy < h; dy += 1) {
+              for (let dx = 0; dx < w; dx += 1)
+                if (numero((y + dy) * size + x + dx) > 0) cuantos += 1;
+            }
+            if (cuantos === 1) {
+              objetivo = { a: y * size + x, b: (y + h - 1) * size + x + w - 1 };
+              break;
+            }
+          }
+          if (objetivo !== undefined) break;
+        }
+      }
+    }
+    expect(objetivo).toBeDefined();
+    if (objetivo === undefined) return;
+
+    const desde = tablero[objetivo.a];
+    const hasta = tablero[objetivo.b];
+    if (desde === undefined || hasta === undefined) return;
+
+    // Toque real, no ratón: con el dedo es donde la captura implícita rompía todo.
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchStart',
+      touchPoints: [{ x: desde.x, y: desde.y }],
+    });
+    for (let k = 1; k <= 8; k += 1) {
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [
+          {
+            x: desde.x + ((hasta.x - desde.x) * k) / 8,
+            y: desde.y + ((hasta.y - desde.y) * k) / 8,
+          },
+        ],
+      });
+    }
+
+    /* Si la captura implícita no se soltó, el arrastre se queda en la primera
+       casilla y la vista previa nunca llega a `ok`. */
+    const previa = await page.evaluate(() => {
+      const el = document.querySelector('[class*="ShikakuView"][class*="preview"]');
+      return el === null ? null : el.getAttribute('data-state');
+    });
+    expect(previa, 'el arrastre no salió de la primera casilla').toBe('ok');
+
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await page.waitForTimeout(400);
+
+    await expect(page.locator('[class*="ShikakuView"][class*="rect"]')).toHaveCount(1);
+  });
 });

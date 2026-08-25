@@ -137,6 +137,33 @@
     border-color: var(--c-accent);
   }
 
+  /* La misma agrupación que el portal de cada juego: dos acciones apiladas,
+     del mismo alto y cerca una de la otra. */
+  .actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-3);
+    inline-size: 100%;
+  }
+
+  .levelUp {
+    padding: var(--sp-2) var(--sp-4);
+    background-color: color-mix(in oklab, var(--c-accent) 16%, transparent);
+    border-radius: var(--r-full);
+    color: var(--c-accent);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-black);
+  }
+
+  .resultLink {
+    display: grid;
+    place-items: center;
+    min-block-size: var(--sp-7);
+    color: var(--c-text);
+    font-weight: var(--fw-bold);
+    text-decoration: underline;
+  }
+
   .level {
     color: var(--c-accent);
     font-size: var(--fs-2xl);
@@ -182,11 +209,13 @@
     font-weight: var(--fw-black);
   }
 
+  /* En una línea: los puntos se cuentan de un vistazo y la cifra los confirma.
+     Apilados quedaban como dos datos sueltos en vez de uno. */
   .tramo {
     display: flex;
-    flex-direction: column;
-    gap: var(--sp-2);
+    gap: var(--sp-3);
     align-items: center;
+    justify-content: center;
     padding-block-start: var(--sp-3);
     border-block-start: var(--bw-hair) solid var(--c-border-hairline);
     inline-size: 100%;

@@ -5,6 +5,7 @@ import { Badge } from '@design/components/Badge';
 import { Button } from '@design/components/Button';
 import { Modal } from '@design/components/Modal';
 import { ArrowLeftIcon, PlayIcon } from '@design/sprites/SettingsIcons';
+import { Trophy } from '@design/sprites/Trophy';
 import { type LossPenalty } from '@storage/types';
 
 import { campaignTier, TIER_LABELS } from '../badges';
@@ -45,7 +46,7 @@ function poolFor(kind: PoolKind, custom: string[]): string[] {
 }
 
 export function CampaignRoute() {
-  const { campaign, ready, start, abandon } = useCampaign();
+  const { campaign, ready, start, abandon, event, dismissEvent } = useCampaign();
   useDocumentMeta('Campaña', 'Subí de nivel ganando partidas, en un juego o saltando entre todos.');
 
   const header = (
@@ -60,10 +61,54 @@ export function CampaignRoute() {
 
   if (!ready) return <AppShell header={header}>{null}</AppShell>;
 
+  /*
+   * El final tiene pantalla propia.
+   *
+   * Sin esto, terminar una campaña te dejaba en el formulario de configuración
+   * —que es lo que se muestra cuando no hay campaña activa— y el logro que
+   * acababas de ganar no aparecía por ningún lado.
+   */
+  if (event?.kind === 'completed' || event?.kind === 'failed') {
+    return (
+      <AppShell header={header}>
+        <Result kind={event.kind} onClose={dismissEvent} />
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell header={header}>
       {campaign === null ? <Setup onStart={start} /> : <Status onAbandon={abandon} />}
     </AppShell>
+  );
+}
+
+function Result({ kind, onClose }: { kind: 'completed' | 'failed'; onClose: () => void }) {
+  const ganada = kind === 'completed';
+
+  return (
+    <div className={`${s.status} anim-slide-up`}>
+      {ganada && <Trophy size={96} state="unlocked" />}
+
+      <p className={s.level}>{ganada ? '¡Campaña completada!' : 'Se acabó'}</p>
+
+      <p className={s.hint}>
+        {ganada
+          ? 'Llegaste al final de Experto. El logro te espera en tu historial.'
+          : 'Te quedaste sin vidas. La campaña se cierra acá.'}
+      </p>
+
+      <div className={s.actions}>
+        {ganada && (
+          <Link to="/historial" className={s.resultLink}>
+            Ver mis logros
+          </Link>
+        )}
+        <Button variant="primary" size="lg" block onClick={onClose}>
+          Empezar otra campaña
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -294,7 +339,7 @@ function Setup({ onStart }: { onStart: (config: CampaignConfig) => Promise<void>
 }
 
 function Status({ onAbandon }: { onAbandon: () => Promise<void> }) {
-  const { campaign } = useCampaign();
+  const { campaign, event } = useCampaign();
   const navigate = useNavigate();
   const [confirming, setConfirming] = useState(false);
 
@@ -328,6 +373,14 @@ function Status({ onAbandon }: { onAbandon: () => Promise<void> }) {
 
       <p className={s.level}>{DIFFICULTY_LABELS[campaign.level]}</p>
 
+      {/* El momento de subir merece decirse: si no, el nivel cambia de nombre y
+          nada más. */}
+      {event?.kind === 'level-up' && (
+        <p className={s.levelUp} role="status">
+          ¡Subiste de nivel!
+        </p>
+      )}
+
       <div className={s.card}>
         <span className={s.cardLabel}>Ahora te toca</span>
 
@@ -342,14 +395,19 @@ function Status({ onAbandon }: { onAbandon: () => Promise<void> }) {
 
         {/* El tramo, en puntos Y en número: los puntos se cuentan de un vistazo
             y el número no deja lugar a dudas cuando son cinco. */}
-        <span className={s.tramo}>
+        <span
+          className={s.tramo}
+          role="img"
+          aria-label={`${String(campaign.wins)} de ${String(winsPerLevel)} victorias en este nivel`}
+        >
           <span className={s.pips} aria-hidden="true">
             {Array.from({ length: winsPerLevel }, (_, i) => (
               <span key={i} className={s.pip} data-on={i < campaign.wins} />
             ))}
           </span>
-          <span className={s.tramoText}>
-            {campaign.wins} de {winsPerLevel} en este nivel
+          <span className={s.tramoText} aria-hidden="true">
+            <span className="tabular">{campaign.wins}</span> de{' '}
+            <span className="tabular">{winsPerLevel}</span>
           </span>
         </span>
       </div>
@@ -360,26 +418,31 @@ function Status({ onAbandon }: { onAbandon: () => Promise<void> }) {
         </p>
       )}
 
-      <Button
-        variant="primary"
-        size="lg"
-        block
-        icon={<PlayIcon size={20} />}
-        onClick={() => {
-          if (entry) void navigate(pathFor(entry));
-        }}
-      >
-        Jugar
-      </Button>
+      {/* Agrupados y los dos `lg`, como el portal de cada juego: dos acciones
+          apiladas tienen que medir lo mismo y estar cerca. */}
+      <div className={s.actions}>
+        <Button
+          variant="primary"
+          size="lg"
+          block
+          icon={<PlayIcon size={20} />}
+          onClick={() => {
+            if (entry) void navigate(pathFor(entry));
+          }}
+        >
+          Jugar
+        </Button>
 
-      <Button
-        block
-        onClick={() => {
-          setConfirming(true);
-        }}
-      >
-        Abandonar campaña
-      </Button>
+        <Button
+          size="lg"
+          block
+          onClick={() => {
+            setConfirming(true);
+          }}
+        >
+          Abandonar campaña
+        </Button>
+      </div>
 
       <Modal
         open={confirming}

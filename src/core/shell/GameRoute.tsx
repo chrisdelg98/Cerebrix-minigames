@@ -56,13 +56,24 @@ function GameSession({ entry }: { entry: TurnEntry }) {
    * Entrando por la portada a otro juego, la campaña ni se entera — jugar
    * suelto sigue existiendo tal cual.
    */
-  const { campaign, report } = useCampaign();
+  const { campaign, report, event } = useCampaign();
   const navigate = useNavigate();
-  const inCampaign = campaign !== null && campaign.current === entry.id;
+
+  /*
+   * Se decide AL ENTRAR y no se recalcula.
+   *
+   * Al ganar, la campaña avanza al juego siguiente en ese mismo instante, así
+   * que comparar contra `campaign.current` deja de dar verdadero justo cuando
+   * hace falta: volvía el selector de dificultad y el modal ofrecía "jugar otra
+   * vez" en vez de seguir la campaña. La ronda es de esta visita, y lo que la
+   * campaña haga después no la cambia.
+   */
+  const [inCampaign] = useState(() => campaign !== null && campaign.current === entry.id);
+  const campaignLevel = campaign?.level ?? 1;
 
   const session = useGameSession(
     entry.load,
-    inCampaign ? campaign.level : defaultDifficultyFor(entry.preview.difficulties),
+    inCampaign ? campaignLevel : defaultDifficultyFor(entry.preview.difficulties),
     inCampaign
   );
 
@@ -89,6 +100,15 @@ function GameSession({ entry }: { entry: TurnEntry }) {
   const modes = session.module?.meta.modes;
   const scored = modes?.find((one) => one.id === session.mode)?.ranked ?? true;
 
+  /* La etiqueta la decide lo que ACABA de pasar, no un texto fijo: "siguiente
+     nivel" y "ver el resultado" no son lo mismo. */
+  const nextLabel =
+    event?.kind === 'completed' || event?.kind === 'failed'
+      ? 'Ver el resultado'
+      : event?.kind === 'level-up'
+        ? 'Siguiente nivel'
+        : 'Siguiente ronda';
+
   const playing = session.status.kind === 'playing';
 
   /*
@@ -98,11 +118,13 @@ function GameSession({ entry }: { entry: TurnEntry }) {
    * remonta el tablero al reintentar, y sin esa guarda una misma victoria
    * contaría dos veces.
    */
-  const reportedRef = useRef<string | null>(null);
+  /* Una vez por VISITA, no por ronda: volver a jugar el mismo juego después de
+     que la campaña ya avanzó no puede sumar de nuevo. */
+  const reportedRef = useRef(false);
   useEffect(() => {
     if (!inCampaign || playing || session.phase !== 'ready' || !session.started) return;
-    if (reportedRef.current === session.roundId) return;
-    reportedRef.current = session.roundId;
+    if (reportedRef.current) return;
+    reportedRef.current = true;
 
     const kind = session.status.kind;
     void report(kind === 'won' ? 'won' : kind === 'draw' ? 'draw' : 'lost');
@@ -148,10 +170,7 @@ function GameSession({ entry }: { entry: TurnEntry }) {
   /* En campaña el nivel lo manda la campaña, así que el selector se va y en su
      lugar se ve en qué punto vas. */
   const subheader = inCampaign ? (
-    <span className={s.campaignChip}>
-      Campaña · {DIFFICULTY_LABELS[session.difficulty]} · {campaign.wins} de{' '}
-      {campaign.config.winsPerLevel}
-    </span>
+    <span className={s.campaignChip}>Campaña · {DIFFICULTY_LABELS[session.difficulty]}</span>
   ) : scored ? (
     <DifficultyPicker<Difficulty>
       value={session.difficulty}
@@ -446,9 +465,7 @@ function GameSession({ entry }: { entry: TurnEntry }) {
            sí no jugaron "en Difícil", jugaron entre ellas. */
         difficulty={scored ? session.difficulty : undefined}
         next={
-          inCampaign
-            ? { label: 'Seguir la campaña', onNext: () => void navigate('/campana') }
-            : undefined
+          inCampaign ? { label: nextLabel, onNext: () => void navigate('/campana') } : undefined
         }
         onRestart={session.restart}
       />

@@ -88,6 +88,14 @@ export const routes: RouteObject[] = [
           }),
       },
       {
+        path: 'campana',
+        lazy: () =>
+          freshChunk(async () => {
+            const { CampaignRoute } = await import('./shell/CampaignRoute');
+            return { Component: CampaignRoute };
+          }),
+      },
+      {
         path: 'historial',
         lazy: () =>
           freshChunk(async () => {

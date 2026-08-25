@@ -3,6 +3,8 @@ import { migrate } from './migrations';
 import { computeGlobalStats, computeStats } from './stats';
 import {
   SCHEMA_VERSION,
+  type BadgeRecord,
+  type CampaignRecord,
   type Backup,
   type GameResult,
   type GameStats,
@@ -14,6 +16,8 @@ import {
 const SESSION_PREFIX = 'cerebrix:session:';
 const RESULTS_KEY = 'cerebrix:results';
 const DIFFICULTY_PREFIX = 'cerebrix:difficulty:';
+const CAMPAIGN_KEY = 'cerebrix:campaign';
+const BADGES_KEY = 'cerebrix:badges';
 
 /**
  * The fallback, for private-mode browsers and anything where IndexedDB is
@@ -167,6 +171,48 @@ export class LocalStorageDriver implements StorageDriver {
     }
 
     return Promise.resolve([...dropped]);
+  }
+
+  /* Una sola campaña a la vez, así que una sola clave. */
+  saveCampaign(campaign: CampaignRecord): Promise<void> {
+    localStorage.setItem(CAMPAIGN_KEY, JSON.stringify(campaign));
+    return Promise.resolve();
+  }
+
+  loadCampaign(): Promise<CampaignRecord | null> {
+    const raw = localStorage.getItem(CAMPAIGN_KEY);
+    if (raw === null) return Promise.resolve(null);
+    try {
+      return Promise.resolve(JSON.parse(raw) as CampaignRecord);
+    } catch {
+      // Una campaña ilegible se descarta en vez de romper la portada.
+      localStorage.removeItem(CAMPAIGN_KEY);
+      return Promise.resolve(null);
+    }
+  }
+
+  clearCampaign(): Promise<void> {
+    localStorage.removeItem(CAMPAIGN_KEY);
+    return Promise.resolve();
+  }
+
+  /** Ganarlo de nuevo NO pisa la fecha: lo que vale es la primera vez. */
+  async awardBadge(badge: BadgeRecord): Promise<void> {
+    const all = await this.listBadges();
+    if (all.some((one) => one.id === badge.id)) return;
+    localStorage.setItem(BADGES_KEY, JSON.stringify([badge, ...all]));
+  }
+
+  listBadges(): Promise<BadgeRecord[]> {
+    const raw = localStorage.getItem(BADGES_KEY);
+    if (raw === null) return Promise.resolve([]);
+    try {
+      const all = JSON.parse(raw) as BadgeRecord[];
+      return Promise.resolve([...all].sort((a, b) => b.earnedAt - a.earnedAt));
+    } catch {
+      localStorage.removeItem(BADGES_KEY);
+      return Promise.resolve([]);
+    }
   }
 
   async clearAll(): Promise<void> {

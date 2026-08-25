@@ -6,6 +6,8 @@ import { computeGlobalStats, computeStats } from './stats';
 import {
   SCHEMA_VERSION,
   type Backup,
+  type BadgeRecord,
+  type CampaignRecord,
   type GameResult,
   type GameStats,
   type GlobalStats,
@@ -14,7 +16,7 @@ import {
 } from './types';
 
 const DB_NAME = 'cerebrix';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 interface CerebrixDb extends DBSchema {
   sessions: {
@@ -29,6 +31,14 @@ interface CerebrixDb extends DBSchema {
   preferences: {
     key: string;
     value: StoredPreference;
+  };
+  campaign: {
+    key: string;
+    value: CampaignRecord;
+  };
+  badges: {
+    key: string;
+    value: BadgeRecord;
   };
 }
 
@@ -61,6 +71,15 @@ export class IndexedDbDriver implements StorageDriver {
         // version 1 with games already saved in it.
         if (!db.objectStoreNames.contains('preferences')) {
           db.createObjectStore('preferences', { keyPath: 'gameId' });
+        }
+        // Añadidos en la versión 3. La campaña usa una clave fija porque hay una
+        // sola; los logros van por su id, que es lo que impide ganarlos dos
+        // veces y pisar la fecha original.
+        if (!db.objectStoreNames.contains('campaign')) {
+          db.createObjectStore('campaign');
+        }
+        if (!db.objectStoreNames.contains('badges')) {
+          db.createObjectStore('badges', { keyPath: 'id' });
         }
       },
     });
@@ -163,6 +182,40 @@ export class IndexedDbDriver implements StorageDriver {
 
     await tx.done;
     return [...dropped];
+  }
+
+  /* Una sola campaña a la vez: siempre la misma clave. */
+  async saveCampaign(campaign: CampaignRecord): Promise<void> {
+    const db = await this.#open();
+    await db.put('campaign', campaign, 'active');
+  }
+
+  async loadCampaign(): Promise<CampaignRecord | null> {
+    const db = await this.#open();
+    return (await db.get('campaign', 'active')) ?? null;
+  }
+
+  async clearCampaign(): Promise<void> {
+    const db = await this.#open();
+    await db.delete('campaign', 'active');
+  }
+
+  /**
+   * Ganar el mismo logro de nuevo NO pisa la fecha.
+   *
+   * Lo que vale de un logro es cuándo lo conseguiste la primera vez; volver a
+   * cumplir la condición no es una noticia.
+   */
+  async awardBadge(badge: BadgeRecord): Promise<void> {
+    const db = await this.#open();
+    if ((await db.get('badges', badge.id)) !== undefined) return;
+    await db.put('badges', badge);
+  }
+
+  async listBadges(): Promise<BadgeRecord[]> {
+    const db = await this.#open();
+    const all = await db.getAll('badges');
+    return all.sort((a, b) => b.earnedAt - a.earnedAt);
   }
 
   async clearAll(): Promise<void> {

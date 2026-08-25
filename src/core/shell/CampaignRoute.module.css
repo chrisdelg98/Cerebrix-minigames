@@ -1,0 +1,232 @@
+@layer components {
+  .back {
+    display: grid;
+    place-items: center;
+    inline-size: var(--sp-7);
+    block-size: var(--sp-7);
+    border-radius: var(--r-md);
+    color: var(--c-text);
+  }
+
+  .title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+
+  .setup,
+  .status {
+    display: flex;
+    flex-direction: column;
+    align-self: start;
+
+    /* Entre secciones tiene que haber más aire que entre una fila y su ayuda,
+       si no la ayuda se lee como el encabezado de lo que viene abajo. */
+    gap: var(--sp-6);
+    inline-size: min(96vw, 34rem);
+    padding-block: var(--sp-4);
+  }
+
+  .status {
+    align-items: center;
+    text-align: center;
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .legend {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  /* Los botones se envuelven: hay filas de cinco opciones y pantallas de 360px. */
+  .row,
+  .games {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .hint {
+    /* Separada de sus botones, pero mucho más cerca de ellos que de la sección
+       siguiente: así se ve de quién es. */
+    margin-block-start: var(--sp-1);
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+
+  .warning {
+    margin-block-start: var(--sp-1);
+    padding: var(--sp-2) var(--sp-3);
+    background-color: color-mix(in oklab, var(--c-gold) 14%, transparent);
+    border-inline-start: var(--bw-thick, 3px) solid var(--c-gold);
+    border-radius: var(--r-sm);
+    color: var(--c-text);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
+
+  .summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    align-items: center;
+    justify-content: space-between;
+    padding-block-start: var(--sp-3);
+    border-block-start: var(--bw-hair) solid var(--c-border-hairline);
+  }
+
+  .summaryLine {
+    color: var(--c-text);
+    font-size: var(--fs-reading);
+  }
+
+  /*
+   * La escalera: cinco barras que suben, el mismo lenguaje que la tarjeta de la
+   * portada. Dice dónde estás en la campaña ENTERA, que es lo que el nombre del
+   * nivel por sí solo no cuenta.
+   */
+  .ladder {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: flex-end;
+    block-size: var(--sp-7);
+  }
+
+  .step {
+    inline-size: var(--sp-4);
+    background-color: var(--c-cell-hover);
+    border: var(--bw-base) solid var(--c-border-hairline);
+    border-radius: var(--r-sm);
+  }
+
+  .step:nth-child(1) {
+    block-size: 40%;
+  }
+
+  .step:nth-child(2) {
+    block-size: 55%;
+  }
+
+  .step:nth-child(3) {
+    block-size: 70%;
+  }
+
+  .step:nth-child(4) {
+    block-size: 85%;
+  }
+
+  .step:nth-child(5) {
+    block-size: 100%;
+  }
+
+  .step[data-state='done'] {
+    background-color: color-mix(in oklab, var(--c-accent) 45%, var(--c-cell));
+    border-color: var(--c-accent);
+  }
+
+  .step[data-state='now'] {
+    background-color: var(--c-accent);
+    border-color: var(--c-accent);
+  }
+
+  .level {
+    color: var(--c-accent);
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-black);
+  }
+
+  /* La tarjeta carga con todo: qué juego toca, su icono y cómo va el tramo. */
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    align-items: center;
+    inline-size: 100%;
+    padding: var(--sp-5) var(--sp-4);
+    background-color: var(--c-surface-raised);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-md);
+  }
+
+  .cardLabel {
+    color: var(--c-text-muted);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+  }
+
+  .game {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: center;
+  }
+
+  .icon {
+    display: grid;
+    place-items: center;
+    color: var(--c-accent);
+  }
+
+  .gameName {
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-black);
+  }
+
+  .tramo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    align-items: center;
+    padding-block-start: var(--sp-3);
+    border-block-start: var(--bw-hair) solid var(--c-border-hairline);
+    inline-size: 100%;
+  }
+
+  /*
+   * El tramo en puntos Y en número: los puntos se cuentan de un vistazo, y el
+   * número no deja lugar a dudas cuando son cinco.
+   */
+  .pips {
+    display: flex;
+    gap: var(--sp-2);
+  }
+
+  .pip {
+    inline-size: var(--sp-4);
+    block-size: var(--sp-4);
+    background-color: var(--c-cell-hover);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-full);
+  }
+
+  .pip[data-on='true'] {
+    background-color: var(--c-accent);
+    border-color: var(--c-accent);
+  }
+
+  .tramoText {
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+  }
+
+  /* Neutro mientras haya margen: el rojo es para la última, no para informar. */
+  .lives {
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
+
+  .lives[data-critical='true'] {
+    color: var(--c-danger);
+  }
+}

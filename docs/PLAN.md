@@ -626,6 +626,87 @@ lugar para curvar, y dos vecinas del mismo matiz siguen distinguiéndose.
 
 ---
 
+## Fase 12 — Campaña y logros 🏁
+
+**Objetivo:** una forma de jugar que atraviesa el estante. **No toca el contrato
+ni ningún juego**: la campaña vive entera en el shell, que ya sabía cuándo
+alguien gana — lo único nuevo es que después de ganar decida qué lanzar.
+
+### Un modo, no dos
+
+Se pidió "campaña en un juego" y "campaña saltando entre juegos". Son **el mismo
+modo**: una campaña es un conjunto de juegos y una escalera de niveles. Conjunto
+de uno, te quedás ahí; de varios, rota. Construir dos habría sido construir lo
+mismo dos veces.
+
+### Cómo avanza
+
+- Ganar suma al nivel actual. Con **N victorias** se sube y el contador vuelve a 0.
+- Terminar Experto completa la campaña.
+- El empate **ni suma ni castiga**, igual que en la racha.
+- El nivel es **de la campaña**: en una ronda no hay selector de dificultad.
+
+### La bolsa, no el dado
+
+El próximo juego sale de una bolsa barajada de la que se saca **sin reponer**;
+al vaciarse se rearma. Así todos pasan una vez antes de que se repita ninguno —
+un sorteo puro repite y se siente injusto. Es el mismo patrón que el Tetris usa
+para sus piezas.
+
+**La bolsa a medio vaciar se guarda con la campaña**: rearmarla al abrir la app
+rompería justamente la promesa que la hace valer la pena.
+
+### Configuración
+
+| Campo               | Rango                                 |     |
+| ------------------- | ------------------------------------- | --- |
+| Victorias por nivel | 1–5, por defecto 2                    |     |
+| Nivel de arranque   | Fácil…Experto                         |     |
+| Conjunto            | Todos · Lógica · Arcade · Elegidos    |     |
+| Al perder           | Nada · Reinicia el tramo · Vidas      |     |
+| Vidas               | 1, 2, 3 o 5 · reponer al subir, sí/no |     |
+
+**El techo son 5 victorias y no 10.** Con cinco niveles, N=5 ya son 25 partidas —
+un par de horas. N=10 serían cincuenta, que no es una campaña sino un segundo
+trabajo, y choca con una app de cinco minutos en el transporte.
+
+**Tres presets** —Tranquila, Clásica, Hardcore— que solo rellenan esos campos.
+No son modos aparte.
+
+### El aviso que hay que dar
+
+**La mitad del estante no se puede perder**: Sudoku, Shikaku, Nonograma, Lights
+Out, Trazo, Tango y Queens no tienen estado de derrota. Con un conjunto solo de
+lógica, cualquier castigo por perder **no hace absolutamente nada**, y la misma
+configuración sería un paseo o un calvario según qué entrara. Por eso el default
+es "nada" y la pantalla lo avisa cuando el castigo elegido queda inerte.
+
+### Logros: un sistema, no un trofeo
+
+Se construye el sistema aunque haya uno solo, porque hacerlo a medida obligaría
+a migrar cuando lleguen los demás.
+
+- **Deducidos** — "100 partidas jugadas", "50 ganadas en Fácil". Salen del
+  historial que ya existe y **no se guardan**: se recalculan, igual que las
+  estadísticas.
+- **De evento** — "completaste una campaña". No está en ningún resultado
+  guardado, así que hay que grabarlo cuando pasa. Es el único por ahora.
+
+**El nivel del logro mide la CONFIGURACIÓN, no qué preset se tocó**: un ajuste a
+mano tan duro como el hardcore se lleva el mismo oro. Se puntúan victorias por
+nivel, castigo, vidas, nivel de arranque y tamaño del conjunto.
+
+Los no ganados se muestran en gris con su condición, no escondidos: un logro
+invisible no motiva a nadie.
+
+### Lo que se guardó
+
+Dos registros nuevos y la base de datos sube a la versión 3: la campaña activa
+(una sola) y los logros ganados. Ganar el mismo logro dos veces **no pisa la
+fecha original** — lo que vale es la primera vez.
+
+---
+
 ## 🎯 Orden mental
 
 ```

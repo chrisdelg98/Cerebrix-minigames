@@ -97,3 +97,62 @@ export interface Backup {
   /** Absent in backups written before preferences existed. */
   preferences: StoredPreference[];
 }
+
+/**
+ * Qué pasa al perder una ronda de campaña.
+ *
+ * `none` es el único que se comporta igual con cualquier conjunto de juegos:
+ * la mitad del estante —Sudoku, Shikaku, Nonograma, Lights Out, Trazo, Tango,
+ * Queens— **no se puede perder**, así que un castigo duro haría que la misma
+ * configuración fuera un paseo o un calvario según qué juegos entraran.
+ */
+export type LossPenalty = 'none' | 'reset' | 'lives';
+
+/**
+ * La campaña en curso. Una sola a la vez.
+ *
+ * Guarda la configuración Y el progreso, incluida **la bolsa a medio vaciar**:
+ * el sorteo saca sin reponer hasta agotar el conjunto, y esa promesa se rompe
+ * si cerrar la app rearma la bolsa.
+ */
+export interface CampaignRecord {
+  schemaVersion: number;
+
+  /* Configuración, fija desde que arranca. */
+  winsPerLevel: number;
+  startLevel: number;
+  /** Ids de juego, en primitivos: /storage no sabe qué es un juego. */
+  pool: string[];
+  onLoss: LossPenalty;
+  /** Vidas configuradas. Solo cuenta con `onLoss: 'lives'`. */
+  lives: number;
+  /** Si las vidas se reponen al subir de nivel. */
+  refillLives: boolean;
+
+  /* Progreso. */
+  level: number;
+  wins: number;
+  livesLeft: number;
+  /** Lo que queda por salir antes de rearmar el conjunto. */
+  bag: string[];
+  /** El juego de la ronda actual. */
+  current: string;
+  startedAt: number;
+}
+
+/**
+ * Un logro ganado.
+ *
+ * Solo se guardan los que **no se pueden deducir del historial**. "100 partidas
+ * jugadas" o "50 ganadas en Fácil" salen de los resultados que ya existen y se
+ * recalculan, igual que las estadísticas; "completaste una campaña" no está en
+ * ningún resultado, así que hay que grabarlo cuando pasa.
+ */
+export interface BadgeRecord {
+  schemaVersion: number;
+  /** Clave en inglés, kebab-case, como los ids de juego. */
+  id: string;
+  earnedAt: number;
+  /** Contexto serializado: con qué configuración se ganó. */
+  detail?: string;
+}

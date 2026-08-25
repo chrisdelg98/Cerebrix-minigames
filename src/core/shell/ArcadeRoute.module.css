@@ -93,4 +93,15 @@
     font-size: var(--fs-reading);
     line-height: var(--lh-body);
   }
+
+  /* Reemplaza al selector de dificultad cuando manda la campaña. */
+  .campaignChip {
+    padding: var(--sp-2) var(--sp-4);
+    background-color: color-mix(in oklab, var(--c-accent) 14%, transparent);
+    border: var(--bw-base) solid var(--c-accent);
+    border-radius: var(--r-full);
+    color: var(--c-text);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+  }
 }

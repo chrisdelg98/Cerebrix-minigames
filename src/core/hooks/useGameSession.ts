@@ -95,7 +95,19 @@ function roundKey(difficulty: number, seed: string | undefined, mode: string | u
   return `${String(difficulty)}:${mode ?? 'default'}:${seed ?? 'first'}`;
 }
 
-export function useGameSession(load: GameLoader, initialDifficulty: Difficulty): Session {
+/**
+ * `locked` es el modo campaña: el nivel lo manda la campaña y no el jugador.
+ *
+ * Además se saltea la partida guardada y la dificultad recordada. Las dos son
+ * memoria del juego suelto, y en una campaña estorban: reanudar un tablero de
+ * otra sesión, o arrancar en el nivel que quedó de la última vez, contradice
+ * lo que la campaña acaba de decidir.
+ */
+export function useGameSession(
+  load: GameLoader,
+  initialDifficulty: Difficulty,
+  locked = false
+): Session {
   const storage = useStorage();
 
   const [module, setModule] = useState<AnyGameModule | null>(null);
@@ -185,7 +197,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     let cancelled = false;
 
     const begin = async (): Promise<void> => {
-      if (!bootedRef.current) {
+      if (!bootedRef.current && !locked) {
         bootedRef.current = true;
 
         const saved = await storage.loadSession(module.meta.id);
@@ -240,7 +252,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
     return () => {
       cancelled = true;
     };
-  }, [module, difficulty, mode, seed, round, storage]);
+  }, [module, difficulty, mode, seed, round, storage, locked]);
 
   const state = history.length > 0 ? history[history.length - 1] : undefined;
   const ready = module !== null && history.length > 0;
@@ -404,7 +416,8 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
 
   const requestDifficulty = useCallback(
     (next: Difficulty) => {
-      if (next === difficulty) return;
+      // En campaña el nivel no es del jugador.
+      if (locked || next === difficulty) return;
 
       // Only ask when there is something to lose. A board nobody has touched
       // costs nothing to rebuild, and a confirmation nobody needs is friction.
@@ -414,7 +427,7 @@ export function useGameSession(load: GameLoader, initialDifficulty: Difficulty):
       }
       applyDifficulty(next);
     },
-    [difficulty, history.length, playing, applyDifficulty]
+    [difficulty, history.length, playing, applyDifficulty, locked]
   );
 
   const confirmDifficulty = useCallback(() => {

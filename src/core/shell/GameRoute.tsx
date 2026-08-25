@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import { Button } from '@design/components/Button';
 import { Confetti } from '@design/components/Confetti';
@@ -19,6 +19,7 @@ import {
 
 import { type Difficulty } from '../contract';
 import { DIFFICULTY_LABELS, defaultDifficultyFor, difficultyOptions } from '../difficulty';
+import { useCampaign } from '../hooks/useCampaign';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { useGameSession } from '../hooks/useGameSession';
 import { findEntry, type TurnEntry } from '../registry';
@@ -50,7 +51,20 @@ export function GameRoute() {
 }
 
 function GameSession({ entry }: { entry: TurnEntry }) {
-  const session = useGameSession(entry.load, defaultDifficultyFor(entry.preview.difficulties));
+  /*
+   * La campaña manda sobre esta partida solo si el juego que toca es este.
+   * Entrando por la portada a otro juego, la campaña ni se entera — jugar
+   * suelto sigue existiendo tal cual.
+   */
+  const { campaign, report } = useCampaign();
+  const navigate = useNavigate();
+  const inCampaign = campaign !== null && campaign.current === entry.id;
+
+  const session = useGameSession(
+    entry.load,
+    inCampaign ? campaign.level : defaultDifficultyFor(entry.preview.difficulties),
+    inCampaign
+  );
 
   useDocumentMeta(
     entry.preview.name,
@@ -76,6 +90,31 @@ function GameSession({ entry }: { entry: TurnEntry }) {
   const scored = modes?.find((one) => one.id === session.mode)?.ranked ?? true;
 
   const playing = session.status.kind === 'playing';
+
+  /*
+   * La ronda se reporta UNA sola vez, cuando termina.
+   *
+   * Va contra el id de la ronda y no contra un booleano porque el shell
+   * remonta el tablero al reintentar, y sin esa guarda una misma victoria
+   * contaría dos veces.
+   */
+  const reportedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!inCampaign || playing || session.phase !== 'ready' || !session.started) return;
+    if (reportedRef.current === session.roundId) return;
+    reportedRef.current = session.roundId;
+
+    const kind = session.status.kind;
+    void report(kind === 'won' ? 'won' : kind === 'draw' ? 'draw' : 'lost');
+  }, [
+    inCampaign,
+    playing,
+    session.phase,
+    session.started,
+    session.roundId,
+    session.status.kind,
+    report,
+  ]);
   const outcomeOpen = !playing && session.phase === 'ready' && dismissedRound !== session.roundId;
 
   const changeDifficulty = (next: Difficulty) => {
@@ -106,7 +145,14 @@ function GameSession({ entry }: { entry: TurnEntry }) {
     </>
   );
 
-  const subheader = scored ? (
+  /* En campaña el nivel lo manda la campaña, así que el selector se va y en su
+     lugar se ve en qué punto vas. */
+  const subheader = inCampaign ? (
+    <span className={s.campaignChip}>
+      Campaña · {DIFFICULTY_LABELS[session.difficulty]} · {campaign.wins} de{' '}
+      {campaign.config.winsPerLevel}
+    </span>
+  ) : scored ? (
     <DifficultyPicker<Difficulty>
       value={session.difficulty}
       options={difficultyOptions(session.module?.meta.difficulties ?? entry.preview.difficulties)}
@@ -399,6 +445,11 @@ function GameSession({ entry }: { entry: TurnEntry }) {
         /* Sin puntaje, el nivel no significa nada: dos personas jugando entre
            sí no jugaron "en Difícil", jugaron entre ellas. */
         difficulty={scored ? session.difficulty : undefined}
+        next={
+          inCampaign
+            ? { label: 'Seguir la campaña', onNext: () => void navigate('/campana') }
+            : undefined
+        }
         onRestart={session.restart}
       />
     </AppShell>

@@ -135,4 +135,83 @@
     padding-block-start: var(--sp-4);
     border-block-start: var(--bw-hair) solid var(--c-border-hairline);
   }
+
+  /*
+   * La campaña, con el mismo peso visual que una tarjeta de juego pero a lo
+   * ancho: es una forma de jugar, no un juego más del estante.
+   */
+  .campaign {
+    position: relative;
+    display: flex;
+    gap: var(--sp-3);
+    align-items: center;
+    justify-content: space-between;
+
+    /* El mismo respiro que las estadísticas de arriba: sin esto quedaba pegada
+       a los estantes y parecía parte del filtro. */
+    margin-block-end: var(--sp-5);
+    padding: var(--sp-4);
+    overflow: hidden;
+    background-color: var(--c-surface-raised);
+    border: var(--bw-base) solid var(--c-border-strong);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-md);
+    color: var(--c-text);
+    text-decoration: none;
+    transition-property: transform, box-shadow;
+    transition-duration: var(--d-fast);
+    transition-timing-function: var(--e-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .campaign:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--sh-pop);
+    }
+  }
+
+  /*
+   * El patrón vive detrás y se desvanece hacia la izquierda, que es donde está
+   * el texto. La máscara hace el trabajo: nada de un degradado encima que
+   * habría que recolorear en cada tema.
+   */
+  .campaignArt {
+    position: absolute;
+
+    /* Holgura para que la barra más alta no la corte el radio de la esquina:
+       cortada parece un desborde, no una decisión. */
+    inset-block: var(--sp-3);
+    inset-inline-end: 0;
+    display: grid;
+    place-items: center end;
+    inline-size: min(60%, 14rem);
+    padding-inline-end: var(--sp-4);
+    color: var(--c-accent);
+    opacity: 0.16;
+    mask-image: linear-gradient(to left, rgb(0 0 0) 35%, transparent);
+    pointer-events: none;
+  }
+
+  .campaignArt svg {
+    inline-size: 100%;
+    block-size: auto;
+  }
+
+  .campaignBody {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+  }
+
+  .campaignName {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-black);
+  }
+
+  .campaignHint {
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
 }

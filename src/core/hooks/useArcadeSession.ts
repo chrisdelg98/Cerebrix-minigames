@@ -56,7 +56,12 @@ function toError(cause: unknown): Error {
   return cause instanceof Error ? cause : new Error(String(cause));
 }
 
-export function useArcadeSession(load: ArcadeLoader, initialDifficulty: Difficulty): ArcadeSession {
+/** `locked` es el modo campaña: el nivel lo manda ella, no la última elección. */
+export function useArcadeSession(
+  load: ArcadeLoader,
+  initialDifficulty: Difficulty,
+  locked = false
+): ArcadeSession {
   const storage = useStorage();
 
   const [module, setModule] = useState<AnyArcadeModule | null>(null);
@@ -122,11 +127,12 @@ export function useArcadeSession(load: ArcadeLoader, initialDifficulty: Difficul
     if (!module || bootedRef.current) return;
     bootedRef.current = true;
 
+    if (locked) return;
     void storage.loadDifficulty(module.meta.id).then((saved) => {
       const preferred = asDifficulty(saved, module.meta.difficulties);
       if (preferred !== null) setDifficulty(preferred);
     });
-  }, [module, storage]);
+  }, [module, storage, locked]);
 
   /*
    * El tablero de la ronda, creado durante el renderizado.

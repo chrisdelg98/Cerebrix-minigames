@@ -93,10 +93,18 @@
     flex-shrink: 0;
   }
 
-  /* Truncates instead of wrapping: a button that grows a second line changes
-     the height of whatever row it sits in. */
+  /*
+   * Truncates instead of wrapping: a button that grows a second line changes
+   * the height of whatever row it sits in.
+   *
+   * Y con su propia altura de línea, que es lo que salva a las letras con rabo.
+   * El botón usa `line-height: 1` para centrar, así que la caja de línea mide
+   * exactamente el tamaño de fuente y la g, la j y la p se salen por abajo —
+   * donde el `overflow: hidden` de acá las cortaba. Se veía en "Jugar".
+   */
   .label {
     overflow: hidden;
+    line-height: var(--lh-snug);
     text-overflow: ellipsis;
     white-space: nowrap;
   }

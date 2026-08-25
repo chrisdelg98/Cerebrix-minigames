@@ -22,6 +22,9 @@ import { useGlobalStats, useSavedSessions } from '../hooks/useStoredData';
 import { REGISTRY, type RegistryEntry } from '../registry';
 import { DataControls } from './DataControls';
 import { GameCard } from './GameCard';
+import { DIFFICULTY_LABELS } from '../difficulty';
+import { useCampaign } from '../hooks/useCampaign';
+import { Badge } from '@design/components/Badge';
 import { GlobalStatsPanel } from './GlobalStatsPanel';
 
 import s from './Home.module.css';
@@ -80,6 +83,7 @@ function rememberCategory(value: CategoryFilter): void {
 export function Home({ entries = REGISTRY }: HomeProps) {
   // Lo oculto sigue teniendo ruta y registro; solo no se ofrece acá.
   const visible = entries.filter((entry) => entry.hidden !== true);
+  const { campaign } = useCampaign();
 
   useDocumentMeta(
     'Cerebrix',
@@ -144,6 +148,38 @@ export function Home({ entries = REGISTRY }: HomeProps) {
           <GlobalStatsPanel stats={stats} collapse />
         </Link>
       )}
+
+      {/*
+        La campaña, arriba de los juegos.
+        Si hay una a medias lo dice y ofrece seguirla: una campaña abandonada
+        por olvido no es una decisión de nadie.
+      */}
+      <Link to="/campana" className={s.campaign}>
+        {/*
+          Cinco barras que suben: son los cinco niveles de la escala, así que el
+          fondo dice lo que la campaña hace en vez de decorar. Se difumina hacia
+          la izquierda para no pelearse con el texto.
+        */}
+        <span className={s.campaignArt} aria-hidden="true">
+          <svg viewBox="0 0 132 56" fill="currentColor" focusable="false">
+            <rect x="0" y="40" width="20" height="16" rx="4" opacity="0.5" />
+            <rect x="28" y="32" width="20" height="24" rx="4" opacity="0.62" />
+            <rect x="56" y="22" width="20" height="34" rx="4" opacity="0.74" />
+            <rect x="84" y="12" width="20" height="44" rx="4" opacity="0.86" />
+            <rect x="112" y="0" width="20" height="56" rx="4" />
+          </svg>
+        </span>
+
+        <span className={s.campaignBody}>
+          <span className={s.campaignName}>Campaña</span>
+          <span className={s.campaignHint}>
+            {campaign === null
+              ? 'Subí de nivel ganando partidas, en un juego o saltando entre todos.'
+              : `En curso · ${DIFFICULTY_LABELS[campaign.level]} · ${String(campaign.wins)} de ${String(campaign.config.winsPerLevel)}`}
+          </span>
+        </span>
+        {campaign !== null && <Badge tone="success">Seguir</Badge>}
+      </Link>
 
       {/* Con un solo estante el filtro no filtra nada: es ruido con aspecto de control. */}
       {options.length > 2 && (

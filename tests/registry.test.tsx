@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { REGISTRY, type RegistryEntry } from '@core/registry';
 import { Home } from '@core/shell/Home';
+import { CampaignProvider } from '@core/shell/CampaignProvider';
 import { StorageContext } from '@core/storageContext';
 import { ToastProvider } from '@design/components/Toast';
 import { LocalStorageDriver } from '@storage/localStorageDriver';
@@ -61,7 +62,11 @@ function Shell({ children }: { children: ReactNode }) {
   return (
     <StorageContext.Provider value={new LocalStorageDriver()}>
       <ToastProvider>
-        <MemoryRouter>{children}</MemoryRouter>
+        {/* La portada muestra el estado de la campaña, así que necesita su
+            proveedor — igual que necesita el almacenamiento. */}
+        <CampaignProvider>
+          <MemoryRouter>{children}</MemoryRouter>
+        </CampaignProvider>
       </ToastProvider>
     </StorageContext.Provider>
   );

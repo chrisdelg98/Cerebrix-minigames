@@ -9,8 +9,10 @@ import { Modal } from '@design/components/Modal';
 import { Skeleton } from '@design/components/Skeleton';
 import { ArrowLeftIcon } from '@design/sprites/SettingsIcons';
 import { Trophy } from '@design/sprites/Trophy';
+import { type BadgeRecord } from '@storage/types';
 import { computeGlobalStats, computeStats, type GameResult } from '@storage/index';
 
+import { BADGES, TIER_LABELS, type BadgeTier } from '../badges';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 import { type Difficulty } from '../contract';
@@ -120,6 +122,8 @@ export function History() {
           <section className={s.totals} aria-label="Tus estadísticas">
             <GlobalStatsPanel stats={computeGlobalStats(results)} />
           </section>
+
+          <Badges />
 
           <Progress results={results} />
 
@@ -299,4 +303,68 @@ function formatWhen(at: number): string {
   if (minutes < 24 * 60) return `hace ${String(Math.floor(minutes / 60))} h`;
 
   return new Date(at).toLocaleDateString('es', { day: 'numeric', month: 'short' });
+}
+
+/**
+ * Los logros, ganados y por ganar.
+ *
+ * Los que faltan se muestran en gris con su condición, no escondidos: un logro
+ * invisible no motiva a nadie a ir por él.
+ *
+ * Hoy hay uno solo —completar una campaña— y es de los que hay que grabar
+ * porque el historial no lo dice. Cuando lleguen los deducibles ("100 partidas
+ * jugadas", "50 ganadas en Fácil") van a salir de las estadísticas y a mostrarse
+ * acá mismo, sin que el jugador note que se calculan distinto. Ver `badges.ts`.
+ */
+function Badges() {
+  const storage = useStorage();
+  const [earned, setEarned] = useState<BadgeRecord[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void storage.listBadges().then((all) => {
+      if (!cancelled) setEarned(all);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [storage]);
+
+  return (
+    <section className={s.badges} aria-label="Tus logros">
+      <h2 className={s.sectionTitle}>Logros</h2>
+      <ul className={s.badgeList}>
+        {BADGES.map((badge) => {
+          const won = earned.find((one) => one.id === badge.id);
+          const tier = tierOf(won);
+
+          return (
+            <li key={badge.id} className={s.badge} data-won={won !== undefined}>
+              <span className={s.badgeName}>
+                {badge.name}
+                {tier !== null && (
+                  <Badge tone={tier === 'gold' ? 'gold' : 'accent'}>{TIER_LABELS[tier]}</Badge>
+                )}
+              </span>
+              <span className={s.badgeHint}>
+                {won === undefined ? badge.requirement : `Ganado ${formatWhen(won.earnedAt)}`}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+/** El nivel viaja en el detalle serializado; un detalle ilegible no rompe nada. */
+function tierOf(record: BadgeRecord | undefined): BadgeTier | null {
+  if (record?.detail === undefined) return null;
+  try {
+    const parsed = JSON.parse(record.detail) as { tier?: string };
+    const tier = parsed.tier;
+    return tier === 'gold' || tier === 'silver' || tier === 'bronze' ? tier : null;
+  } catch {
+    return null;
+  }
 }

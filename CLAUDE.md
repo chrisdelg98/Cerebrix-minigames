@@ -97,11 +97,12 @@ inicial ≤ 120 kB gzip, cada juego ≤ 60 kB gzip aparte.
 
 ## Estado actual
 
-Fases 0 a 9 terminadas: andamiaje, contrato + shell, sistema de diseño,
+Fases 0 a 12 terminadas: andamiaje, contrato + shell, sistema de diseño,
 persistencia, dificultad unificada, Sudoku, Buscaminas, PWA offline e instalable,
 Nonograma, Tres en línea —el primero de dos personas, que trajo `draw`, ganador
 con nombre y `modes` al contrato— Conecta 4, que entró sin tocar `/core` y con
-eso dio por buena esa parte del contrato, y Shikaku. El detalle, los criterios de aceptación y lo que quedó
+eso dio por buena esa parte del contrato, Shikaku, y una **campaña** configurable con logros —toda
+en el shell, sin tocar el contrato—. El detalle, los criterios de aceptación y lo que quedó
 explícitamente pendiente están en [`docs/PLAN.md`](docs/PLAN.md).
 
 `src/games/_dummy` **no se borra** cuando lleguen los juegos reales: es la

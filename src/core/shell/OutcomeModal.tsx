@@ -31,6 +31,11 @@ export interface OutcomeModalProps {
    */
   difficulty?: Difficulty | undefined;
   onRestart: () => void;
+  /**
+   * En campaña la partida no se repite: se sigue. El shell pasa qué viene y a
+   * dónde ir, y el modal cambia el botón sin saber qué es una campaña.
+   */
+  next?: { label: string; onNext: () => void } | undefined;
 }
 
 /**
@@ -56,6 +61,7 @@ export function OutcomeModal({
   winner,
   difficulty,
   onRestart,
+  next,
 }: OutcomeModalProps) {
   const navigate = useNavigate();
   const won = outcome === 'won';
@@ -78,9 +84,15 @@ export function OutcomeModal({
           >
             Inicio
           </Button>
-          <Button variant="primary" onClick={onRestart}>
-            Jugar otra vez
-          </Button>
+          {next === undefined ? (
+            <Button variant="primary" onClick={onRestart}>
+              Jugar otra vez
+            </Button>
+          ) : (
+            <Button variant="primary" onClick={next.onNext}>
+              {next.label}
+            </Button>
+          )}
         </>
       }
     >

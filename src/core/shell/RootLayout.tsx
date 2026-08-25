@@ -6,6 +6,8 @@ import { ToastProvider } from '@design/components/Toast';
 
 import { useForgetUnknownGames } from '../hooks/useForgetUnknownGames';
 
+import { CampaignProvider } from './CampaignProvider';
+
 import s from './RootLayout.module.css';
 
 /**
@@ -19,13 +21,17 @@ export function RootLayout() {
 
   return (
     <ToastProvider>
-      <a className="skip-link" href="#main">
-        Saltar al contenido
-      </a>
+      {/* La campaña envuelve todo porque sobrevive a moverse entre rutas: el
+          jugador salta de un juego a otro y el progreso lo sigue. */}
+      <CampaignProvider>
+        <a className="skip-link" href="#main">
+          Saltar al contenido
+        </a>
 
-      <Suspense fallback={<RouteFallback />}>
-        <Outlet />
-      </Suspense>
+        <Suspense fallback={<RouteFallback />}>
+          <Outlet />
+        </Suspense>
+      </CampaignProvider>
     </ToastProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@design/components/Button';
 import { Confetti } from '@design/components/Confetti';
@@ -9,15 +9,16 @@ import { Timer } from '@design/components/Timer';
 import { ArrowLeftIcon, PlayIcon, PlusIcon } from '@design/sprites/SettingsIcons';
 
 import { type Difficulty } from '../contract';
-import { defaultDifficultyFor, difficultyOptions } from '../difficulty';
+import { defaultDifficultyFor, difficultyOptions, DIFFICULTY_LABELS } from '../difficulty';
 import { useArcadeSession } from '../hooks/useArcadeSession';
+import { useCampaign } from '../hooks/useCampaign';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import { findEntry, type ClockEntry } from '../registry';
 import { AppShell } from './AppShell';
 import { Examples } from './Examples';
 import { OutcomeModal } from './OutcomeModal';
 import { NotFound } from './NotFound';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import s from './ArcadeRoute.module.css';
 
@@ -39,7 +40,17 @@ export function ArcadeRoute() {
 }
 
 function ArcadeSession({ entry }: { entry: ClockEntry }) {
-  const session = useArcadeSession(entry.load, defaultDifficultyFor(entry.preview.difficulties));
+  /* Igual que en los juegos por turnos: la campaña manda solo si el juego que
+     toca es este. Ver GameRoute. */
+  const { campaign, report } = useCampaign();
+  const navigate = useNavigate();
+  const inCampaign = campaign !== null && campaign.current === entry.id;
+
+  const session = useArcadeSession(
+    entry.load,
+    inCampaign ? campaign.level : defaultDifficultyFor(entry.preview.difficulties),
+    inCampaign
+  );
 
   useDocumentMeta(
     entry.preview.name,
@@ -51,6 +62,16 @@ function ArcadeSession({ entry }: { entry: ClockEntry }) {
   const won = session.status.kind === 'won';
   const over = !playing && session.phase === 'ready' && session.started;
   const outcomeOpen = over && dismissed !== session.roundId;
+
+  /* La ronda se reporta una sola vez, contra el id de la ronda: el shell
+     remonta el tablero al reintentar y sin esa guarda contaría dos veces. */
+  const reportedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!inCampaign || !over) return;
+    if (reportedRef.current === session.roundId) return;
+    reportedRef.current = session.roundId;
+    void report(won ? 'won' : 'lost');
+  }, [inCampaign, over, won, session.roundId, report]);
 
   const header = (
     <>
@@ -70,7 +91,13 @@ function ArcadeSession({ entry }: { entry: ClockEntry }) {
     </>
   );
 
-  const subheader = (
+  /* En campaña el nivel no se elige: se muestra en qué punto vas. */
+  const subheader = inCampaign ? (
+    <span className={s.campaignChip}>
+      Campaña · {DIFFICULTY_LABELS[session.difficulty]} · {campaign.wins} de{' '}
+      {campaign.config.winsPerLevel}
+    </span>
+  ) : (
     <DifficultyPicker<Difficulty>
       value={session.difficulty}
       options={difficultyOptions(session.module?.meta.difficulties ?? entry.preview.difficulties)}
@@ -188,6 +215,11 @@ function ArcadeSession({ entry }: { entry: ClockEntry }) {
         reason={session.status.kind === 'lost' ? session.status.reason : undefined}
         difficulty={session.difficulty}
         onRestart={session.restart}
+        next={
+          inCampaign
+            ? { label: 'Seguir la campaña', onNext: () => void navigate('/campana') }
+            : undefined
+        }
       />
     </AppShell>
   );

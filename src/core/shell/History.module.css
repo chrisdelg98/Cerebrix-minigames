@@ -212,4 +212,51 @@
     font-size: var(--fs-reading);
     line-height: var(--lh-body);
   }
+
+  .badges {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+
+  .badgeList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--sp-3);
+    list-style: none;
+  }
+
+  /* Los que faltan van apagados pero legibles: un logro invisible no motiva. */
+  .badge {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    padding: var(--sp-3) var(--sp-4);
+    background-color: var(--c-surface);
+    border: var(--bw-base) dashed var(--c-border-hairline);
+    border-radius: var(--r-md);
+    opacity: 0.65;
+  }
+
+  .badge[data-won='true'] {
+    background-color: var(--c-surface-raised);
+    border-style: solid;
+    border-color: var(--c-border-strong);
+    box-shadow: var(--sh-sm);
+    opacity: 1;
+  }
+
+  .badgeName {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    align-items: center;
+    font-weight: var(--fw-black);
+  }
+
+  .badgeHint {
+    color: var(--c-text-muted);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+  }
 }

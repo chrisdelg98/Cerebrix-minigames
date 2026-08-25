@@ -1,5 +1,7 @@
 import {
   type Backup,
+  type BadgeRecord,
+  type CampaignRecord,
   type GameResult,
   type GameStats,
   type GlobalStats,
@@ -49,6 +51,15 @@ export interface StorageDriver {
    * mantenerla a mano y crece con cada cambio.
    */
   retainGames(gameIds: readonly string[]): Promise<string[]>;
+
+  /* La campaña en curso. Una sola: empezar otra pisa la anterior. */
+  saveCampaign(campaign: CampaignRecord): Promise<void>;
+  loadCampaign(): Promise<CampaignRecord | null>;
+  clearCampaign(): Promise<void>;
+
+  /** Grabar un logro. Volver a ganar el mismo NO pisa la fecha original. */
+  awardBadge(badge: BadgeRecord): Promise<void>;
+  listBadges(): Promise<BadgeRecord[]>;
 
   /** Wipes everything: sessions, results and preferences. No way back. */
   clearAll(): Promise<void>;
